@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: d38dc34eb80451d468596e8e1545723a
+guid: 8ad3f63b82a6d9e47864c8d209b2cffd
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 3918035133236867022
-    second: itwt_04_ps_0
+      213: 251153147248194034
+    second: Black Dome In-Game Assets_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,7 +113,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: itwt_04_ps_0
+      name: Black Dome In-Game Assets_0
       rect:
         serializedVersion: 2
         x: 0
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: ecf651ee138af5630800000000000000
-      internalID: 3918035133236867022
+      spriteID: 2f133fde4764c7300800000000000000
+      internalID: 251153147248194034
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      itwt_04_ps_0: 3918035133236867022
+      Black Dome In-Game Assets_0: 251153147248194034
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

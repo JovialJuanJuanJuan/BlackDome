@@ -1457,7 +1457,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1065850823}
-  - component: {fileID: 1065850824}
   - component: {fileID: 1065850825}
   m_Layer: 0
   m_Name: SceneControl
@@ -1481,33 +1480,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1065850824
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1065850821}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 015a98783e8408a4695b182ae1d6b922, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Scene04Event
-  fadeScreenIn: {fileID: 27370943}
-  textBox: {fileID: 667647221}
-  Picture1: {fileID: 528591484}
-  Picture2: {fileID: 1158079769}
-  Picture3: {fileID: 0}
-  Picture4: {fileID: 0}
-  speakerName: 
-  textToSpeak: 
-  currentTextLength: 0
-  textLength: 0
-  mainTextObject: {fileID: 1131499545}
-  nextButton: {fileID: 1303874373}
-  eventPos: 0
-  charName: {fileID: 252604209}
-  fadeOut: {fileID: 1535045723}
 --- !u!114 &1065850825
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1520,28 +1492,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf333c30fb7bd8242a28990a0e041a06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IntoTheWestTube02
-  charNeutral: {fileID: 0}
-  charSurprised: {fileID: 0}
-  charHappy: {fileID: 0}
-  charEmbarrassed: {fileID: 0}
-  charConfused: {fileID: 0}
-  charSad: {fileID: 0}
-  charExcited: {fileID: 0}
-  fadeScreenIn: {fileID: 0}
-  textBox: {fileID: 0}
+  charNeutral: {fileID: 1413493139}
+  charSurprised: {fileID: 640619712}
+  charHappy: {fileID: 2126314756}
+  charEmbarrassed: {fileID: 169323781}
+  charConfused: {fileID: 1475773548}
+  charSad: {fileID: 1807709757}
+  charExcited: {fileID: 1567452979}
+  fadeScreenIn: {fileID: 27370943}
+  textBox: {fileID: 667647221}
   textToSpeak: 
   currentTextLength: 0
   textLength: 0
-  mainTextObject: {fileID: 0}
-  nextButton: {fileID: 0}
+  mainTextObject: {fileID: 1131499545}
+  nextButton: {fileID: 1303874373}
   eventPos: 0
-  charName: {fileID: 0}
-  fadeOut: {fileID: 0}
-  Picture1: {fileID: 0}
-  Picture2: {fileID: 0}
-  ChoiceButton1: {fileID: 0}
-  ChoiceButton2: {fileID: 0}
-  ChoiceButton3: {fileID: 0}
+  charName: {fileID: 252604209}
+  fadeOut: {fileID: 1535045723}
+  Picture1: {fileID: 528591484}
+  Picture2: {fileID: 1158079769}
 --- !u!1 &1131499545
 GameObject:
   m_ObjectHideFlags: 0
@@ -1673,7 +1642,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: d38dc34eb80451d468596e8e1545723a, type: 3}
+  m_Texture: {fileID: 2800000, guid: 8ad3f63b82a6d9e47864c8d209b2cffd, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -1772,8 +1741,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1065850824}
-        m_TargetAssemblyTypeName: Scene04Event, Assembly-CSharp
+      - m_Target: {fileID: 1065850825}
+        m_TargetAssemblyTypeName: IntoTheWestTube02, Assembly-CSharp
         m_MethodName: NextButton
         m_Mode: 1
         m_Arguments:
