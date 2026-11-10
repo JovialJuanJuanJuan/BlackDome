@@ -41,6 +41,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Chapter1/IntoTheWestTube02.unity
     guid: d58efa4288ea1dd44813fa4d56329735
+  - enabled: 1
+    path: Assets/Scenes/Chapter1/TheHiddenColony01.unity
+    guid: 1c437d5fe91b4ff44a5a9035a51a559b
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0
