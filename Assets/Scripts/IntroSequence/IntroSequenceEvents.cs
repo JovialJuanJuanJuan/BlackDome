@@ -163,15 +163,19 @@ public class IntroSequenceEvents : MonoBehaviour
     IEnumerator FadeOutAndLoadNext()
     {
         nextButton.SetActive(false);
-        textBox.SetActive(false);
-        mainTextObject.SetActive(false);
 
         if (fadeOut != null)
         {
             fadeOut.SetActive(true);
         }
 
-        yield return new WaitForSeconds(6f);
+        // Let the dialogue box play its own exit while the screen begins to darken.
+        yield return new WaitForSeconds(0.35f);
+
+        textBox.SetActive(false);
+        mainTextObject.SetActive(false);
+
+        yield return new WaitForSeconds(5.65f);
         SceneManager.LoadScene(4);
     }
 }
