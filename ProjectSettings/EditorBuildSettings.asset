@@ -44,6 +44,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Chapter1/TheHiddenColony01.unity
     guid: 1c437d5fe91b4ff44a5a9035a51a559b
+  - enabled: 1
+    path: Assets/Scenes/Chapter1/TheHiddenColony02.unity
+    guid: 6222b7e9a36276f48b0df491248e07b0
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0
