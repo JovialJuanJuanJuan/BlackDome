@@ -5,10 +5,6 @@ using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
 {
-    [SerializeField] GameObject menuPic1;
-    [SerializeField] GameObject menuPic2;
-    [SerializeField] int picNum = 1;
-    [SerializeField] bool isAnimating = false;
     [SerializeField] GameObject fadeOut;
     [SerializeField] AudioSource buttonClick;
     [SerializeField] int sceneToLoad;
@@ -51,51 +47,22 @@ public class MainMenu : MonoBehaviour
         Application.Quit();
     }
 
-    void Update()
-    {
-        if (isAnimating == false)
-        {
-            isAnimating = true;
-            StartCoroutine(RandomPic());
-        }
-    }
-
-    IEnumerator RandomPic()
-    {
-        yield return new WaitForSeconds(1);
-        picNum = Random.Range(1, 3);  // Changed from 1,4 to 1,3
-        if (picNum == 1)
-        {
-            menuPic1.SetActive(true);
-            menuPic2.SetActive(false);
-        }
-        else if (picNum == 2)  // Changed from if (picNum == 2) block
-        {
-            menuPic1.SetActive(false);
-            menuPic2.SetActive(true);
-        }
-        yield return new WaitForSeconds(7);
-        menuPic1.SetActive(false);
-        menuPic2.SetActive(false);
-        isAnimating = false;
-    }
-
     IEnumerator TransferToIntroSeq()
     {
         yield return new WaitForSeconds(3);
-        SceneManager.LoadScene(3);
+        yield return SceneManager.LoadSceneAsync(3);
     }
 
     IEnumerator LoadScene()
     {
         yield return new WaitForSeconds(3);
-        SceneManager.LoadScene(sceneToLoad);
+        yield return SceneManager.LoadSceneAsync(sceneToLoad);
     }
 
     IEnumerator TransferToCredits()
     {
         yield return new WaitForSeconds(3);
-        SceneManager.LoadScene(2);
+        yield return SceneManager.LoadSceneAsync(2);
     }
 
     IEnumerator StopFade()

@@ -178,6 +178,6 @@ public class KodaLateMidnight : MonoBehaviour
         }
 
         yield return new WaitForSeconds(3f);
-        SceneManager.LoadScene(24);
+        yield return SceneManager.LoadSceneAsync(24);
     }
 }

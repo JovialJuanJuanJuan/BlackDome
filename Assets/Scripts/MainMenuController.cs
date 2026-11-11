@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -7,11 +8,13 @@ using UnityEngine.UI;
 
 /// <summary>
 /// Drop this component on an empty GameObject (e.g. "MainMenu") and drag your four
-/// menu buttons into the slots below. It gives each of them two things and nothing else:
+/// menu buttons into the slots below. It gives them the following and nothing else:
 ///
 ///  1. A subtle hover animation: an ease-out scale pop plus a gentle brightness lift on
 ///     pointer enter, smoothly wound back on pointer exit.
 ///  2. One shared hover sound, played through an AudioSource it adds to itself.
+///  3. An optional description line per button (e.g. "StartGame_Desc"): it is switched on and
+///     faded in while its button is hovered, then faded back out and switched off.
 ///
 /// Click handling is left entirely to your own Button.onClick wiring.
 /// </summary>
@@ -24,6 +27,15 @@ public class MainMenuController : MonoBehaviour
     [SerializeField] private Button loadButton;
     [SerializeField] private Button creditsButton;
     [SerializeField] private Button quitButton;
+
+    [Header("Hover Descriptions")]
+    [Tooltip("Text object revealed while the matching button is hovered. Any slot can be left empty.")]
+    [SerializeField] private TMP_Text startDescription;
+    [SerializeField] private TMP_Text loadDescription;
+    [SerializeField] private TMP_Text creditsDescription;
+    [SerializeField] private TMP_Text quitDescription;
+    [Tooltip("Seconds a description takes to fade in on hover and back out when the pointer leaves.")]
+    [SerializeField, Range(0.05f, 1f)] private float descriptionFadeTime = 0.3f;
 
     [Header("Hover Animation")]
     [Tooltip("Scale the button grows to while hovered. Keep it close to 1 for a subtle feel.")]
@@ -53,7 +65,18 @@ public class MainMenuController : MonoBehaviour
         public Coroutine animation;
     }
 
+    /// <summary>Per-description state, so a fade can be interrupted mid-way without popping.</summary>
+    private sealed class DescriptionVisual
+    {
+        public TMP_Text text;
+        public GameObject root;
+        public Color baseColor;
+        public Coroutine fade;
+    }
+
     private readonly List<ButtonVisual> _visuals = new List<ButtonVisual>();
+    private readonly Dictionary<Button, DescriptionVisual> _descriptions =
+        new Dictionary<Button, DescriptionVisual>();
     private AudioSource _audio;
     private float _lastHoverSoundTime = float.NegativeInfinity;
 
@@ -74,6 +97,11 @@ public class MainMenuController : MonoBehaviour
         CacheButton(loadButton);
         CacheButton(creditsButton);
         CacheButton(quitButton);
+
+        CacheDescription(startButton, startDescription);
+        CacheDescription(loadButton, loadDescription);
+        CacheDescription(creditsButton, creditsDescription);
+        CacheDescription(quitButton, quitDescription);
     }
 
     private void OnDisable()
@@ -105,6 +133,36 @@ public class MainMenuController : MonoBehaviour
         _visuals.Add(visual);
         RegisterHoverEvents(visual);
         ApplyVisual(visual);
+    }
+
+    private void CacheDescription(Button button, TMP_Text text)
+    {
+        if (button == null || text == null || _descriptions.ContainsKey(button))
+        {
+            return;
+        }
+
+        // The descriptions sit over the menu, so they must never swallow pointer events.
+        text.raycastTarget = false;
+
+        // Alpha is driven here instead of by an Animator, so the fade in and the fade out
+        // can share one curve and be interrupted at any point without fighting the clip.
+        Animator animator = text.GetComponent<Animator>();
+        if (animator != null)
+        {
+            animator.enabled = false;
+        }
+
+        var description = new DescriptionVisual
+        {
+            text = text,
+            root = text.gameObject,
+            baseColor = text.color,
+        };
+
+        _descriptions.Add(button, description);
+        SetDescriptionAlpha(description, 0f);
+        description.root.SetActive(false);
     }
 
     /// <summary>
@@ -149,6 +207,12 @@ public class MainMenuController : MonoBehaviour
             PlayHoverSound();
         }
 
+        DescriptionVisual description;
+        if (_descriptions.TryGetValue(visual.button, out description))
+        {
+            ShowDescription(description, isHovered);
+        }
+
         if (visual.animation != null)
         {
             StopCoroutine(visual.animation);
@@ -182,6 +246,71 @@ public class MainMenuController : MonoBehaviour
         visual.hoverAmount = target;
         visual.animation = null;
         ApplyVisual(visual);
+    }
+
+    // ---------------------------------------------------------------- descriptions
+
+    private void ShowDescription(DescriptionVisual description, bool visible)
+    {
+        if (description.fade != null)
+        {
+            StopCoroutine(description.fade);
+            description.fade = null;
+        }
+
+        if (description.root == null)
+        {
+            return;
+        }
+
+        if (visible)
+        {
+            // Switch the object on first; it is already transparent, so nothing flashes.
+            description.root.SetActive(true);
+        }
+
+        description.fade = StartCoroutine(FadeDescription(description, visible ? 1f : 0f, visible));
+    }
+
+    private IEnumerator FadeDescription(DescriptionVisual description, float target, bool stayActive)
+    {
+        float duration = Mathf.Max(descriptionFadeTime, 0.0001f);
+        float start = description.baseColor.a > 0f
+            ? description.text.color.a / description.baseColor.a
+            : 1f;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+
+            float t = Mathf.Clamp01(elapsed / duration);
+            float eased = 1f - Mathf.Pow(1f - t, 3f); // same ease-out as the hover pop
+            SetDescriptionAlpha(description, Mathf.LerpUnclamped(start, target, eased));
+            yield return null;
+        }
+
+        SetDescriptionAlpha(description, target);
+        description.fade = null;
+
+        if (!stayActive && description.root != null)
+        {
+            description.root.SetActive(false);
+        }
+    }
+
+    private static void SetDescriptionAlpha(DescriptionVisual description, float alpha01)
+    {
+        // The menu may already be tearing down (scene unload, play mode exit) when a fade or
+        // the disable pass still runs, so the text can be a destroyed object by now.
+        if (description.text == null)
+        {
+            return;
+        }
+
+        Color color = description.baseColor;
+        color.a = description.baseColor.a * Mathf.Clamp01(alpha01);
+        description.text.color = color;
     }
 
     private void ApplyVisual(ButtonVisual visual)
@@ -219,6 +348,23 @@ public class MainMenuController : MonoBehaviour
 
             visual.hoverAmount = 0f;
             ApplyVisual(visual);
+        }
+
+        // Coroutines stop with the component, so hide any description that was mid-fade.
+        foreach (DescriptionVisual description in _descriptions.Values)
+        {
+            if (description.fade != null)
+            {
+                StopCoroutine(description.fade);
+                description.fade = null;
+            }
+
+            SetDescriptionAlpha(description, 0f);
+
+            if (description.root != null)
+            {
+                description.root.SetActive(false);
+            }
         }
     }
 

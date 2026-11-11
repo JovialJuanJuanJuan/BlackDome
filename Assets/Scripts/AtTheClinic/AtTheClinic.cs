@@ -584,7 +584,7 @@ public class Scene02Events : MonoBehaviour
 
         yield return new WaitForSeconds(4f);
 
-        SceneManager.LoadScene(6);
+        yield return SceneManager.LoadSceneAsync(6);
     }
 
 

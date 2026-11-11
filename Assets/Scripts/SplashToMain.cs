@@ -20,6 +20,6 @@ public class SplashToMain : MonoBehaviour
     IEnumerator SplashSequence()
     {
         yield return new WaitForSeconds(6);
-        SceneManager.LoadScene(1);
+        yield return SceneManager.LoadSceneAsync(1);
     }
 }

@@ -574,7 +574,7 @@ W-wait for me, I got small legs!
         fadeOut.SetActive(true);
 
         yield return new WaitForSeconds(4f);
-        SceneManager.LoadScene(19);
+        yield return SceneManager.LoadSceneAsync(19);
     }
 
     public void NextButton()

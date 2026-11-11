@@ -376,6 +376,6 @@ public class Scene07Event : MonoBehaviour
         textBox.SetActive(true);
         fadeOut.SetActive(true);
         yield return new WaitForSeconds(4f);
-        SceneManager.LoadScene(13);
+        yield return SceneManager.LoadSceneAsync(13);
     }
 }

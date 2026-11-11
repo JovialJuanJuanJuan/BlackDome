@@ -263,7 +263,7 @@ public class Scene01Events : MonoBehaviour
 
         yield return new WaitForSeconds(4f);
 
-        SceneManager.LoadScene(5);
+        yield return SceneManager.LoadSceneAsync(5);
     }
 
     public void NextButton()

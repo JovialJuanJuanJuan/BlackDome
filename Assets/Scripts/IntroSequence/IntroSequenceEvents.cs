@@ -176,6 +176,6 @@ public class IntroSequenceEvents : MonoBehaviour
         mainTextObject.SetActive(false);
 
         yield return new WaitForSeconds(5.65f);
-        SceneManager.LoadScene(4);
+        yield return SceneManager.LoadSceneAsync(4);
     }
 }

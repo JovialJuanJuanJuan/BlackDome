@@ -784,7 +784,7 @@ You
         fadeOut.SetActive(true);
 
         yield return new WaitForSeconds(4f);
-        SceneManager.LoadScene(20);
+        yield return SceneManager.LoadSceneAsync(20);
     }
 
     public void NextButton()

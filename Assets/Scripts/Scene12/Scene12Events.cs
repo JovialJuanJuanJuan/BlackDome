@@ -730,7 +730,7 @@ Don't be so late, I still have to get my eight hours of sleep!
         fadeOut.SetActive(true);
 
         yield return new WaitForSeconds(4f);
-        SceneManager.LoadScene(23);
+        yield return SceneManager.LoadSceneAsync(23);
     }
 
     public void NextButton()

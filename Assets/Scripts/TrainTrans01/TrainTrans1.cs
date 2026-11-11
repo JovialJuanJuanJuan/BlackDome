@@ -40,7 +40,7 @@ public class TrainSceneController : MonoBehaviour
 
         yield return new WaitForSeconds(1f);
 
-        SceneManager.LoadScene(18);
+        yield return SceneManager.LoadSceneAsync(18);
     }
 
     private IEnumerator FadeAudio(AudioSource source, float from, float to, float duration)

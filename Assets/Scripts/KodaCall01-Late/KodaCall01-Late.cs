@@ -131,6 +131,6 @@ public class KodaCall01 : MonoBehaviour
         }
 
         yield return new WaitForSeconds(3f);
-        SceneManager.LoadScene(21);
+        yield return SceneManager.LoadSceneAsync(21);
     }
 }

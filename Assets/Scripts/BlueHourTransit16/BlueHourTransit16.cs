@@ -39,6 +39,6 @@ public class EnableClocksAndAudio : MonoBehaviour
         yield return new WaitForSeconds(7f);
 
         // Load scene 7
-        SceneManager.LoadScene(7);
+        yield return SceneManager.LoadSceneAsync(7);
     }
 }

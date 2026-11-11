@@ -195,6 +195,6 @@ public class IntoTheWestTube02 : MonoBehaviour
         textBox.SetActive(true);
         fadeOut.SetActive(true);
         yield return new WaitForSeconds(4f);
-        SceneManager.LoadScene(12);
+        yield return SceneManager.LoadSceneAsync(12);
     }
 }
