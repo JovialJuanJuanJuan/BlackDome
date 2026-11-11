@@ -341,6 +341,14 @@ public class TheHiddenColony02 : MonoBehaviour
                 ShowExpression("embarrassed");
                 textToSpeak = "You see this thing here?";
                 break;
+            case 34:
+                ShowExpression("embarrassed");
+                textToSpeak = "Agnes turned herself sideways, and right off the bat...";
+                break;
+            case 35:
+                ShowExpression("embarrassed");
+                textToSpeak = "...Bay noticed the strange device she was wearing on her ear.";
+                break;
 
         }
 
