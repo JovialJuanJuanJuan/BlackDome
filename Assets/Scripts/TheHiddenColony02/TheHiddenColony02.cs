@@ -15,7 +15,15 @@ public class TheHiddenColony02 : MonoBehaviour
     public GameObject charConfused;
     public GameObject charSad;
     public GameObject charExcited;
-    public GameObject charMasked;
+
+    [Header("Morgana Expressions")]
+    public GameObject morganaNeutral;
+    public GameObject morganaSurprised;
+    public GameObject morganaHappy;
+    public GameObject morganaEmbarrassed;
+    public GameObject morganaConfused;
+    public GameObject morganaSad;
+    public GameObject morganaExcited;
 
     [Header("UI")]
     public GameObject fadeScreenIn;
@@ -41,7 +49,15 @@ public class TheHiddenColony02 : MonoBehaviour
 
     int introIndex = 0;
     bool isTyping = false; // Prevents spamming Next
-    bool expressionsHiddenUntilTunnelEntrance = false;
+    // Agnes does not appear on screen until her first line (case 30),
+    // so character expressions stay hidden until the intro clears this flag
+    bool expressionsHiddenUntilTunnelEntrance = true;
+
+    // Which character the expression objects belong to right now
+    string currentCharacter = "Morgana";
+
+    // Last expression applied, so a character can be brought back after being hidden
+    string lastExpression = "neutral";
 
     // Prevents the player from pressing buttons while a choice dialogue is running
     bool choiceDialoguePlaying = false;
@@ -72,14 +88,27 @@ public class TheHiddenColony02 : MonoBehaviour
 
     void HideAllExpressions()
     {
-        charNeutral.SetActive(false);
-        charSurprised.SetActive(false);
-        charHappy.SetActive(false);
-        charEmbarrassed.SetActive(false);
-        charConfused.SetActive(false);
-        charSad.SetActive(false);
-        charExcited.SetActive(false);
-        charMasked.SetActive(false);
+        SetExpressionObject(charNeutral, false);
+        SetExpressionObject(charSurprised, false);
+        SetExpressionObject(charHappy, false);
+        SetExpressionObject(charEmbarrassed, false);
+        SetExpressionObject(charConfused, false);
+        SetExpressionObject(charSad, false);
+        SetExpressionObject(charExcited, false);
+
+        SetExpressionObject(morganaNeutral, false);
+        SetExpressionObject(morganaSurprised, false);
+        SetExpressionObject(morganaHappy, false);
+        SetExpressionObject(morganaEmbarrassed, false);
+        SetExpressionObject(morganaConfused, false);
+        SetExpressionObject(morganaSad, false);
+        SetExpressionObject(morganaExcited, false);
+    }
+
+    void SetExpressionObject(GameObject target, bool active)
+    {
+        if (target != null)
+            target.SetActive(active);
     }
 
     void ShowExpression(string expression)
@@ -89,18 +118,25 @@ public class TheHiddenColony02 : MonoBehaviour
         if (expressionsHiddenUntilTunnelEntrance)
             return;
 
+        bool morgana = currentCharacter == "Morgana";
+        GameObject target = null;
+
         switch (expression)
         {
-            case "neutral":     charNeutral.SetActive(true); break;
-            case "surprised":   charSurprised.SetActive(true); break;
-            case "happy":       charHappy.SetActive(true); break;
-            case "smile":       charHappy.SetActive(true); break;
-            case "embarrassed": charEmbarrassed.SetActive(true); break;
-            case "confused":    charConfused.SetActive(true); break;
-            case "sad":         charSad.SetActive(true); break;
-            case "excited":     charExcited.SetActive(true); break;
-            case "masked":      charMasked.SetActive(true); break;
+            case "neutral":     target = morgana ? morganaNeutral : charNeutral; break;
+            case "surprised":   target = morgana ? morganaSurprised : charSurprised; break;
+            case "happy":       target = morgana ? morganaHappy : charHappy; break;
+            case "smile":       target = morgana ? morganaHappy : charHappy; break;
+            case "embarrassed": target = morgana ? morganaEmbarrassed : charEmbarrassed; break;
+            case "confused":    target = morgana ? morganaConfused : charConfused; break;
+            case "sad":         target = morgana ? morganaSad : charSad; break;
+            case "excited":     target = morgana ? morganaExcited : charExcited; break;
         }
+
+        if (target != null)
+            lastExpression = expression;
+
+        SetExpressionObject(target, true);
     }
 
     void FadeOutActiveExpressions()
@@ -108,7 +144,9 @@ public class TheHiddenColony02 : MonoBehaviour
         GameObject[] expressions =
         {
             charNeutral, charSurprised, charHappy, charEmbarrassed,
-            charConfused, charSad, charExcited, charMasked
+            charConfused, charSad, charExcited,
+            morganaNeutral, morganaSurprised, morganaHappy, morganaEmbarrassed,
+            morganaConfused, morganaSad, morganaExcited
         };
 
         foreach (GameObject expression in expressions)
@@ -196,6 +234,10 @@ public class TheHiddenColony02 : MonoBehaviour
             ChoiceButton3.SetActive(false);
 
         isTyping = true;
+
+        // Morgana is the one on screen from her introduction (case 15) until Agnes steps in (case 30)
+        currentCharacter = index >= 30 ? "Agnes" : "Morgana";
+
         switch (index)
         {
             case 0:
@@ -212,6 +254,7 @@ public class TheHiddenColony02 : MonoBehaviour
                 break;
             case 3:
                 ShowExpression("smile");
+                StartCoroutine(FadeAndDisable(Picture1));
                 textToSpeak = "[...his eyes widened, something between confusion and astonishment washed over him.]";
                 break;
             case 4:
@@ -220,7 +263,7 @@ public class TheHiddenColony02 : MonoBehaviour
                 break;
             case 5:
                 ShowExpression("happy");
-                textToSpeak = "LET OUS OUTSIDE, THEY'RE HIDING THE WORLD FROM US.";
+                textToSpeak = "LET OUS OUTSIDE, THEY'RE HIDING IT FROM US.";
                 break;
             case 6:
                 ShowExpression("confused");
@@ -232,8 +275,6 @@ public class TheHiddenColony02 : MonoBehaviour
                 break;
             case 8:
                 ShowExpression("smile");
-                expressionsHiddenUntilTunnelEntrance = true;
-                StartCoroutine(FadeAndDisable(Picture1));
                 FadeOutActiveExpressions();
                 textToSpeak = "[When Bay got close enough, the individual turned abruptly from their chair...]";
                 break;
@@ -264,6 +305,8 @@ public class TheHiddenColony02 : MonoBehaviour
                 break;
             case 15:
                 ShowExpression("smile");
+                expressionsHiddenUntilTunnelEntrance = false;
+                StartCoroutine(FadeInObject(morganaHappy));
                 textToSpeak = "Oh, you must be the new Dommie. Bay, ain't it?";
                 break;
             case 16:
@@ -303,10 +346,9 @@ public class TheHiddenColony02 : MonoBehaviour
                 textToSpeak = "...The Hidden Colony.";
                 break;
             case 25:
-                expressionsHiddenUntilTunnelEntrance = false;
+                // Agnes stays hidden until she actually steps in at case 30,
+                // so the character sprite is not shown during Morgana's lines.
                 ShowExpression("smile");
-                StartCoroutine(FadeAndDisable(Picture3));
-                StartCoroutine(FadeInObject(charHappy));
                 textToSpeak = "We know what that Dome Control Administration group is doing, I reckon you already know a bit?";
                 break;
             case 26:
@@ -326,7 +368,9 @@ public class TheHiddenColony02 : MonoBehaviour
                 textToSpeak = "[She gave her a look, then she faced Bay.]";
                 break;
             case 30:
+                // Agnes only appears from this line onwards
                 ShowExpression("happy");
+                StartCoroutine(FadeInObject(charHappy));
                 textToSpeak = "Oh, it seems she introduced herself to you first.";
                 break;
             case 31:
@@ -338,28 +382,32 @@ public class TheHiddenColony02 : MonoBehaviour
                 textToSpeak = "She was the one who told me where you were. Right near the clinic.";
                 break;
             case 33:
+                // Picture4 is the base layer: fading Picture3 out here reveals it,
+                // and Agnes is taken off screen while Picture4 is showing
+                expressionsHiddenUntilTunnelEntrance = true;
                 ShowExpression("embarrassed");
+                StartCoroutine(FadeAndDisable(Picture3));
                 textToSpeak = "You see this thing here?";
                 break;
             case 34:
                 ShowExpression("embarrassed");
-                textToSpeak = "Agnes turned herself sideways, and right off the bat...";
+                textToSpeak = "[Agnes turned herself sideways, and right off the bat...]";
                 break;
             case 35:
                 ShowExpression("embarrassed");
-                textToSpeak = "...Bay noticed the strange device she was wearing on her ear.";
+                textToSpeak = "[...Bay noticed the strange device she was wearing on her ear.]";
                 break;
 
         }
 
-        string speaker = textToSpeak.StartsWith("[")
+        // No character name until Morgana introduces herself (case 15).
+        // Morgana speaks from case 15, Agnes from case 30 onwards.
+        string speaker = index < 15 || textToSpeak.StartsWith("[")
             ? ""
-            : index == 32 || index == 38 || index == 40 ? "Ryder" : "Agnes";
+            : index >= 30 ? "Agnes" : "Morgana";
 
         charName.GetComponent<TMP_Text>().text = speaker;
 
-        if (speaker == "Ryder")
-            ShowExpression("masked");
         textBox.GetComponent<TMP_Text>().text = textToSpeak;
         currentTextLength = textToSpeak.Length;
         TextCreator.runTextPrint = true;
@@ -370,10 +418,10 @@ public class TheHiddenColony02 : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
 
         // -------------------------------------------------
-        // CHOICE POINT (after Case 41)
+        // CHOICE POINT (after Case 35)
         // -------------------------------------------------
 
-        if (index == 41)
+        if (index == 35)
         {
             // Hide the normal next button
             nextButton.SetActive(false);
@@ -427,7 +475,7 @@ public class TheHiddenColony02 : MonoBehaviour
         if (isTyping) return; // Don't skip the typing animation
 
         introIndex++;
-        if (introIndex <= 41)
+        if (introIndex <= 35)
         {
             StartCoroutine(PlayIntroLine(introIndex));
         }
@@ -456,8 +504,12 @@ public class TheHiddenColony02 : MonoBehaviour
 
         DialogueLine[] choice1Dialogue =
         {
-            new DialogueLine("", "[Ryder looked at Bay, then slightly nodded.]"),
-            new DialogueLine("Ryder", "That's what I wanted to hear, carry on.")
+            new DialogueLine("", "[Agnes put her finger over the device. There was a small blinking blue light.]"),
+            new DialogueLine("Agnes", "We call these Flocks."),
+            new DialogueLine("Agnes", "They are wearable communication devices developed by the Research & Technology Committee and Engineering Committee..."),
+            new DialogueLine("Agnes", "...aka, us!"),
+            new DialogueLine("Agnes", "Aren't they cool? They can communicate up to thirty miles without interruption."),
+            new DialogueLine("Agnes", "They use a special frequency called The Flock, meaning the DCP can't intercept us when communicating.")
         };
 
         yield return StartCoroutine(PlayDialogueLines(choice1Dialogue));
@@ -485,7 +537,13 @@ public class TheHiddenColony02 : MonoBehaviour
 
         DialogueLine[] choice2Dialogue =
         {
-            new DialogueLine("", "[Ryder looked at Bay, slightly nodding at his response.]")
+            new DialogueLine("", "[Agnes put her finger over the device. There was a small blinking blue light.]"),
+            new DialogueLine("Agnes", "Yup, you're right!"),
+            new DialogueLine("Agnes", "We call these Flocks."),
+            new DialogueLine("Agnes", "They are wearable communication devices developed by the Research & Technology Committee and Engineering Committee..."),
+            new DialogueLine("Agnes", "...aka, us!"),
+            new DialogueLine("Agnes", "Aren't they cool? They can communicate up to thirty miles without interruption."),
+            new DialogueLine("Agnes", "They use a special frequency called The Flock, meaning the DCP can't intercept us when communicating.")
         };
 
         yield return StartCoroutine(PlayDialogueLines(choice2Dialogue));
@@ -513,11 +571,14 @@ public class TheHiddenColony02 : MonoBehaviour
 
         DialogueLine[] choice3Dialogue =
         {
-            new DialogueLine("", "[Ryder looked at Bay, he was being directly challenged.]"),
-            new DialogueLine("", "[He let out a small laugh through the mask, coming out as a distorted mess.]"),
-            new DialogueLine("Ryder", "You've got guts, boy."),
-            new DialogueLine("Ryder", "You look like a good person, but the moment you act up..."),
-            new DialogueLine("Ryder", "...my fist will end up permanently marked on your cheek.")
+            new DialogueLine("Agnes", "Oh, they sure aren't!"),
+            new DialogueLine("Agnes", "They adjust perfectly around your ear, no matter how big or small it is."),
+            new DialogueLine("", "[Agnes put her finger over the device. There was a small blinking blue light.]"),
+            new DialogueLine("Agnes", "We call these Flocks."),
+            new DialogueLine("Agnes", "They are wearable communication devices developed by the Research & Technology Committee and Engineering Committee..."),
+            new DialogueLine("Agnes", "...aka, us!"),
+            new DialogueLine("Agnes", "Aren't they cool? They can communicate up to thirty miles without interruption."),
+            new DialogueLine("Agnes", "They use a special frequency called The Flock, meaning the DCP can't intercept us when communicating.")
         };
 
         yield return StartCoroutine(PlayDialogueLines(choice3Dialogue));
@@ -532,17 +593,17 @@ public class TheHiddenColony02 : MonoBehaviour
 
     DialogueLine[] aftermathDialogue =
     {
-        new DialogueLine("", "[Agnes' eyes widened.]"),
-        new DialogueLine("Agnes", "Don't be too harsh with him, he's just... different.", "embarrassed"),
-        new DialogueLine("", "[Ryder stepped out of their way, letting them continue.]"),
-        new DialogueLine("Ryder", "Whatever, just don't do anything dumb that might get me in trouble."),
-        new DialogueLine("Ryder", "I still got to fill my monthly quota."),
-        new DialogueLine("Ryder", "Have you with your... new recruit."),
-        new DialogueLine("", "[Bay noticed the change in his tone, and what did he mean new recruit?]"),
-        new DialogueLine("", "[Agnes started walking with purpose towards the tube, Bay following behind.]"),
-        new DialogueLine("", "[Ryder looked back at the two before standing back at the entrance of the tube.]"),
-        new DialogueLine("Ryder", "Come on, let's go..."),
-        new DialogueLine("Ryder", "...or else we're gonna be late.")
+        new DialogueLine("", "[She turned back towards Bay to face him, Morgana watching the two.]"),
+        new DialogueLine("Agnes", "Anyways, we have to get to work."),
+        new DialogueLine("Agnes", "As you saw, Morgana is designing a poster."),
+        new DialogueLine("Agnes", "We'll go print a bunch of those and stick them around the Dome."),
+        new DialogueLine("", "[Morgana grinned, proud of herself for being mentioned.]"),
+        new DialogueLine("Agnes", "Don't worry, you don't have to get yourself mixed with these numbskulls if you don't want to."),
+        new DialogueLine("Agnes", "I'll eventually find something you can do. Meanwhile..."),
+        new DialogueLine("Agnes", "...I know the perfect job you can do for me."),
+        new DialogueLine("", "[She flashed her signature mischievous smile to him, and turned around as she began walking.]"),
+        new DialogueLine("", "[What did she gave in store for him?]"),
+        new DialogueLine("", "[Whatever it was, he had to be prepared.]")
     };
 
     // =====================================================
@@ -587,9 +648,18 @@ public class TheHiddenColony02 : MonoBehaviour
         // Narration (lines wrapped in brackets) has no character name
         charName.GetComponent<TMP_Text>().text = textToSpeak.StartsWith("[") ? "" : dialogueLine.speaker;
 
-        if (dialogueLine.speaker == "Ryder")
-            ShowExpression("masked");
-        else if (!string.IsNullOrEmpty(dialogueLine.expression))
+        if (!string.IsNullOrEmpty(dialogueLine.speaker))
+            currentCharacter = dialogueLine.speaker;
+
+        // Picture3 comes back for the Flocks explanation, and Agnes with it
+        if (dialogueLine.text == "We call these Flocks.")
+        {
+            expressionsHiddenUntilTunnelEntrance = false;
+            StartCoroutine(FadeInObject(Picture3));
+            ShowExpression(lastExpression);
+        }
+
+        if (!string.IsNullOrEmpty(dialogueLine.expression))
             ShowExpression(dialogueLine.expression);
 
         textBox.GetComponent<TMP_Text>().text = textToSpeak;

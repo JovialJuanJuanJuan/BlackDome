@@ -372,8 +372,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: WestTubeV2, Assembly-CSharp
+      - m_Target: {fileID: 1065850827}
+        m_TargetAssemblyTypeName: TheHiddenColony02, Assembly-CSharp
         m_MethodName: ChoiceButton3Pressed
         m_Mode: 1
         m_Arguments:
@@ -600,8 +600,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: WestTubeV2, Assembly-CSharp
+      - m_Target: {fileID: 1065850827}
+        m_TargetAssemblyTypeName: TheHiddenColony02, Assembly-CSharp
         m_MethodName: ChoiceButton2Pressed
         m_Mode: 1
         m_Arguments:
@@ -2048,7 +2048,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: I'LL BE RESPECTFUL
+  m_text: WHAT IS THAT?
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 399e316338c946b4c8328c2979f79dfd, type: 2}
   m_sharedMaterial: {fileID: -5228803328055754320, guid: 399e316338c946b4c8328c2979f79dfd, type: 2}
@@ -2380,7 +2380,13 @@ MonoBehaviour:
   charConfused: {fileID: 1475773548}
   charSad: {fileID: 1807709757}
   charExcited: {fileID: 1567452979}
-  charMasked: {fileID: 0}
+  morganaNeutral: {fileID: 523677636}
+  morganaSurprised: {fileID: 1002902493}
+  morganaHappy: {fileID: 87334803}
+  morganaEmbarrassed: {fileID: 476847727}
+  morganaConfused: {fileID: 176116355}
+  morganaSad: {fileID: 356618266}
+  morganaExcited: {fileID: 1727950805}
   fadeScreenIn: {fileID: 27370943}
   textBox: {fileID: 667647221}
   textToSpeak: 
@@ -2699,8 +2705,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: TheHiddenColony01, Assembly-CSharp
+      - m_Target: {fileID: 1065850827}
+        m_TargetAssemblyTypeName: TheHiddenColony02, Assembly-CSharp
         m_MethodName: NextButton
         m_Mode: 1
         m_Arguments:
@@ -2828,7 +2834,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: ...OR WHAT?
+  m_text: THAT LOOKS UNCOMFORTABLE
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 399e316338c946b4c8328c2979f79dfd, type: 2}
   m_sharedMaterial: {fileID: -5228803328055754320, guid: 399e316338c946b4c8328c2979f79dfd, type: 2}
@@ -3400,7 +3406,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: YES SIR!
+  m_text: A COMMUNICATION DEVICE?
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 399e316338c946b4c8328c2979f79dfd, type: 2}
   m_sharedMaterial: {fileID: -5228803328055754320, guid: 399e316338c946b4c8328c2979f79dfd, type: 2}
@@ -3715,8 +3721,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: WestTubeV2, Assembly-CSharp
+      - m_Target: {fileID: 1065850827}
+        m_TargetAssemblyTypeName: TheHiddenColony02, Assembly-CSharp
         m_MethodName: ChoiceButton1Pressed
         m_Mode: 1
         m_Arguments:
