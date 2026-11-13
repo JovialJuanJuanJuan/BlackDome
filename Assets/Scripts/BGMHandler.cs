@@ -45,6 +45,11 @@ public class BackgroundMusicFader : MonoBehaviour
 
     private Coroutine fadeRoutine;
 
+    // Used by the quick duck-out / resume pair below
+    private Coroutine quickFadeRoutine;
+    private bool quickFadePaused;
+    private float quickFadeVolume;
+
     public bool IsFadingOut { get; private set; }
 
     private void Awake()
@@ -113,6 +118,114 @@ public class BackgroundMusicFader : MonoBehaviour
         fadeOutRequested = true;
         IsFadingOut = true;
         BeginFade(0f, fadeOutDuration);
+    }
+
+    /// <summary>
+    /// Fades the music down to silence across the given duration. Handy when the last
+    /// lines of a scene should wind the track down instead of cutting it.
+    /// </summary>
+    public void FadeOutOver(float duration)
+    {
+        if (audioSource == null || fadeOutRequested)
+        {
+            return;
+        }
+
+        fadeOutRequested = true;
+        IsFadingOut = true;
+        BeginFade(0f, Mathf.Max(0.01f, duration));
+    }
+
+    /// <summary>
+    /// Cuts the music out quickly and pauses it, so it can be brought back on the exact
+    /// sample it left. Used for suspense beats mid-scene.
+    /// </summary>
+    public void QuickFadeOutAndPause(float duration)
+    {
+        if (audioSource == null)
+        {
+            return;
+        }
+
+        StopQuickFade();
+        quickFadeRoutine = StartCoroutine(QuickFadeOutRoutine(Mathf.Max(0.01f, duration)));
+    }
+
+    /// <summary>
+    /// Resumes music that was paused by <see cref="QuickFadeOutAndPause"/> and fades it
+    /// back up to the level it had before the cut.
+    /// </summary>
+    public void ResumeAfterQuickFade(float duration)
+    {
+        if (audioSource == null)
+        {
+            return;
+        }
+
+        StopQuickFade();
+        quickFadeRoutine = StartCoroutine(ResumeRoutine(Mathf.Max(0.01f, duration)));
+    }
+
+    private IEnumerator QuickFadeOutRoutine(float duration)
+    {
+        // Don't let a normal fade fight this one
+        StopFade();
+
+        quickFadeVolume = audioSource.volume > 0f ? audioSource.volume : targetVolume;
+
+        float startVolume = audioSource.volume;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += ignoreTimeScale ? Time.unscaledDeltaTime : Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            audioSource.volume = Mathf.Lerp(startVolume, 0f, Mathf.SmoothStep(0f, 1f, t));
+            yield return null;
+        }
+
+        audioSource.volume = 0f;
+
+        // Pause, not Stop: the track keeps its playback position for a seamless resume
+        audioSource.Pause();
+        quickFadePaused = true;
+        quickFadeRoutine = null;
+    }
+
+    private IEnumerator ResumeRoutine(float duration)
+    {
+        if (!quickFadePaused)
+        {
+            // Nothing was cut, so just make sure the music is back at its level
+            FadeIn();
+            yield break;
+        }
+
+        StopFade();
+        audioSource.UnPause();
+
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += ignoreTimeScale ? Time.unscaledDeltaTime : Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            audioSource.volume = Mathf.Lerp(0f, quickFadeVolume, Mathf.SmoothStep(0f, 1f, t));
+            yield return null;
+        }
+
+        audioSource.volume = quickFadeVolume;
+        quickFadePaused = false;
+        quickFadeRoutine = null;
+    }
+
+    private void StopQuickFade()
+    {
+        if (quickFadeRoutine != null)
+        {
+            StopCoroutine(quickFadeRoutine);
+            quickFadeRoutine = null;
+        }
     }
 
     /// <summary>Immediately sets the music to its fade-in level, skipping the fade.</summary>
@@ -209,5 +322,6 @@ public class BackgroundMusicFader : MonoBehaviour
     private void OnDisable()
     {
         StopFade();
+        StopQuickFade();
     }
 }

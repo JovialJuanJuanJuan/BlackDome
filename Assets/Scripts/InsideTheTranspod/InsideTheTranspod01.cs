@@ -610,6 +610,7 @@ public class InsideTheTranspod01 : MonoBehaviour
         textBox.SetActive(true);
         fadeOut.SetActive(true);
         yield return new WaitForSeconds(4f);
-        yield return SceneManager.LoadSceneAsync(13);
+        // WestTube
+        yield return SceneManager.LoadSceneAsync(9);
     }
 }

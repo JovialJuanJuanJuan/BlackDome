@@ -830,6 +830,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 713d256c137b48b4d899d3b0c35efba3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CredToMain
+  creditsDuration: 15
+  fadeOutLeadTime: 2
+  fadeOut: {fileID: 2006488513}
 --- !u!4 &1404268815
 Transform:
   m_ObjectHideFlags: 0
