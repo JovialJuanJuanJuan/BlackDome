@@ -32,8 +32,12 @@ public sealed class DialogueBoxUI : MonoBehaviour
     private const float NameMarginRight = -1655.8954f;    // keeps the name's text area 2075.9 wide
     private const float BodyMarginLeft = 20.646973f;
     private const float BodyMarginRight = 61.94104f;
-    private const float ChoiceSpacing = 168f;
-    private const float ChoiceClearance = 8f;
+    // The choice plates stack up the right edge of the frame, clear of the card and of the
+    // middle of the screen where the art and the dialogue text are.
+    private const float ChoiceGap = 34f;
+    private const float ChoiceRightMargin = 60f;
+    private const float ChoiceBottomClearance = 10f;
+    private const float ChoiceTopMargin = 24f;
 
     /// <summary>The name kicks up a little and flashes when a new speaker takes over.</summary>
     private const float NamePulseDuration = 0.26f;
@@ -50,14 +54,6 @@ public sealed class DialogueBoxUI : MonoBehaviour
     private static readonly Vector2 NextSize = new Vector2(263.63232f, 59.106506f);
     private static readonly Vector2 NextPosition = new Vector2(-183f, 83f);
     private static readonly Vector2 ChoiceSize = new Vector2(650.01f, 134.3603f);
-
-    /// <summary>Where RidingBlue stacks its choice plates, top plate first.</summary>
-    private static readonly Vector2[] ChoicePositions =
-    {
-        new Vector2(-155f, 52.36998f),
-        new Vector2(-155f, -115.63003f),
-        new Vector2(-155f, -290f)
-    };
 
     private static readonly Color DialogueText = Color.white;
     private static readonly Color DefaultAccent = new Color(0.92f, 0.92f, 0.92f, 0.85f);
@@ -175,6 +171,7 @@ public sealed class DialogueBoxUI : MonoBehaviour
         ApplyPanelStyle();
         ApplyTextStyle();
         ApplyButtonStyle();
+        SilenceChoiceClickSound();
         ApplySpeakerStyle(string.Empty);
 
         panelRestPosition = panelRect.anchoredPosition;
@@ -335,8 +332,10 @@ public sealed class DialogueBoxUI : MonoBehaviour
     }
 
     /// <summary>
-    /// Puts the choice plates where RidingBlue keeps them. A third plate would land inside the
-    /// card at that spot, so a tall stack is lifted until it clears the box, keeping its spacing.
+    /// Stacks the choice plates up the right edge of the frame, the last plate just clear of the
+    /// card and the rest rising above it in reading order. The middle of the screen is left open,
+    /// so the choices no longer sit on top of the art or the dialogue text, and a stack too tall
+    /// for the frame tightens its gap instead of running off the top.
     /// </summary>
     private void ApplyChoiceLayout(float canvasHeight)
     {
@@ -345,7 +344,21 @@ public sealed class DialogueBoxUI : MonoBehaviour
             return;
         }
 
-        for (int i = 0; i < choiceButtons.Count; i++)
+        int count = choiceButtons.Count;
+        float lowestCenter = PanelHeight + ChoiceBottomClearance + ChoiceSize.y * 0.5f;
+        float spacing = ChoiceSize.y + ChoiceGap;
+        float ceiling = canvasHeight - ChoiceTopMargin - ChoiceSize.y * 0.5f;
+
+        if (count > 1 && lowestCenter + spacing * (count - 1) > ceiling)
+        {
+            spacing = Mathf.Max(ChoiceSize.y, (ceiling - lowestCenter) / (count - 1));
+        }
+
+        // Anchored to the right edge, so the margin holds at any aspect ratio.
+        float rightOffset = -(ChoiceSize.x * 0.5f + ChoiceRightMargin);
+        float canvasCenter = canvasHeight * 0.5f;
+
+        for (int i = 0; i < count; i++)
         {
             RectTransform rect = choiceButtons[i].transform as RectTransform;
             if (rect == null)
@@ -353,55 +366,16 @@ public sealed class DialogueBoxUI : MonoBehaviour
                 continue;
             }
 
-            rect.anchorMin = new Vector2(0.5f, 0.5f);
-            rect.anchorMax = new Vector2(0.5f, 0.5f);
+            rect.anchorMin = new Vector2(1f, 0.5f);
+            rect.anchorMax = new Vector2(1f, 0.5f);
             rect.pivot = new Vector2(0.5f, 0.5f);
             rect.sizeDelta = ChoiceSize;
-            rect.anchoredPosition = ChoicePosition(i);
+            rect.anchoredPosition = new Vector2(
+                rightOffset,
+                lowestCenter + spacing * (count - 1 - i) - canvasCenter);
             rect.localScale = Vector3.one;
             rect.localRotation = Quaternion.identity;
         }
-
-        float halfHeight = canvasHeight * 0.5f;
-        float lowestBottom = float.PositiveInfinity;
-
-        for (int i = 0; i < choiceButtons.Count; i++)
-        {
-            RectTransform rect = choiceButtons[i].transform as RectTransform;
-            if (rect != null)
-            {
-                lowestBottom = Mathf.Min(
-                    lowestBottom,
-                    halfHeight + rect.anchoredPosition.y - ChoiceSize.y * 0.5f);
-            }
-        }
-
-        float requiredBottom = PanelHeight + ChoiceClearance;
-        if (float.IsPositiveInfinity(lowestBottom) || lowestBottom >= requiredBottom)
-        {
-            return;
-        }
-
-        float shift = requiredBottom - lowestBottom;
-        for (int i = 0; i < choiceButtons.Count; i++)
-        {
-            RectTransform rect = choiceButtons[i].transform as RectTransform;
-            if (rect != null)
-            {
-                rect.anchoredPosition += new Vector2(0f, shift);
-            }
-        }
-    }
-
-    private static Vector2 ChoicePosition(int index)
-    {
-        if (index < ChoicePositions.Length)
-        {
-            return ChoicePositions[index];
-        }
-
-        int last = ChoicePositions.Length - 1;
-        return ChoicePositions[last] + new Vector2(0f, -(index - last) * ChoiceSpacing);
     }
 
     private void ApplyPanelStyle()
@@ -565,6 +539,23 @@ public sealed class DialogueBoxUI : MonoBehaviour
             }
 
             effect.Initialize(DialogueButtonFx.ButtonRole.Choice, i);
+        }
+    }
+
+    /// <summary>
+    /// The choice plates now play the Next button's click (see DialogueButtonFx), so the scene's
+    /// separate choice click component is switched off. Left enabled it would fire its own clip on
+    /// the same click and the two would be heard together.
+    /// </summary>
+    private void SilenceChoiceClickSound()
+    {
+        ChoiceButtonClickSound[] legacy = FindObjectsByType<ChoiceButtonClickSound>(
+            FindObjectsInactive.Exclude,
+            FindObjectsSortMode.None);
+
+        for (int i = 0; i < legacy.Length; i++)
+        {
+            legacy[i].enabled = false;
         }
     }
 

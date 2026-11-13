@@ -47,6 +47,9 @@ public class TheHiddenColony02 : MonoBehaviour
     public GameObject ChoiceButton2;
     public GameObject ChoiceButton3;
 
+    // The line where Agnes turns around and walks off. Her sprite fades out as it finishes.
+    const string AgnesExitLine = "[She flashed her signature mischievous smile to him, and turned around as she began walking.]";
+
     int introIndex = 0;
     bool isTyping = false; // Prevents spamming Next
     // Agnes does not appear on screen until her first line (case 30),
@@ -137,6 +140,25 @@ public class TheHiddenColony02 : MonoBehaviour
             lastExpression = expression;
 
         SetExpressionObject(target, true);
+    }
+
+    /// <summary>
+    /// Fades Agnes's own sprites and nobody else's, so Morgana stays on screen when Agnes walks
+    /// off.
+    /// </summary>
+    void FadeOutAgnesExpression()
+    {
+        GameObject[] agnesExpressions =
+        {
+            charNeutral, charSurprised, charHappy, charEmbarrassed,
+            charConfused, charSad, charExcited
+        };
+
+        foreach (GameObject expression in agnesExpressions)
+        {
+            if (expression != null && expression.activeSelf)
+                StartCoroutine(FadeAndDisable(expression));
+        }
     }
 
     void FadeOutActiveExpressions()
@@ -601,7 +623,7 @@ public class TheHiddenColony02 : MonoBehaviour
         new DialogueLine("Agnes", "Don't worry, you don't have to get yourself mixed with these numbskulls if you don't want to."),
         new DialogueLine("Agnes", "I'll eventually find something you can do. Meanwhile..."),
         new DialogueLine("Agnes", "...I know the perfect job you can do for me."),
-        new DialogueLine("", "[She flashed her signature mischievous smile to him, and turned around as she began walking.]"),
+        new DialogueLine("", AgnesExitLine),
         new DialogueLine("", "[What did she gave in store for him?]"),
         new DialogueLine("", "[Whatever it was, he had to be prepared.]")
     };
@@ -677,6 +699,11 @@ public class TheHiddenColony02 : MonoBehaviour
 
         // Wait until the entire line has finished typing
         yield return new WaitUntil(() => textLength >= currentTextLength);
+
+        // Agnes has turned and started walking away, so her expression leaves the frame with her
+        // as this line ends. The fade runs on its own, so advancing early does not cut it short.
+        if (textToSpeak == AgnesExitLine)
+            FadeOutAgnesExpression();
 
         // The line is completely typed.
         // Show Next so the player can manually continue.
