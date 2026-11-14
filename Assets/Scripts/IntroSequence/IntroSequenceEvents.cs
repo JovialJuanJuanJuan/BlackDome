@@ -1,6 +1,8 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using TMPro;
 
 public class IntroSequenceEvents : MonoBehaviour
@@ -12,6 +14,16 @@ public class IntroSequenceEvents : MonoBehaviour
     [SerializeField] GameObject charName;
     [SerializeField] GameObject fadeOut;
 
+    [Header("Picture Stack")]
+    [Tooltip("Picture1 lies over Picture2, over Picture3, over Picture4, so a fade only ever removes the top image and the next one is already waiting underneath.")]
+    [SerializeField] GameObject picture1;
+    [SerializeField] GameObject picture2;
+    [SerializeField] GameObject picture3;
+    [SerializeField] GameObject picture4;
+
+    [Tooltip("How long each picture takes to fade in or out, in seconds.")]
+    [SerializeField] float pictureFadeDuration = 1.5f;
+
     [Header("Text System")]
     [SerializeField] string textToSpeak;
     [SerializeField] float charDelay = 0.1f;   // typing speed (seconds per character)
@@ -22,9 +34,20 @@ public class IntroSequenceEvents : MonoBehaviour
 
     TMP_Text tmp;
 
+    // One running fade per picture, so a beat can finish or replace the fade before it.
+    readonly Dictionary<GameObject, Coroutine> pictureFades = new Dictionary<GameObject, Coroutine>();
+    readonly Dictionary<GameObject, Graphic> pictureGraphics = new Dictionary<GameObject, Graphic>();
+
     void Start()
     {
         tmp = textBox.GetComponent<TMP_Text>();
+
+        // The intro always opens on the scene's own background; the first line brings Picture1 up.
+        HidePictureImmediately(picture1);
+        HidePictureImmediately(picture2);
+        HidePictureImmediately(picture3);
+        HidePictureImmediately(picture4);
+
         StartCoroutine(EventStarter());
     }
 
@@ -50,6 +73,8 @@ public class IntroSequenceEvents : MonoBehaviour
         isPlayingLine = true;
         isSkipping = false;
         nextButton.SetActive(false);
+
+        PlayPictureBeat(index);
 
         switch (index)
         {
@@ -160,6 +185,156 @@ public class IntroSequenceEvents : MonoBehaviour
         }
     }
 
+    // =====================================================
+    // PICTURES
+    // =====================================================
+
+    /// <summary>
+    /// The picture beats ride on top of the narration. Each one starts as its line begins typing, so
+    /// the image changes under the words instead of after them.
+    /// </summary>
+    void PlayPictureBeat(int index)
+    {
+        switch (index)
+        {
+            case 0:
+                // "Light hides within the darkness of the people..."
+                FadePictureIn(picture1);
+                break;
+            case 1:
+                // "...rooted from the darkness of their own world."
+                FadePictureOut(picture1, picture2);
+                break;
+            case 2:
+                // "To find light, you must first overcome the darkness."
+                FadePictureOut(picture2, picture3);
+                break;
+            case 4:
+                // "...the world will shine bright."
+                FadePictureOut(picture3, picture4);
+                break;
+            case 7:
+                // "Darkness can consume you in the scarcity of light."
+                // Nothing is left under Picture4, so the last image gives way to the scene itself.
+                FadePictureOut(picture4, null);
+                break;
+        }
+    }
+
+    void FadePictureIn(GameObject picture)
+    {
+        if (picture == null)
+            return;
+
+        SetPictureAlpha(picture, 0f);
+        RunPictureFade(picture, 1f);
+    }
+
+    void FadePictureOut(GameObject picture, GameObject reveal)
+    {
+        if (picture == null)
+            return;
+
+        // If the player ran ahead of this picture's fade-in, finish it first: the image it uncovers
+        // should come out from behind a fully opaque picture, not a half-faded one.
+        FinishPictureFade(picture);
+
+        if (reveal != null)
+        {
+            reveal.SetActive(true);
+            SetPictureAlpha(reveal, 1f);
+        }
+
+        RunPictureFade(picture, 0f);
+    }
+
+    void RunPictureFade(GameObject picture, float target)
+    {
+        StopPictureFade(picture);
+        pictureFades[picture] = StartCoroutine(FadePictureRoutine(picture, target));
+    }
+
+    /// <summary>Brings a picture to full strength straight away, cancelling any fade in progress.</summary>
+    void FinishPictureFade(GameObject picture)
+    {
+        StopPictureFade(picture);
+        SetPictureAlpha(picture, 1f);
+        picture.SetActive(true);
+    }
+
+    void StopPictureFade(GameObject picture)
+    {
+        Coroutine running;
+        if (pictureFades.TryGetValue(picture, out running) && running != null)
+            StopCoroutine(running);
+
+        pictureFades.Remove(picture);
+    }
+
+    IEnumerator FadePictureRoutine(GameObject picture, float target)
+    {
+        picture.SetActive(true);
+
+        float start = PictureAlpha(picture);
+        float elapsed = 0f;
+
+        while (elapsed < pictureFadeDuration)
+        {
+            elapsed += Time.deltaTime;
+
+            // SmoothStep at both ends, so the change eases out of the old image and into the new one.
+            float eased = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(elapsed / pictureFadeDuration));
+            SetPictureAlpha(picture, Mathf.Lerp(start, target, eased));
+
+            yield return null;
+        }
+
+        SetPictureAlpha(picture, target);
+
+        if (target <= 0f)
+            picture.SetActive(false);
+    }
+
+    void HidePictureImmediately(GameObject picture)
+    {
+        if (picture == null)
+            return;
+
+        SetPictureAlpha(picture, 0f);
+        picture.SetActive(false);
+    }
+
+    Graphic PictureGraphic(GameObject picture)
+    {
+        Graphic graphic;
+        if (pictureGraphics.TryGetValue(picture, out graphic) && graphic != null)
+            return graphic;
+
+        graphic = picture.GetComponent<Graphic>();
+        pictureGraphics[picture] = graphic;
+        return graphic;
+    }
+
+    float PictureAlpha(GameObject picture)
+    {
+        Graphic graphic = PictureGraphic(picture);
+        return graphic != null ? graphic.color.a : 0f;
+    }
+
+    void SetPictureAlpha(GameObject picture, float alpha)
+    {
+        if (picture == null)
+            return;
+
+        Graphic graphic = PictureGraphic(picture);
+        if (graphic == null)
+            return;
+
+        Color color = graphic.color;
+        color.a = alpha;
+        graphic.color = color;
+    }
+
     IEnumerator FadeOutAndLoadNext()
     {
         nextButton.SetActive(false);
@@ -177,7 +352,19 @@ public class IntroSequenceEvents : MonoBehaviour
 
         yield return new WaitForSeconds(5.65f);
 
-        // PaperSign picks up here and hands over to UnconStart when the sign is clicked.
-        yield return SceneManager.LoadSceneAsync(15);
+        // The intro hands over to whichever scene follows it in the build list, so moving or
+        // inserting a scene in Build Settings moves the hand-off with it.
+        int currentIndex = SceneManager.GetActiveScene().buildIndex;
+        int nextIndex = currentIndex + 1;
+
+        if (nextIndex < SceneManager.sceneCountInBuildSettings)
+        {
+            yield return SceneManager.LoadSceneAsync(nextIndex);
+        }
+        else
+        {
+            Debug.LogWarning(
+                $"IntroSequence is the last scene in the build list (index {currentIndex}), so there is nothing to load next.");
+        }
     }
 }

@@ -332,6 +332,7 @@ GameObject:
   - component: {fileID: 390877833}
   - component: {fileID: 390877832}
   - component: {fileID: 390877834}
+  - component: {fileID: 390877835}
   m_Layer: 5
   m_Name: ChapterName
   m_TagString: Untagged
@@ -389,13 +390,13 @@ MonoBehaviour:
     serializedVersion: 2
     rgba: 4294967295
   m_fontColor: {r: 1, g: 1, b: 1, a: 1}
-  m_enableVertexGradient: 0
-  m_colorMode: 3
+  m_enableVertexGradient: 1
+  m_colorMode: 2
   m_fontColorGradient:
     topLeft: {r: 1, g: 1, b: 1, a: 1}
     topRight: {r: 1, g: 1, b: 1, a: 1}
-    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
-    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+    bottomLeft: {r: 0.44, g: 0.55, b: 0.66, a: 1}
+    bottomRight: {r: 0.44, g: 0.55, b: 0.66, a: 1}
   m_fontColorGradientPreset: {fileID: 0}
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
@@ -415,7 +416,7 @@ MonoBehaviour:
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
   m_textAlignment: 65535
-  m_characterSpacing: 0
+  m_characterSpacing: 4
   m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: -30
@@ -458,6 +459,24 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 390877830}
   m_CullTransparentMesh: 1
+--- !u!114 &390877835
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 390877830}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4e8f1a2d6b34e1f8a7c9d0e5b2f4a63, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ChapterNameStyle
+  topColor: {r: 1, g: 1, b: 1, a: 1}
+  bottomColor: {r: 0.44, g: 0.55, b: 0.66, a: 1}
+  tracking: 4
+  lineSpacing: -30
+  rimColor: {r: 0.28, g: 0.4, b: 0.52, a: 0.32}
+  rimDistance: 1.6
 --- !u!95 &390877834
 Animator:
   serializedVersion: 7
@@ -811,7 +830,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &920973796
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1620,7 +1639,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1722642595
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1692,7 +1711,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1730314776
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1841,12 +1860,12 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 287256493}
+  - {fileID: 1256627489}
   - {fileID: 2017914729}
   - {fileID: 1730314776}
   - {fileID: 1722642595}
   - {fileID: 920973796}
-  - {fileID: 287256493}
-  - {fileID: 1256627489}
   - {fileID: 1132138755}
   - {fileID: 1863780412}
   - {fileID: 1457897433}
@@ -2195,6 +2214,11 @@ MonoBehaviour:
   fadeOut: {fileID: 1457897432}
   textToSpeak: 
   charDelay: 0.04
+  picture1: {fileID: 920973795}
+  picture2: {fileID: 1722642594}
+  picture3: {fileID: 1730314775}
+  picture4: {fileID: 2017914728}
+  pictureFadeDuration: 1.5
 --- !u!1 &2012326332
 GameObject:
   m_ObjectHideFlags: 0
@@ -2349,7 +2373,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2017914729
 RectTransform:
   m_ObjectHideFlags: 0
