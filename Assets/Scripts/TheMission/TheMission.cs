@@ -38,6 +38,9 @@ public class TheMission : MonoBehaviour
     [SerializeField] GameObject charName;
     [SerializeField] GameObject fadeOut;
 
+    [Header("Audio")]
+    [SerializeField] BackgroundMusicFader bgm;
+
     [Header("Scene Pictures")]
     public GameObject Picture1;
     public GameObject Picture2;
@@ -46,12 +49,20 @@ public class TheMission : MonoBehaviour
     // The line where Agnes turns around and walks off. Her sprite fades out as it finishes.
     const string AgnesExitLine = "[With that, Agnes turned and walked away, leaving Bay to contemplate the gravity of the situation]";
 
+    // The last line inside the room. The room shots fade out as it finishes, leaving Bay out
+    // in the narrow passage.
+    const string RoomExitLine = "[Bay couldn't shake off that feeling of unease as he stepped out back into the narrow passage.]";
+
+    // The closing lines dim the room and drain the music, so the scene ends dark and quiet
+    const float BlackscreenFadeDuration = 6f;
+    const float MusicSlowFadeDuration = 10f;
+
     int introIndex = 0;
     bool isTyping = false; // Prevents spamming Next
 
     // Morgana only walks into frame on her first line (case 3), so the expressions
-    // stay hidden during the opening narration. They are hidden again for the Flocks
-    // close-up (case 33) and come back with Morgana at case 34.
+    // stay hidden during the opening narration. They are hidden again while the poster
+    // shots are up (case 9) and come back with Morgana at case 16.
     bool expressionsHiddenUntilMorganaAppears = true;
 
     // Which character the expression objects belong to right now
@@ -67,6 +78,10 @@ public class TheMission : MonoBehaviour
 
     void Start()
     {
+        // Falls back to the scene's music fader if it wasn't assigned in the inspector
+        if (bgm == null)
+            bgm = FindFirstObjectByType<BackgroundMusicFader>();
+
         StartCoroutine(EventStarter());
         nextButton.SetActive(false); // Ensure it's hidden at start
     }
@@ -171,23 +186,6 @@ public class TheMission : MonoBehaviour
         }
     }
 
-    void FadeOutActiveExpressions()
-    {
-        GameObject[] expressions =
-        {
-            charNeutral, charSurprised, charHappy, charEmbarrassed,
-            charConfused, charSad, charExcited,
-            morganaNeutral, morganaSurprised, morganaHappy, morganaEmbarrassed,
-            morganaConfused, morganaSad, morganaExcited
-        };
-
-        foreach (GameObject expression in expressions)
-        {
-            if (expression != null && expression.activeSelf)
-                StartCoroutine(FadeAndDisable(expression));
-        }
-    }
-
     IEnumerator FadeAndDisable(GameObject target)
     {
         if (target == null)
@@ -221,7 +219,26 @@ public class TheMission : MonoBehaviour
         yield return StartCoroutine(FadeAndDisable(Picture2));
     }
 
-    IEnumerator FadeInObject(GameObject target)
+    /// <summary>
+    /// Fades the three room shots out together so the passage behind them takes over.
+    /// </summary>
+    void FadeOutRoomPictures()
+    {
+        StartCoroutine(FadeAndDisable(Picture1));
+        StartCoroutine(FadeAndDisable(Picture2));
+        StartCoroutine(FadeAndDisable(Picture3));
+    }
+
+    /// <summary>
+    /// Drains the scene's music away across the closing lines.
+    /// </summary>
+    void SlowFadeMusicOut()
+    {
+        if (bgm != null)
+            bgm.FadeOutOver(MusicSlowFadeDuration);
+    }
+
+    IEnumerator FadeInObject(GameObject target, float duration = 1f)
     {
         if (target == null)
             yield break;
@@ -233,7 +250,6 @@ public class TheMission : MonoBehaviour
         target.SetActive(true);
         canvasGroup.alpha = 0f;
 
-        const float duration = 1f;
         float elapsed = 0f;
         while (elapsed < duration)
         {
@@ -340,7 +356,7 @@ public class TheMission : MonoBehaviour
                 textToSpeak = "THEY WANNA KEEP US DOWN HERE.";
                 break;
             case 14:
-                textToSpeak = "OPEN THE DOORS, PIGS!";
+                textToSpeak = "OPEN THE DOOR, PIGS!";
                 break;
             case 15:
                 textToSpeak = "DOWN WITH THE SWEEPERS.";
@@ -429,22 +445,18 @@ public class TheMission : MonoBehaviour
                 textToSpeak = "See? Comfortable as ever.";
                 break;
             case 33:
-                // Picture3 fades out to the Flocks close-up: that shot has no characters in it,
-                // so they leave with the room.
+                // Picture3 fades out to the Flocks close-up, but Morgana still talks on this
+                // line, so she stays on screen instead of leaving with the room.
+                speaker = "Morgana";
                 ShowExpression("neutral");
-                expressionsHiddenUntilMorganaAppears = true;
                 StartCoroutine(FadeAndDisable(Picture3));
-                FadeOutActiveExpressions();
                 textToSpeak = "Now, let's go. That's all you need for now.";
                 break;
             case 34:
-                // Back to the room, so Morgana comes back on screen with it
+                // Back to the room. Morgana never left, so only the picture fades back in.
                 speaker = "Morgana";
-                expressionsHiddenUntilMorganaAppears = false;
-                lastExpression = "neutral";
-                HideAllExpressions();
+                ShowExpression("neutral");
                 StartCoroutine(FadeInObject(Picture3));
-                StartCoroutine(FadeInObject(morganaNeutral));
                 textToSpeak = "We'll be keeping in touch with whoever's left in here.";
                 break;
             case 35:
@@ -535,6 +547,10 @@ public class TheMission : MonoBehaviour
             case 52:
                 speaker = "Morgana";
                 ShowExpression("neutral");
+                // The scene starts winding down here: the room slowly goes dark and the
+                // music drains away under the closing lines.
+                StartCoroutine(FadeInObject(blackScreen, BlackscreenFadeDuration));
+                SlowFadeMusicOut();
                 textToSpeak = "Let this be the catalyst for change...";
                 break;
             case 53:
@@ -565,6 +581,10 @@ public class TheMission : MonoBehaviour
         if (textToSpeak == AgnesExitLine)
             FadeOutAgnesExpression();
 
+        // Bay steps out of the room as this line ends, so the room shots leave with him
+        if (textToSpeak == RoomExitLine)
+            FadeOutRoomPictures();
+
         nextButton.SetActive(true);
         isTyping = false;
     }
@@ -594,7 +614,7 @@ public class TheMission : MonoBehaviour
         textBox.SetActive(true);
         fadeOut.SetActive(true);
         yield return new WaitForSeconds(4f);
-        // TheJoining
-        yield return SceneManager.LoadSceneAsync(14);
+        // TheMission is the last scene of Chapter 1, so it hands over to the Credits.
+        yield return SceneManager.LoadSceneAsync(2);
     }
 }

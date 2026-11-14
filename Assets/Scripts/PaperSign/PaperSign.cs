@@ -186,7 +186,8 @@ public class PaperSign : MonoBehaviour
         }
 
         yield return new WaitForSeconds(fadeOutHold);
-        yield return SceneManager.LoadSceneAsync(4);
+        // TheMission
+        yield return SceneManager.LoadSceneAsync(16);
     }
 
     IEnumerator FadeWhitescreenOut()

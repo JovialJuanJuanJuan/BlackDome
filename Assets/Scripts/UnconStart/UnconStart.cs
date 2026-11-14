@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class Scene01Events : MonoBehaviour
+public class UnconStart : MonoBehaviour
 {
     [Header("UI")]
     public GameObject fadeScreenIn;

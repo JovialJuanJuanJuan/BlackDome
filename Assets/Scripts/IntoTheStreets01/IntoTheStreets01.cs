@@ -59,27 +59,27 @@ public class Scene04Event : MonoBehaviour
         {
             case 0:
                 speakerName = "You";
-                textToSpeak = "He exited the place, which turned out to be a sort of clinic as he expected.";
+                textToSpeak = "[He exited the place, which turned out to be a sort of clinic as he expected.]";
                 break;
             case 1:
                 speakerName = "You";
-                textToSpeak = "To his surprise, the place is enormous.";
+                textToSpeak = "[To his surprise, the place is enormous.]";
                 break;
             case 2:
                 speakerName = "You";
-                textToSpeak = "An actual city, but...";
+                textToSpeak = "[An actual city, but...]";
                 break;
             case 3:
                 speakerName = "You";
-                textToSpeak = "He looked up and around, he could see the shape of the curved roof.";
+                textToSpeak = "[He looked up and around, he could see the shape of the curved roof.]";
                 break;
             case 4:
                 speakerName = "You";
-                textToSpeak = "The air felt different, he wasn't outdoors.";
+                textToSpeak = "[The air felt different, he wasn't outdoors.]";
                 break;
             case 5:
                 speakerName = "You";
-                textToSpeak = "He was somewhere inside, and unfamiliar of his surroundings...";
+                textToSpeak = "[He was somewhere inside, and unfamiliar of his surroundings...]";
                 break;
             case 6:
                 speakerName = "You";
@@ -87,55 +87,55 @@ public class Scene04Event : MonoBehaviour
                 break;
             case 7:
                 speakerName = "You";
-                textToSpeak = "He walked down the civilian pavement, but he felt as if something was missing...";
+                textToSpeak = "[He walked down the civilian pavement, but he felt as if something was missing...]";
                 break;
             case 8:
                 speakerName = "You";
-                textToSpeak = "...wasn't there something in-between these pavements?";
+                textToSpeak = "[...wasn't there something in-between these pavements?]";
                 break;
             case 9:
                 speakerName = "You";
-                textToSpeak = "He tried to recall the word, but his mind was clouded with thoughts...";
+                textToSpeak = "[He tried to recall the word, but his mind was clouded with thoughts...]";
                 break;
             case 10:
                 speakerName = "You";
-                textToSpeak = "...so he dismissed it and continued ahead.";
+                textToSpeak = "[...so he dismissed it and continued ahead.]";
                 break;
             case 11:
                 speakerName = "You";
-                textToSpeak = "He noticed something moving up on the corner of his eyes, and as he looked up...";
+                textToSpeak = "[He noticed something moving up on the corner of his eyes, and as he looked up...]";
                 break;
             case 12:
                 speakerName = "You";
-                textToSpeak = "He saw it:";
+                textToSpeak = "[He saw it:]";
                 break;
             case 13:
                 speakerName = "You";
-                textToSpeak = "White, spherical-shaped vehicles were floating all over the city.";
+                textToSpeak = "[White, spherical-shaped vehicles were floating all over the city.]";
                 break;
             case 14:
                 speakerName = "You";
-                textToSpeak = "Some were cautiously driving while others maneuvered expertly across the city.";
+                textToSpeak = "[Some were cautiously driving while others maneuvered expertly across the city.]";
                 break;
             case 15:
                 speakerName = "You";
-                textToSpeak = "While he walked, he noticed one of the spheres was slowly descending towards him.";
+                textToSpeak = "[While he walked, he noticed one of the spheres was slowly descending towards him.]";
                 break;
             case 16:
                 speakerName = "You";
-                textToSpeak = "He got out of the way, but he saw the driver was being wary of where he was standing.";
+                textToSpeak = "[He got out of the way, but he saw the driver was being wary of where he was standing.]";
                 break;
             case 17:
                 speakerName = "You";
-                textToSpeak = "The sphere landed safely, but it was still a few inches off the ground...";
+                textToSpeak = "[The sphere landed safely, but it was still a few inches off the ground...]";
                 break;
             case 18:
                 speakerName = "You";
-                textToSpeak = "...still floating";
+                textToSpeak = "[...still floating]";
                 break;
             case 19:
                 speakerName = "You";
-                textToSpeak = "A figure stepped out of the vehicle, and revealed itself...";
+                textToSpeak = "[A figure stepped out of the vehicle, and revealed itself...]";
                 break;
         }
 

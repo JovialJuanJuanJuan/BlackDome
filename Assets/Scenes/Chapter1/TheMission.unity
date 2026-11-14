@@ -1949,6 +1949,7 @@ MonoBehaviour:
   eventPos: 0
   charName: {fileID: 252604209}
   fadeOut: {fileID: 1535045723}
+  bgm: {fileID: 1348316797}
   Picture1: {fileID: 528591484}
   Picture2: {fileID: 1158079769}
   Picture3: {fileID: 1279304870}
@@ -3204,7 +3205,6 @@ RectTransform:
   - {fileID: 1279304871}
   - {fileID: 1158079770}
   - {fileID: 528591485}
-  - {fileID: 1456057097}
   - {fileID: 1413493140}
   - {fileID: 169323782}
   - {fileID: 2126314757}
@@ -3219,6 +3219,7 @@ RectTransform:
   - {fileID: 1002902494}
   - {fileID: 356618267}
   - {fileID: 176116356}
+  - {fileID: 1456057097}
   - {fileID: 1131499546}
   - {fileID: 1303874374}
   - {fileID: 27370944}
