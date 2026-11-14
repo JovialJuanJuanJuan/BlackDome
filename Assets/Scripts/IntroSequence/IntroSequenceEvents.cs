@@ -176,6 +176,8 @@ public class IntroSequenceEvents : MonoBehaviour
         mainTextObject.SetActive(false);
 
         yield return new WaitForSeconds(5.65f);
-        yield return SceneManager.LoadSceneAsync(4);
+
+        // PaperSign picks up here and hands over to UnconStart when the sign is clicked.
+        yield return SceneManager.LoadSceneAsync(15);
     }
 }

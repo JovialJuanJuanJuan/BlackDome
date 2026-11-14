@@ -50,6 +50,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Chapter1/TheJoining.unity
     guid: 0a242f27be0c74246a31fb54cfac36b9
+  - enabled: 1
+    path: Assets/Scenes/Chapter1/PaperSign.unity
+    guid: 8286ad59de5fdb84baf37d5a9ba05a4a
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

@@ -370,8 +370,7 @@ public class TheJoining : MonoBehaviour
         textBox.SetActive(true);
         fadeOut.SetActive(true);
         yield return new WaitForSeconds(4f);
-        // Chapter 1 ends here and no following scene exists yet, so this returns to the
-        // Main Menu instead of looping back into TheHiddenColony01.
-        yield return SceneManager.LoadSceneAsync(1);
+        // The scene ends on the paper Bay is asked to sign by Agnes for him to join.
+        yield return SceneManager.LoadSceneAsync(15);
     }
 }
