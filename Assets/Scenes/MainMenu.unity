@@ -1,4 +1,4 @@
-﻿%YAML 1.1
+%YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
 --- !u!29 &1
 OcclusionCullingSettings:
@@ -1056,7 +1056,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: da967d093c4e5e34e9e02e03d7daa444, type: 3}
+  m_Resource: {fileID: 8300000, guid: c95f0329800fdc841a11a24c56f1f45c, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 0.61
   m_Pitch: 1
@@ -1741,6 +1741,82 @@ MonoBehaviour:
   hoverSound: {fileID: 8300000, guid: e2711b4a0cf73cb458165abe46888a61, type: 3}
   hoverVolume: 0.6
   hoverSoundCooldown: 0.05
+--- !u!114 &1089150948
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1089150945}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0eba0dd348245539fd005b5661fa028, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MenuSelectionBar
+  startButton: {fileID: 1379721153}
+  loadButton: {fileID: 22567277}
+  creditsButton: {fileID: 2025477038}
+  quitButton: {fileID: 2106259993}
+  fillColor: {r: 0.055, g: 0.055, b: 0.065, a: 0.93}
+  borderColor: {r: 0.93, g: 0.94, b: 0.95, a: 0.85}
+  borderWidth: 2
+  plateSlant: 26
+  platePadding: 26
+  plateHeightScale: 0.9
+  slideTime: 0.08
+  fadeTime: 0.14
+  ruleColor: {r: 1, g: 1, b: 1, a: 0.22}
+  ruleHeight: 3
+  ruleGap: 56
+  ruleSlant: 26
+--- !u!114 &1089150949
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1089150945}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6df92cedc88c4694aa9504cc81a61218, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PressAnyKeyPrompt
+  container: {fileID: 2088463020}
+  selectionBar: {fileID: 1089150948}
+  menuReveal: {fileID: 1089150950}
+  font: {fileID: 11400000, guid: 89c6d16dd127c0f46a417c4abe02ca4c, type: 2}
+  message: PRESS ANY KEY
+  color: {r: 0.95, g: 0.95, b: 0.96, a: 0.85}
+  fontSize: 26
+  letterSpacing: 20
+  bottomOffset: 100
+  appearDelay: 2.2
+  fadeTime: 0.45
+  breathPeriod: 3.2
+  breathMinAlpha: 0.35
+  focusDelay: 0.35
+  acceptMouseClick: 1
+--- !u!114 &1089150950
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1089150945}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e21589991924dd8ba1189b60435fd15, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MenuReveal
+  startButton: {fileID: 1379721153}
+  loadButton: {fileID: 22567277}
+  creditsButton: {fileID: 2025477038}
+  quitButton: {fileID: 2106259993}
+  delay: 0.15
+  stagger: 0.07
+  revealTime: 0.28
+  startScale: 0.86
+  slideFrom: 48
 --- !u!1 &1379721151
 GameObject:
   m_ObjectHideFlags: 0
@@ -3125,79 +3201,3 @@ SceneRoots:
   - {fileID: 2030898378}
   - {fileID: 1557869305}
   - {fileID: 1089150946}
---- !u!114 &1089150948
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1089150945}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f0eba0dd348245539fd005b5661fa028, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MenuSelectionBar
-  startButton: {fileID: 1379721153}
-  loadButton: {fileID: 22567277}
-  creditsButton: {fileID: 2025477038}
-  quitButton: {fileID: 2106259993}
-  fillColor: {r: 0.055, g: 0.055, b: 0.065, a: 0.93}
-  borderColor: {r: 0.93, g: 0.94, b: 0.95, a: 0.85}
-  borderWidth: 2
-  plateSlant: 26
-  platePadding: 26
-  plateHeightScale: 0.9
-  slideTime: 0.08
-  fadeTime: 0.14
-  ruleColor: {r: 1, g: 1, b: 1, a: 0.22}
-  ruleHeight: 3
-  ruleGap: 56
-  ruleSlant: 26
---- !u!114 &1089150949
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1089150945}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6df92cedc88c4694aa9504cc81a61218, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PressAnyKeyPrompt
-  container: {fileID: 2088463020}
-  selectionBar: {fileID: 1089150948}
-  menuReveal: {fileID: 1089150950}
-  font: {fileID: 11400000, guid: 89c6d16dd127c0f46a417c4abe02ca4c, type: 2}
-  message: PRESS ANY KEY
-  color: {r: 0.95, g: 0.95, b: 0.96, a: 0.85}
-  fontSize: 26
-  letterSpacing: 20
-  bottomOffset: 100
-  appearDelay: 2.2
-  fadeTime: 0.45
-  breathPeriod: 3.2
-  breathMinAlpha: 0.35
-  focusDelay: 0.35
-  acceptMouseClick: 1
---- !u!114 &1089150950
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1089150945}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5e21589991924dd8ba1189b60435fd15, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MenuReveal
-  startButton: {fileID: 1379721153}
-  loadButton: {fileID: 22567277}
-  creditsButton: {fileID: 2025477038}
-  quitButton: {fileID: 2106259993}
-  delay: 0.15
-  stagger: 0.07
-  revealTime: 0.28
-  startScale: 0.86
-  slideFrom: 48
