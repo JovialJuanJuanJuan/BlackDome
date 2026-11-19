@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: e5808b867794b984c8013ea9f3741639
+guid: bc19ae9492e89824f8af52e7ce099a78
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 2960402581040015946
-    second: 18_0
+      213: -8325601163599978556
+    second: morgana_excited_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -96,30 +96,17 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: WebGL
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: 18_0
+      name: morgana_excited_0
       rect:
         serializedVersion: 2
-        x: 8
+        x: 186
         y: 0
-        width: 590
-        height: 981
+        width: 631
+        height: 1029
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: a4a2a0b6676751920800000000000000
-      internalID: 2960402581040015946
+      spriteID: 4cf5b064ad5857c80800000000000000
+      internalID: -8325601163599978556
       vertices: []
       indices: 
       edges: []
@@ -148,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      18_0: 2960402581040015946
+      morgana_excited_0: -8325601163599978556
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -70,41 +70,65 @@ public class WestTube : MonoBehaviour
         nextButton.SetActive(false); // Ensure it's hidden at start
     }
 
+    // Expression switching (blend, pop, hide) lives in ExpressionSet
+    ExpressionSet expressionSet;
+
+    void Awake()
+    {
+        expressionSet = new ExpressionSet(this, GetExpressionObjects());
+    }
+
+    GameObject[] GetExpressionObjects()
+    {
+        return new GameObject[]
+        {
+            charNeutral, charSurprised, charHappy, charEmbarrassed,
+            charConfused, charSad, charExcited, charMasked
+        };
+    }
+
     void HideAllExpressions()
     {
-        charNeutral.SetActive(false);
-        charSurprised.SetActive(false);
-        charHappy.SetActive(false);
-        charEmbarrassed.SetActive(false);
-        charConfused.SetActive(false);
-        charSad.SetActive(false);
-        charExcited.SetActive(false);
-        charMasked.SetActive(false);
+        expressionSet.HideAll();
     }
 
     void ShowExpression(string expression)
     {
-        HideAllExpressions();
-
         if (expressionsHiddenUntilTunnelEntrance)
+        {
+            expressionSet.HideAll();
             return;
+        }
+
+        GameObject target = null;
 
         switch (expression)
         {
-            case "neutral":     charNeutral.SetActive(true); break;
-            case "surprised":   charSurprised.SetActive(true); break;
-            case "happy":       charHappy.SetActive(true); break;
-            case "smile":       charHappy.SetActive(true); break;
-            case "embarrassed": charEmbarrassed.SetActive(true); break;
-            case "confused":    charConfused.SetActive(true); break;
-            case "sad":         charSad.SetActive(true); break;
-            case "excited":     charExcited.SetActive(true); break;
-            case "masked":      charMasked.SetActive(true); break;
+            case "neutral":     target = charNeutral; break;
+            case "surprised":   target = charSurprised; break;
+            case "happy":       target = charHappy; break;
+            case "smile":       target = charHappy; break;
+            case "embarrassed": target = charEmbarrassed; break;
+            case "confused":    target = charConfused; break;
+            case "sad":         target = charSad; break;
+            case "excited":     target = charExcited; break;
+            case "masked":      target = charMasked; break;
         }
+
+        // An unknown expression leaves nobody on screen, same as before
+        if (target == null)
+        {
+            expressionSet.HideAll();
+            return;
+        }
+
+        expressionSet.Show(target);
     }
 
     void FadeOutActiveExpressions()
     {
+        expressionSet.Settle();
+
         GameObject[] expressions =
         {
             charNeutral, charSurprised, charHappy, charEmbarrassed,
@@ -306,7 +330,6 @@ public class WestTube : MonoBehaviour
                 expressionsHiddenUntilTunnelEntrance = false;
                 ShowExpression("smile");
                 StartCoroutine(FadeAndDisable(Picture3));
-                StartCoroutine(FadeInObject(charHappy));
                 textToSpeak = "[Finally, they reached the tunnel entrance. A man was standing right there.]";
                 break;
             case 26:

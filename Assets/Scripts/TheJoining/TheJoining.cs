@@ -71,23 +71,35 @@ public class TheJoining : MonoBehaviour
         nextButton.SetActive(false); // Ensure it's hidden at start
     }
 
+    // Expression switching (blend, pop, hide) lives in ExpressionSet
+    ExpressionSet expressionSet;
+
+    void Awake()
+    {
+        expressionSet = new ExpressionSet(this, GetExpressionObjects());
+    }
+
+    GameObject[] GetExpressionObjects()
+    {
+        return new GameObject[]
+        {
+            charNeutral, charSurprised, charHappy, charEmbarrassed,
+            charConfused, charSad, charExcited
+        };
+    }
+
     void HideAllExpressions()
     {
-        charNeutral.SetActive(false);
-        charSurprised.SetActive(false);
-        charHappy.SetActive(false);
-        charEmbarrassed.SetActive(false);
-        charConfused.SetActive(false);
-        charSad.SetActive(false);
-        charExcited.SetActive(false);
+        expressionSet.HideAll();
     }
 
     void ShowExpression(string expression)
     {
-        HideAllExpressions();
-
         if (expressionsHiddenUntilAgnesSpeaks)
+        {
+            expressionSet.HideAll();
             return;
+        }
 
         GameObject target = null;
 
@@ -103,54 +115,14 @@ public class TheJoining : MonoBehaviour
             case "excited":     target = charExcited; break;
         }
 
-        if (target != null)
-            StartCoroutine(FadeInExpression(target));
-    }
-
-    // Expressions with their own Animator animate themselves in, so they are just
-    // switched on. The rest ease in: a soft scale-up from slightly smaller with a
-    // fade, rather than popping into place.
-    IEnumerator FadeInExpression(GameObject target)
-    {
+        // An unknown expression leaves nobody on screen, same as before
         if (target == null)
-            yield break;
-
-        if (target.GetComponent<Animator>() != null)
         {
-            target.SetActive(true);
-            yield break;
+            expressionSet.HideAll();
+            return;
         }
 
-        CanvasGroup canvasGroup = target.GetComponent<CanvasGroup>();
-        if (canvasGroup == null)
-            canvasGroup = target.AddComponent<CanvasGroup>();
-
-        Vector3 finalScale = target.transform.localScale;
-        Vector3 startScale = finalScale * 0.92f;
-
-        target.SetActive(true);
-        canvasGroup.alpha = 0f;
-        target.transform.localScale = startScale;
-
-        const float duration = 0.4f;
-        float elapsed = 0f;
-
-        while (elapsed < duration)
-        {
-            elapsed += Time.deltaTime;
-
-            // Ease-out so the sprite settles into place instead of stopping dead
-            float progress = Mathf.Clamp01(elapsed / duration);
-            float eased = 1f - Mathf.Pow(1f - progress, 3f);
-
-            canvasGroup.alpha = eased;
-            target.transform.localScale = Vector3.LerpUnclamped(startScale, finalScale, eased);
-
-            yield return null;
-        }
-
-        canvasGroup.alpha = 1f;
-        target.transform.localScale = finalScale;
+        expressionSet.Show(target);
     }
 
     IEnumerator EventStarter()

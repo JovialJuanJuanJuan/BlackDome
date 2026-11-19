@@ -69,34 +69,43 @@ public class IntoTheWestTube : MonoBehaviour
         nextButton.SetActive(false); // Ensure it's hidden at start
     }
 
+    // Expression switching (blend, pop, hide) lives in ExpressionSet
+    ExpressionSet expressionSet;
+
+    void Awake()
+    {
+        expressionSet = new ExpressionSet(this, GetCharacterImages());
+    }
+
     void HideAllExpressions()
     {
-        charNeutral.SetActive(false);
-        charSurprised.SetActive(false);
-        charHappy.SetActive(false);
-        charEmbarrassed.SetActive(false);
-        charConfused.SetActive(false);
-        charSad.SetActive(false);
-        charExcited.SetActive(false);
+        expressionSet.HideAll();
     }
 
     void ShowExpression(string expression)
     {
-        if (characterExpressionsHidden)
-            return;
+        GameObject target = null;
 
-        HideAllExpressions();
         switch (expression)
         {
-            case "neutral":     charNeutral.SetActive(true); break;
-            case "surprised":   charSurprised.SetActive(true); break;
-            case "happy":       charHappy.SetActive(true); break;
-            case "smile":       charHappy.SetActive(true); break;
-            case "embarrassed": charEmbarrassed.SetActive(true); break;
-            case "confused":    charConfused.SetActive(true); break;
-            case "sad":         charSad.SetActive(true); break;
-            case "excited":     charExcited.SetActive(true); break;
+            case "neutral":     target = charNeutral; break;
+            case "surprised":   target = charSurprised; break;
+            case "happy":       target = charHappy; break;
+            case "smile":       target = charHappy; break;
+            case "embarrassed": target = charEmbarrassed; break;
+            case "confused":    target = charConfused; break;
+            case "sad":         target = charSad; break;
+            case "excited":     target = charExcited; break;
         }
+
+        // An unknown expression leaves nobody on screen, same as before
+        if (target == null)
+        {
+            expressionSet.HideAll();
+            return;
+        }
+
+        expressionSet.Show(target);
     }
 
     IEnumerator EventStarter()

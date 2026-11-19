@@ -86,48 +86,37 @@ public class TheMission : MonoBehaviour
         nextButton.SetActive(false); // Ensure it's hidden at start
     }
 
-    void HideAllExpressions()
-    {
-        SetExpressionObject(charNeutral, false);
-        SetExpressionObject(charSurprised, false);
-        SetExpressionObject(charHappy, false);
-        SetExpressionObject(charEmbarrassed, false);
-        SetExpressionObject(charConfused, false);
-        SetExpressionObject(charSad, false);
-        SetExpressionObject(charExcited, false);
+    // Expression switching (blend, pop, hide) lives in ExpressionSet
+    ExpressionSet expressionSet;
 
-        SetExpressionObject(morganaNeutral, false);
-        SetExpressionObject(morganaSurprised, false);
-        SetExpressionObject(morganaHappy, false);
-        SetExpressionObject(morganaEmbarrassed, false);
-        SetExpressionObject(morganaConfused, false);
-        SetExpressionObject(morganaSad, false);
-        SetExpressionObject(morganaExcited, false);
+    void Awake()
+    {
+        expressionSet = new ExpressionSet(this, GetExpressionObjects());
     }
 
-    void SetExpressionObject(GameObject target, bool active)
+    GameObject[] GetExpressionObjects()
     {
-        if (target != null)
+        return new GameObject[]
         {
-            // A sprite that faded out earlier keeps a CanvasGroup at alpha 0.
-            // Bring it back at full opacity instead of showing nothing.
-            if (active)
-            {
-                CanvasGroup canvasGroup = target.GetComponent<CanvasGroup>();
-                if (canvasGroup != null)
-                    canvasGroup.alpha = 1f;
-            }
+            charNeutral, charSurprised, charHappy, charEmbarrassed,
+            charConfused, charSad, charExcited,
+            morganaNeutral, morganaSurprised, morganaHappy, morganaEmbarrassed,
+            morganaConfused, morganaSad, morganaExcited
+        };
+    }
 
-            target.SetActive(active);
-        }
+    void HideAllExpressions()
+    {
+        expressionSet.HideAll();
     }
 
     void ShowExpression(string expression)
     {
-        HideAllExpressions();
-
         if (expressionsHiddenUntilMorganaAppears)
+        {
+            expressionSet.HideAll();
             return;
+        }
 
         bool morgana = currentCharacter == "Morgana";
         GameObject target = null;
@@ -146,7 +135,14 @@ public class TheMission : MonoBehaviour
         if (target != null)
             lastExpression = expression;
 
-        SetExpressionObject(target, true);
+        // An unknown expression leaves nobody on screen, same as before
+        if (target == null)
+        {
+            expressionSet.HideAll();
+            return;
+        }
+
+        expressionSet.Show(target);
     }
 
     /// <summary>
@@ -155,6 +151,8 @@ public class TheMission : MonoBehaviour
     /// </summary>
     void FadeOutAgnesExpression()
     {
+        expressionSet.Settle();
+
         GameObject[] agnesExpressions =
         {
             charNeutral, charSurprised, charHappy, charEmbarrassed,
@@ -173,6 +171,8 @@ public class TheMission : MonoBehaviour
     /// </summary>
     void FadeOutMorganaExpression()
     {
+        expressionSet.Settle();
+
         GameObject[] morganaExpressions =
         {
             morganaNeutral, morganaSurprised, morganaHappy, morganaEmbarrassed,
@@ -303,10 +303,9 @@ public class TheMission : MonoBehaviour
             case 3:
                 // Morgana's first line, so she walks into frame here
                 speaker = "Morgana";
-                ShowExpression("happy");
                 expressionsHiddenUntilMorganaAppears = false;
                 lastExpression = "happy";
-                StartCoroutine(FadeInObject(morganaHappy));
+                ShowExpression("happy");
                 // The opening is held on black, so the room is revealed with Morgana
                 StartCoroutine(FadeAndDisable(blackScreen));
                 textToSpeak = "Hey, I didn't know ya could handle these machines.";
@@ -366,10 +365,9 @@ public class TheMission : MonoBehaviour
                 speaker = "Morgana";
                 expressionsHiddenUntilMorganaAppears = false;
                 lastExpression = "neutral";
-                HideAllExpressions();
+                ShowExpression("neutral");
                 StartCoroutine(FadeInObject(Picture2));
                 StartCoroutine(FadeInObject(Picture1));
-                StartCoroutine(FadeInObject(morganaNeutral));
                 textToSpeak = "Like I said, we will spread these 'round the Dome. We have to be careful.";
                 break;
             case 17:
@@ -477,8 +475,7 @@ public class TheMission : MonoBehaviour
                 // Morgana leaves the room and Agnes walks in
                 currentCharacter = "Agnes";
                 lastExpression = "neutral";
-                HideAllExpressions();
-                StartCoroutine(FadeInObject(charNeutral));
+                ShowExpression("neutral");
                 textToSpeak = "[As Morgana entered the door, Bay saw Agnes approaching him with a determined look on her face.]";
                 break;
             case 39:

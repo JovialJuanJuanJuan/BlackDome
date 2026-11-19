@@ -89,37 +89,37 @@ public class TheHiddenColony02 : MonoBehaviour
         nextButton.SetActive(false); // Ensure it's hidden at start
     }
 
-    void HideAllExpressions()
-    {
-        SetExpressionObject(charNeutral, false);
-        SetExpressionObject(charSurprised, false);
-        SetExpressionObject(charHappy, false);
-        SetExpressionObject(charEmbarrassed, false);
-        SetExpressionObject(charConfused, false);
-        SetExpressionObject(charSad, false);
-        SetExpressionObject(charExcited, false);
+    // Expression switching (blend, pop, hide) lives in ExpressionSet
+    ExpressionSet expressionSet;
 
-        SetExpressionObject(morganaNeutral, false);
-        SetExpressionObject(morganaSurprised, false);
-        SetExpressionObject(morganaHappy, false);
-        SetExpressionObject(morganaEmbarrassed, false);
-        SetExpressionObject(morganaConfused, false);
-        SetExpressionObject(morganaSad, false);
-        SetExpressionObject(morganaExcited, false);
+    void Awake()
+    {
+        expressionSet = new ExpressionSet(this, GetExpressionObjects());
     }
 
-    void SetExpressionObject(GameObject target, bool active)
+    GameObject[] GetExpressionObjects()
     {
-        if (target != null)
-            target.SetActive(active);
+        return new GameObject[]
+        {
+            charNeutral, charSurprised, charHappy, charEmbarrassed,
+            charConfused, charSad, charExcited,
+            morganaNeutral, morganaSurprised, morganaHappy, morganaEmbarrassed,
+            morganaConfused, morganaSad, morganaExcited
+        };
+    }
+
+    void HideAllExpressions()
+    {
+        expressionSet.HideAll();
     }
 
     void ShowExpression(string expression)
     {
-        HideAllExpressions();
-
         if (expressionsHiddenUntilTunnelEntrance)
+        {
+            expressionSet.HideAll();
             return;
+        }
 
         bool morgana = currentCharacter == "Morgana";
         GameObject target = null;
@@ -139,7 +139,14 @@ public class TheHiddenColony02 : MonoBehaviour
         if (target != null)
             lastExpression = expression;
 
-        SetExpressionObject(target, true);
+        // An unknown expression leaves nobody on screen, same as before
+        if (target == null)
+        {
+            expressionSet.HideAll();
+            return;
+        }
+
+        expressionSet.Show(target);
     }
 
     /// <summary>
@@ -148,6 +155,8 @@ public class TheHiddenColony02 : MonoBehaviour
     /// </summary>
     void FadeOutAgnesExpression()
     {
+        expressionSet.Settle();
+
         GameObject[] agnesExpressions =
         {
             charNeutral, charSurprised, charHappy, charEmbarrassed,
@@ -163,6 +172,8 @@ public class TheHiddenColony02 : MonoBehaviour
 
     void FadeOutActiveExpressions()
     {
+        expressionSet.Settle();
+
         GameObject[] expressions =
         {
             charNeutral, charSurprised, charHappy, charEmbarrassed,
@@ -326,9 +337,8 @@ public class TheHiddenColony02 : MonoBehaviour
                 textToSpeak = "[She began speaking:]";
                 break;
             case 15:
-                ShowExpression("smile");
                 expressionsHiddenUntilTunnelEntrance = false;
-                StartCoroutine(FadeInObject(morganaHappy));
+                ShowExpression("smile");
                 textToSpeak = "Oh, you must be the new Dommie. Bay, ain't it?";
                 break;
             case 16:
@@ -392,7 +402,6 @@ public class TheHiddenColony02 : MonoBehaviour
             case 30:
                 // Agnes only appears from this line onwards
                 ShowExpression("happy");
-                StartCoroutine(FadeInObject(charHappy));
                 textToSpeak = "Oh, it seems she introduced herself to you first.";
                 break;
             case 31:
