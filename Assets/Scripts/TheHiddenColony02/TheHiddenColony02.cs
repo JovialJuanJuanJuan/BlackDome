@@ -304,7 +304,7 @@ public class TheHiddenColony02 : MonoBehaviour
                 break;
             case 7:
                 ShowExpression("happy");
-                textToSpeak = "WE ARE IMPORTANT. WE ARE HUMANS.";
+                textToSpeak = "WE TOO ARE IMPORTANT. WE ARE HUMANS.";
                 break;
             case 8:
                 ShowExpression("smile");
@@ -322,7 +322,7 @@ public class TheHiddenColony02 : MonoBehaviour
                 break;
             case 11:
                 ShowExpression("smile");
-                textToSpeak = "[She took off her hood, revealing her long blonde hair cascading down her back.]";
+                textToSpeak = "[She took off her hood, revealing her short blonde hair and green eyes.]";
                 break;
             case 12:
                 ShowExpression("smile");
