@@ -290,7 +290,7 @@ public class TheMission : MonoBehaviour
             case 0:
                 // Opening shot only, nobody on screen yet
                 ShowExpression("neutral");
-                textToSpeak = "A few days later...";
+                textToSpeak = "[slow]A few days later...";
                 break;
             case 1:
                 ShowExpression("neutral");
@@ -308,12 +308,12 @@ public class TheMission : MonoBehaviour
                 ShowExpression("happy");
                 // The opening is held on black, so the room is revealed with Morgana
                 StartCoroutine(FadeAndDisable(blackScreen));
-                textToSpeak = "Hey, I didn't know ya could handle these machines.";
+                textToSpeak = "[calm]Hey, I didn't know ya could handle these machines.";
                 break;
             case 4:
                 speaker = "Morgana";
                 ShowExpression("happy");
-                textToSpeak = "Thought they were too complicated for ya.";
+                textToSpeak = "[calm]Thought they were too complicated for ya.";
                 break;
             case 5:
                 ShowExpression("happy");
@@ -331,7 +331,7 @@ public class TheMission : MonoBehaviour
             case 8:
                 speaker = "Morgana";
                 ShowExpression("excited");
-                textToSpeak = "Whatever, check this out!";
+                textToSpeak = "[urgent]Whatever, check this out!";
                 break;
             case 9:
                 // Morgana steps out of frame so the poster shots have the screen to themselves.
@@ -349,16 +349,16 @@ public class TheMission : MonoBehaviour
                 break;
             case 12:
                 // Poster slogans, so no speaker name
-                textToSpeak = "THEY ARE CONTAMINATING THE SURFACE.";
+                textToSpeak = "[urgent]THEY ARE CONTAMINATING THE SURFACE.";
                 break;
             case 13:
-                textToSpeak = "THEY WANNA KEEP US DOWN HERE.";
+                textToSpeak = "[urgent]THEY WANNA KEEP US DOWN HERE.";
                 break;
             case 14:
-                textToSpeak = "OPEN THE DOOR, PIGS!";
+                textToSpeak = "[urgent]OPEN THE DOOR, PIGS!";
                 break;
             case 15:
-                textToSpeak = "DOWN WITH THE SWEEPERS.";
+                textToSpeak = "[urgent]DOWN WITH THE SWEEPERS.";
                 break;
             case 16:
                 // Camera and Morgana both come back for the plan
@@ -383,37 +383,37 @@ public class TheMission : MonoBehaviour
             case 19:
                 speaker = "Morgana";
                 ShowExpression("excited");
-                textToSpeak = "We will sneak out of here, all six of us from the Committee...";
+                textToSpeak = "[tense]We will sneak out of here, all six of us from the Committee...";
                 break;
             case 20:
                 speaker = "Morgana";
                 ShowExpression("happy");
-                textToSpeak = "...including you, Bay.";
+                textToSpeak = "[tense]...including you, Bay.";
                 break;
             case 21:
                 speaker = "Morgana";
                 ShowExpression("happy");
-                textToSpeak = "Don't worry, they don't call me the Sneak Queen for nothing.";
+                textToSpeak = "[calm]Don't worry, they don't call me the Sneak Queen for nothing.";
                 break;
             case 22:
                 ShowExpression("neutral");
-                textToSpeak = "~Sneaking out and trying to stick posters everywhere, it sounded dangerous but...";
+                textToSpeak = "[soft]~Sneaking out and trying to stick posters everywhere, it sounded dangerous but...";
                 break;
             case 23:
                 ShowExpression("happy");
-                textToSpeak = "~...for whatever reason, he felt the thrill of it.";
+                textToSpeak = "[soft]~...for whatever reason, he felt the thrill of it.";
                 break;
             case 24:
                 ShowExpression("neutral");
-                textToSpeak = "~He didn't feel as confused as he used to be, just a few days before.";
+                textToSpeak = "[soft]~He didn't feel as confused as he used to be, just a few days before.";
                 break;
             case 25:
                 ShowExpression("neutral");
-                textToSpeak = "~His mind was clearer, there was a purpose he must chase...";
+                textToSpeak = "[soft]~His mind was clearer, there was a purpose he must chase...";
                 break;
             case 26:
                 ShowExpression("happy");
-                textToSpeak = "~...just like them.";
+                textToSpeak = "[soft]~...just like them.";
                 break;
             case 27:
                 speaker = "Morgana";
@@ -496,22 +496,22 @@ public class TheMission : MonoBehaviour
             case 42:
                 speaker = "Agnes";
                 ShowExpression("sad");
-                textToSpeak = "I know this is all really sudden for you...";
+                textToSpeak = "[slow]I know this is all really sudden for you...";
                 break;
             case 43:
                 speaker = "Agnes";
                 ShowExpression("sad");
-                textToSpeak = "...this is for a greater cause, trust me.";
+                textToSpeak = "[slow]...this is for a greater cause, trust me.";
                 break;
             case 44:
                 speaker = "Agnes";
                 ShowExpression("sad");
-                textToSpeak = "...";
+                textToSpeak = "[slow]...[pause=0.8]";
                 break;
             case 45:
                 speaker = "Agnes";
                 ShowExpression("happy");
-                textToSpeak = "Best of luck, Bay.";
+                textToSpeak = "[soft]Best of luck, Bay.";
                 break;
             case 46:
                 ShowExpression("sad");
@@ -548,17 +548,17 @@ public class TheMission : MonoBehaviour
                 // music drains away under the closing lines.
                 StartCoroutine(FadeInObject(blackScreen, BlackscreenFadeDuration));
                 SlowFadeMusicOut();
-                textToSpeak = "Let this be the catalyst for change...";
+                textToSpeak = "[slow]Let this be the catalyst for change...";
                 break;
             case 53:
                 speaker = "Morgana";
                 ShowExpression("neutral");
-                textToSpeak = "...let us begin...";
+                textToSpeak = "[slow]...let us begin...";
                 break;
             case 54:
                 speaker = "Morgana";
                 ShowExpression("excited");
-                textToSpeak = "...Operation Newspread.";
+                textToSpeak = "[tense]...Operation Newspread.[pause=0.8]";
                 break;
         }
 
@@ -569,7 +569,7 @@ public class TheMission : MonoBehaviour
         textBox.GetComponent<TMP_Text>().text = body;
         DialogueText.ApplyStyle(textBox.GetComponent<TMP_Text>(), italics);
         currentTextLength = body.Length;
-        TextCreator.runTextPrint = true;
+        TextCreator.Run(textToSpeak);
 
         yield return new WaitForSeconds(0.05f);
         yield return new WaitForSeconds(1f);

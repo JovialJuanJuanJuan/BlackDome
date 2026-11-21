@@ -167,7 +167,7 @@ public class UnconStart : MonoBehaviour
         TextCreator.charCount = 0;
 
         // Start typewriter effect
-        TextCreator.runTextPrint = true;
+        TextCreator.Run(textToSpeak);
 
         // Play sigh on first intro line
         if (index == 9 && workAlarm != null)

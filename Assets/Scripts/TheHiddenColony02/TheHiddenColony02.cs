@@ -293,62 +293,62 @@ public class TheHiddenColony02 : MonoBehaviour
         {
             case 0:
                 ShowExpression("smile");
-                textToSpeak = "~Bay began to approach the individual, who was inside their own world.";
+                textToSpeak = "[calm]~Bay began to approach the individual, who was inside their own world.";
                 break;
             case 1:
                 ShowExpression("smile");
-                textToSpeak = "~When he got close enough, he noticed the person was making some kind of poster.";
+                textToSpeak = "[calm]~When he got close enough, he noticed the person was making some kind of poster.";
                 break;
             case 2:
                 ShowExpression("smile");
-                textToSpeak = "~He managed to read it once he was close enough...";
+                textToSpeak = "[tense]~He managed to read it once he was close enough...";
                 break;
             case 3:
                 ShowExpression("smile");
                 StartCoroutine(FadeAndDisable(Picture1));
-                textToSpeak = "~...his eyes widened, something between confusion and astonishment washed over him.";
+                textToSpeak = "[tense]~...his eyes widened, something between confusion and astonishment washed over him.";
                 break;
             case 4:
                 ShowExpression("embarrassed");
-                textToSpeak = "THE SWEEPERS ARE FAR FROM RIGHT.";
+                textToSpeak = "[urgent]THE SWEEPERS ARE FAR FROM RIGHT.";
                 break;
             case 5:
                 ShowExpression("happy");
-                textToSpeak = "LET US OUTSIDE, THEY'RE HIDING IT FROM US.";
+                textToSpeak = "[urgent]LET US OUTSIDE, THEY'RE HIDING IT FROM US.";
                 break;
             case 6:
                 ShowExpression("confused");
-                textToSpeak = "DON'T LET US ROT HERE.";
+                textToSpeak = "[urgent]DON'T LET US ROT HERE.";
                 break;
             case 7:
                 ShowExpression("happy");
-                textToSpeak = "WE TOO ARE IMPORTANT. WE ARE HUMANS.";
+                textToSpeak = "[urgent]WE TOO ARE IMPORTANT. WE ARE HUMANS.";
                 break;
             case 8:
                 ShowExpression("smile");
                 FadeOutActiveExpressions();
-                textToSpeak = "~When Bay got close enough, the individual turned abruptly from their chair...";
+                textToSpeak = "[tense]~When Bay got close enough, the individual turned abruptly from their chair...";
                 break;
             case 9:
                 ShowExpression("smile");
-                textToSpeak = "~...he finally saw their face.";
+                textToSpeak = "[tense]~...he finally saw their face.[pause=0.7]";
                 break;
             case 10:
                 ShowExpression("smile");
                 StartCoroutine(FadeAndDisable(Picture2));
-                textToSpeak = "~It was a girl, maybe fifteen years old or so.";
+                textToSpeak = "[soft]~It was a girl, maybe fifteen years old or so.";
                 break;
             case 11:
                 ShowExpression("smile");
-                textToSpeak = "~She took off her hood, revealing her short blonde hair and green eyes.";
+                textToSpeak = "[soft]~She took off her hood, revealing her short blonde hair and green eyes.";
                 break;
             case 12:
                 ShowExpression("smile");
-                textToSpeak = "~She looked familiar, but he couldn't quite put his finger on where he saw her before.";
+                textToSpeak = "[soft]~She looked familiar, but he couldn't quite put his finger on where he saw her before.";
                 break;
             case 13:
                 ShowExpression("smile");
-                textToSpeak = "~She was wearing headphones, which she didn't take off before she completely faced him.";
+                textToSpeak = "[calm]~She was wearing headphones, which she didn't take off before she completely faced him.";
                 break;
             case 14:
                 ShowExpression("smile");
@@ -389,25 +389,25 @@ public class TheHiddenColony02 : MonoBehaviour
                 break;
             case 23:
                 ShowExpression("neutral");
-                textToSpeak = "We are The Underdomers, and this is our home...";
+                textToSpeak = "[slow]We are The Underdomers, and this is our home...";
                 break;
             case 24:
                 ShowExpression("happy");
-                textToSpeak = "...The Hidden Colony.";
+                textToSpeak = "[slow]...The Hidden Colony.";
                 break;
             case 25:
                 // Agnes stays hidden until she actually steps in at case 30,
                 // so the character sprite is not shown during Morgana's lines.
                 ShowExpression("neutral");
-                textToSpeak = "We know what that Dome Control Administration group is doing, I reckon you already know a bit?";
+                textToSpeak = "[calm]We know what that Dome Control Administration group is doing, I reckon you already know a bit?";
                 break;
             case 26:
                 ShowExpression("sad");
-                textToSpeak = "They don't want anyone knowing 'bout what's up there, outside...";
+                textToSpeak = "[tense]They don't want anyone knowing 'bout what's up there, outside...";
                 break;
             case 27:
                 ShowExpression("neutral");
-                textToSpeak = "...what they call The Surface.";
+                textToSpeak = "[tense]...what they call The Surface.";
                 break;
             case 28:
                 ShowExpression("happy");
@@ -467,7 +467,7 @@ public class TheHiddenColony02 : MonoBehaviour
         textBox.GetComponent<TMP_Text>().text = body;
         DialogueText.ApplyStyle(textBox.GetComponent<TMP_Text>(), DialogueText.ShouldUseItalics(textToSpeak, speaker));
         currentTextLength = body.Length;
-        TextCreator.runTextPrint = true;
+        TextCreator.Run(textToSpeak);
 
         yield return new WaitForSeconds(0.05f);
         yield return new WaitForSeconds(1f);
@@ -733,7 +733,7 @@ public class TheHiddenColony02 : MonoBehaviour
         TextCreator.charCount = 0;
 
         // Start typewriter
-        TextCreator.runTextPrint = true;
+        TextCreator.Run(textToSpeak);
 
         yield return new WaitForSeconds(0.05f);
         yield return new WaitForSeconds(1f);

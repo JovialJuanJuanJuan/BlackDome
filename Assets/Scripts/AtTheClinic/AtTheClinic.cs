@@ -143,7 +143,7 @@ public class Scene02Events : MonoBehaviour
         TextCreator.charCount = 0;
 
         // Start typewriter effect
-        TextCreator.runTextPrint = true;
+        TextCreator.Run(textToSpeak);
 
         // Play alarm if needed
         if (index == 9 && workAlarm != null)
@@ -396,7 +396,7 @@ public class Scene02Events : MonoBehaviour
 
 
         // Start typewriter
-        TextCreator.runTextPrint = true;
+        TextCreator.Run(textToSpeak);
 
 
         yield return new WaitForSeconds(0.05f);

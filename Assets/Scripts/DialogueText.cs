@@ -1,10 +1,14 @@
 using TMPro;
 
 /// <summary>
-/// How narration is told apart from speech. Lines that describe the world or Bay's own thoughts
-/// are written with a leading '~' in the dialogue scripts; the marker is never displayed, and the
-/// line is shown in italics with no speaker name, so the player still reads it as the narrator's
-/// voice rather than a character talking.
+/// How narration is told apart from speech, and how a line is prepared for display. Lines that
+/// describe the world or Bay's own thoughts are written with a leading '~' in the dialogue scripts;
+/// the marker is never displayed, and the line is shown in italics with no speaker name, so the
+/// player still reads it as the narrator's voice rather than a character talking.
+///
+/// A line may also carry pacing markers before or after the '~', which are stripped here so the
+/// text the player sees (and the length the dialogue scripts wait on) holds only the words. See
+/// <see cref="TypewriterPacing"/> for the markers themselves.
 /// </summary>
 public static class DialogueText
 {
@@ -14,13 +18,13 @@ public static class DialogueText
     /// <summary>True when the line is the narrator's, not a character speaking.</summary>
     public static bool IsNarration(string line)
     {
-        return !string.IsNullOrEmpty(line) && line[0] == NarrationMarker;
+        return TypewriterPacing.Parse(line).Narration;
     }
 
-    /// <summary>The line as the player sees it: the narration marker removed.</summary>
+    /// <summary>The line as the player sees it: every marker removed.</summary>
     public static string Body(string line)
     {
-        return IsNarration(line) ? line.Substring(1) : line;
+        return TypewriterPacing.Parse(line).Body;
     }
 
     /// <summary>
@@ -29,10 +33,13 @@ public static class DialogueText
     /// </summary>
     public static bool IsQuotedSpeech(string line)
     {
-        if (string.IsNullOrEmpty(line))
+        TypewriterLine parsed = TypewriterPacing.Parse(line);
+        string spoken = parsed.Body;
+
+        if (string.IsNullOrEmpty(spoken))
             return false;
 
-        string trimmed = line.Trim();
+        string trimmed = spoken.Trim();
         if (trimmed.Length < 2)
             return false;
 
@@ -49,10 +56,12 @@ public static class DialogueText
     /// </summary>
     public static bool ShouldUseItalics(string line, string speakerName)
     {
-        if (IsNarration(line))
+        TypewriterLine parsed = TypewriterPacing.Parse(line);
+
+        if (parsed.Narration)
             return true;
 
-        return string.IsNullOrEmpty(speakerName) && !IsQuotedSpeech(line);
+        return string.IsNullOrEmpty(speakerName) && !IsQuotedSpeech(parsed.Body);
     }
 
     /// <summary>

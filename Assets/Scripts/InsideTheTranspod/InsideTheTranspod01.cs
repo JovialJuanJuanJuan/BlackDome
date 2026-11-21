@@ -237,7 +237,7 @@ public class InsideTheTranspod01 : MonoBehaviour
         textBox.GetComponent<TMP_Text>().text = body;
         DialogueText.ApplyStyle(textBox.GetComponent<TMP_Text>(), DialogueText.ShouldUseItalics(textToSpeak, speaker));
         currentTextLength = body.Length;
-        TextCreator.runTextPrint = true;
+        TextCreator.Run(textToSpeak);
 
         yield return new WaitForSeconds(0.05f);
         yield return new WaitForSeconds(1f);
@@ -488,7 +488,7 @@ public class InsideTheTranspod01 : MonoBehaviour
         TextCreator.charCount = 0;
 
         // Start typewriter
-        TextCreator.runTextPrint = true;
+        TextCreator.Run(textToSpeak);
 
         yield return new WaitForSeconds(0.05f);
         yield return new WaitForSeconds(1f);

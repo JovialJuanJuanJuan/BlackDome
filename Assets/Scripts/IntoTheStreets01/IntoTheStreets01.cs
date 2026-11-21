@@ -59,15 +59,15 @@ public class Scene04Event : MonoBehaviour
         {
             case 0:
                 speakerName = "You";
-                textToSpeak = "~He exited the place, which turned out to be a sort of clinic as he expected.";
+                textToSpeak = "[calm]~He exited the place, which turned out to be a sort of clinic as he expected.";
                 break;
             case 1:
                 speakerName = "You";
-                textToSpeak = "~To his surprise, the place is enormous.";
+                textToSpeak = "[calm]~To his surprise, the place is enormous.";
                 break;
             case 2:
                 speakerName = "You";
-                textToSpeak = "~An actual city, but...";
+                textToSpeak = "[slow]~An actual city, but...";
                 break;
             case 3:
                 speakerName = "You";
@@ -83,7 +83,7 @@ public class Scene04Event : MonoBehaviour
                 break;
             case 6:
                 speakerName = "You";
-                textToSpeak = ". . .";
+                textToSpeak = "[slow]. . .";
                 break;
             case 7:
                 speakerName = "You";
@@ -107,11 +107,11 @@ public class Scene04Event : MonoBehaviour
                 break;
             case 12:
                 speakerName = "You";
-                textToSpeak = "~He saw it:";
+                textToSpeak = "[tense]~He saw it:[pause=0.6]";
                 break;
             case 13:
                 speakerName = "You";
-                textToSpeak = "~White, spherical-shaped vehicles were floating all over the city.";
+                textToSpeak = "[soft]~White, spherical-shaped vehicles were floating all over the city.";
                 break;
             case 14:
                 speakerName = "You";
@@ -135,7 +135,7 @@ public class Scene04Event : MonoBehaviour
                 break;
             case 19:
                 speakerName = "You";
-                textToSpeak = "~A figure stepped out of the vehicle, and revealed itself...";
+                textToSpeak = "[tense]~A figure stepped out of the vehicle, and revealed itself...";
                 break;
         }
 
@@ -147,7 +147,7 @@ public class Scene04Event : MonoBehaviour
         textBox.GetComponent<TMPro.TMP_Text>().text = body;
         DialogueText.ApplyStyle(textBox.GetComponent<TMPro.TMP_Text>(), italics);
         currentTextLength = body.Length;
-        TextCreator.runTextPrint = true;
+        TextCreator.Run(textToSpeak);
 
         yield return new WaitForSeconds(0.05f);
         yield return new WaitForSeconds(1f);

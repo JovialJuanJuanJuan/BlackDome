@@ -28,6 +28,18 @@ public class IntroSequenceEvents : MonoBehaviour
     [SerializeField] string textToSpeak;
     [SerializeField] float charDelay = 0.1f;   // typing speed (seconds per character)
 
+    [Tooltip("Extra beat after a full stop, question mark or exclamation mark.")]
+    [SerializeField] float sentencePause = 0.18f;
+
+    [Tooltip("Extra beat after a comma, semicolon, colon or dash.")]
+    [SerializeField] float clausePause = 0.08f;
+
+    [Tooltip("How long each character takes to fade and rise into place, at normal speed.")]
+    [SerializeField] float revealDuration = 0.16f;
+
+    // Characters fade and rise into place as they are typed, the same way dialogue does.
+    readonly TypewriterReveal reveal = new TypewriterReveal();
+
     int introIndex = 0;
     bool isPlayingLine = false;
     bool isSkipping = false;
@@ -53,9 +65,11 @@ public class IntroSequenceEvents : MonoBehaviour
         StartCoroutine(EventStarter());
     }
 
-    void Update()
+    void LateUpdate()
     {
-        // No typing here anymore — typing is handled by a coroutine.
+        // Typing itself is handled by PlayIntroLine; this only draws the characters fading in.
+        if (reveal.IsAnimating)
+            reveal.Animate(Time.time);
     }
 
     IEnumerator EventStarter()
@@ -81,83 +95,135 @@ public class IntroSequenceEvents : MonoBehaviour
         switch (index)
         {
             case 0:
-                textToSpeak = "Light hides within the darkness of the people...";
+                textToSpeak = "[slow]Light hides within the darkness of the people...";
                 break;
             case 1:
-                textToSpeak = "...rooted from the darkness of their own world.";
+                textToSpeak = "[slow]...rooted from the darkness of their own world.";
                 break;
             case 2:
-                textToSpeak = "To find light, you must first overcome the darkness.";
+                textToSpeak = "[calm]To find light, you must first overcome the darkness.";
                 break;
             case 3:
-                textToSpeak = "Only then...";
+                textToSpeak = "[slow]Only then...";
                 break;
             case 4:
-                textToSpeak = "...the world will shine bright.";
+                textToSpeak = "[soft]...the world will shine bright.";
                 break;
             case 5:
-                textToSpeak = "You know how I know? Perhaps not...";
+                textToSpeak = "[calm]You know how I know? Perhaps not...";
                 break;
             case 6:
-                textToSpeak = "...but it is a fact that many already take for granted.";
+                textToSpeak = "[calm]...but it is a fact that many already take for granted.";
                 break;
             case 7:
-                textToSpeak = "Darkness can consume you in the scarcity of light.";
+                textToSpeak = "[slow]Darkness can consume you in the scarcity of light.";
                 break;
             case 8:
-                textToSpeak = "It's for this reason that you and I can have a world as bright as...";
+                textToSpeak = "[slow]It's for this reason that you and I can have a world as bright as...";
                 break;
             case 9:
-                textToSpeak = "But it is not the outside world.";
+                textToSpeak = "[tense]But it is not the outside world.[pause=0.6]";
                 break;
             case 10:
-                textToSpeak = "It is your world.";
+                textToSpeak = "[slow]It is your world.";
                 break;
             case 11:
-                textToSpeak = "The one you, and only you, can perceive.";
+                textToSpeak = "[soft]The one you, and only you, can perceive.";
                 break;
             case 12:
-                textToSpeak = "Darkness prevails in the world of the people, but light prevails in your world.";
+                textToSpeak = "[calm]Darkness prevails in the world of the people, but light prevails in your world.";
                 break;
             case 13:
-                textToSpeak = "As hard as it may seem at first, the light is always there—omnipresent...";
+                textToSpeak = "[slow]As hard as it may seem at first, the light is always there—omnipresent...";
                 break;
             case 14:
-                textToSpeak = "...waiting.";
+                textToSpeak = "[soft]...waiting.[pause=0.9]";
                 break;
             case 15:
-                textToSpeak = "Remember, never confuse light for darkness...";
+                textToSpeak = "[tense]Remember, never confuse light for darkness...";
                 break;
             case 16:
-                textToSpeak = "...for it's the greatest deception of all...";
+                textToSpeak = "[tense]...for it's the greatest deception of all...";
                 break;
             case 17:
-                textToSpeak = "...the greatest error that a human being can commit.";
+                textToSpeak = "[slow]...the greatest error that a human being can commit.";
                 break;
             case 18:
-                textToSpeak = "And you, my friend, are a human being.";
+                textToSpeak = "[calm]And you, my friend, are a human being.";
                 break;
             case 19:
-                textToSpeak = "A human being, and a human being alone, can find the light.";
+                textToSpeak = "[slow]A human being, and a human being alone, can find the light.";
                 break;
                 
         }
 
-        tmp.text = "";
+        // The line can carry pacing markers: a mood like [slow], and holds like [pause=0.8] between
+        // words. They are stripped here, so only the words themselves are ever shown.
+        TypewriterLine line = TypewriterPacing.Parse(textToSpeak);
 
-        // Typewriter coroutine: slower, controlled speed
-        for (int i = 0; i <= textToSpeak.Length; i++)
+        float speed = Mathf.Max(0.35f, line.Speed);
+        float gap = charDelay / speed;
+
+        // Lay the whole line out once, then uncover it a character at a time. TMP keeps the same
+        // layout throughout, so the sentence never re-wraps or shifts while it is being typed, and
+        // each character fades and rises into place rather than snapping on.
+        tmp.text = line.Body;
+
+        reveal.Duration = Mathf.Clamp(revealDuration / speed, 0.05f, 0.3f);
+        reveal.SentencePause = line.HasMood ? line.SentencePause : sentencePause;
+        reveal.ClausePause = line.HasMood ? line.ClausePause : clausePause;
+        reveal.Begin(tmp);
+
+        int totalCharacters = tmp.textInfo.characterCount;
+        int shown = 0;
+        float wait = 0f;
+
+        // A hold written before the first word is a silence that opens the line.
+        float leadHold = line.HoldAt(0);
+        if (leadHold > 0f)
+            yield return new WaitForSeconds(leadHold);
+
+        // Typewriter coroutine: slower, controlled speed, with an even beat between characters
+        // at any frame rate instead of one character per frame boundary.
+        while (shown < totalCharacters)
         {
             if (isSkipping)
             {
                 // Instantly show full line if user clicked during typing
-                tmp.text = textToSpeak;
                 break;
             }
 
-            tmp.text = textToSpeak.Substring(0, i);
-            yield return new WaitForSeconds(charDelay);
+            // Count down the gap to the next character, and type it in the frame that gap ends.
+            if (wait > 0f)
+            {
+                wait -= Time.deltaTime;
+                if (wait > 0f)
+                {
+                    yield return null;
+                    continue;
+                }
+            }
+
+            reveal.Reveal(shown, Time.time);
+            shown++;
+
+            TMP_TextInfo info = tmp.textInfo;
+            char character = info.characterInfo[shown - 1].character;
+            char nextCharacter = shown < totalCharacters ? info.characterInfo[shown].character : '\0';
+            wait = gap + reveal.PauseAfter(character, nextCharacter) + line.HoldAt(shown);
+
+            yield return null;
         }
+
+        // A hold at the end of a line is a silence before the line is finished.
+        float tailHold = line.HoldAt(totalCharacters);
+        if (tailHold > 0f && !isSkipping)
+            yield return new WaitForSeconds(tailHold);
+
+        // A skipped line is shown at once; a finished one lets its last characters keep fading in
+        // through the short pause before Next appears.
+        if (isSkipping)
+            reveal.Finish();
 
         // Small pause after full line is visible
         yield return new WaitForSeconds(0.3f);
