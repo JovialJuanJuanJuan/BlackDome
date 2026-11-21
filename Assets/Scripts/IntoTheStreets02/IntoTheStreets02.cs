@@ -227,7 +227,8 @@ public class IntoTheStreets02 : MonoBehaviour
 
         }
 
-        charName.GetComponent<TMP_Text>().text = textToSpeak.StartsWith("[") ? "" : "Agnes";
+        // Bay's own line ("Bay. Bay Ausman.") is spoken by the player character.
+        charName.GetComponent<TMP_Text>().text = textToSpeak.StartsWith("[") ? "" : (index == 21 ? "You" : "Agnes");
         textBox.GetComponent<TMP_Text>().text = textToSpeak;
         currentTextLength = textToSpeak.Length;
         TextCreator.runTextPrint = true;
