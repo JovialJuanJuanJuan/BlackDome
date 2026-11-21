@@ -9,7 +9,9 @@ using UnityEngine;
 public class ExpressionSprite : MonoBehaviour
 {
     CanvasGroup group;
+    RectTransform rect;
     Vector3 baseScale = Vector3.one;
+    Vector2 basePosition;
     bool captured;
 
     public CanvasGroup Group
@@ -34,6 +36,35 @@ public class ExpressionSprite : MonoBehaviour
     /// </summary>
     public bool HasAppeared { get; set; }
 
+    /// <summary>How far the sprite currently sits from its authored spot.</summary>
+    public float OffsetX
+    {
+        get
+        {
+            Capture();
+            return rect != null ? rect.anchoredPosition.x - basePosition.x : 0f;
+        }
+    }
+
+    /// <summary>
+    /// Slides the sprite sideways from where it was authored, which is how the stage moves a
+    /// listening character out of the speaker's way.
+    /// </summary>
+    public void SetOffsetX(float offset)
+    {
+        Capture();
+        if (rect != null)
+            rect.anchoredPosition = basePosition + new Vector2(offset, 0f);
+    }
+
+    /// <summary>Puts the sprite back where it was authored.</summary>
+    public void RestorePosition()
+    {
+        Capture();
+        if (rect != null)
+            rect.anchoredPosition = basePosition;
+    }
+
     /// <summary>Puts the sprite back to its authored size.</summary>
     public void RestoreScale()
     {
@@ -47,6 +78,10 @@ public class ExpressionSprite : MonoBehaviour
             return;
 
         baseScale = transform.localScale;
+
+        rect = transform as RectTransform;
+        if (rect != null)
+            basePosition = rect.anchoredPosition;
 
         group = GetComponent<CanvasGroup>();
         if (group == null)

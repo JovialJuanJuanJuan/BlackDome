@@ -70,33 +70,50 @@ public class WestTube : MonoBehaviour
         nextButton.SetActive(false); // Ensure it's hidden at start
     }
 
-    // Expression switching (blend, pop, hide) lives in ExpressionSet
-    ExpressionSet expressionSet;
+    // Agnes and Ryder each keep their own expression sprites. While Agnes is alone she stays
+    // centred as before; once Ryder arrives the pair takes the left and right marks, and the
+    // stage dims whoever is not talking.
+    ExpressionSet agnesSet;
+    ExpressionSet ryderSet;
+    CharacterStage stage;
 
     void Awake()
     {
-        expressionSet = new ExpressionSet(this, GetExpressionObjects());
+        agnesSet = new ExpressionSet(this, GetAgnesExpressions());
+        ryderSet = new ExpressionSet(this, new GameObject[] { charMasked });
+        stage = new CharacterStage(
+            this,
+            new CharacterStage.Slot("Agnes", agnesSet, CharacterStage.LeftHome),
+            new CharacterStage.Slot("Ryder", ryderSet, CharacterStage.RightHome));
     }
 
-    GameObject[] GetExpressionObjects()
+    GameObject[] GetAgnesExpressions()
     {
         return new GameObject[]
         {
             charNeutral, charSurprised, charHappy, charEmbarrassed,
-            charConfused, charSad, charExcited, charMasked
+            charConfused, charSad, charExcited
         };
     }
 
     void HideAllExpressions()
     {
-        expressionSet.HideAll();
+        agnesSet.HideAll();
+        ryderSet.HideAll();
     }
 
     void ShowExpression(string expression)
     {
         if (expressionsHiddenUntilTunnelEntrance)
         {
-            expressionSet.HideAll();
+            HideAllExpressions();
+            return;
+        }
+
+        // Ryder never takes the mask off, so his one sprite is named directly.
+        if (expression == "masked")
+        {
+            stage.Show("Ryder", charMasked, ExpressionFade.SwitchDuration);
             return;
         }
 
@@ -112,22 +129,22 @@ public class WestTube : MonoBehaviour
             case "confused":    target = charConfused; break;
             case "sad":         target = charSad; break;
             case "excited":     target = charExcited; break;
-            case "masked":      target = charMasked; break;
         }
 
         // An unknown expression leaves nobody on screen, same as before
         if (target == null)
         {
-            expressionSet.HideAll();
+            agnesSet.HideAll();
             return;
         }
 
-        expressionSet.Show(target);
+        stage.Show("Agnes", target, ExpressionFade.SwitchDuration);
     }
 
     void FadeOutActiveExpressions()
     {
-        expressionSet.Settle();
+        agnesSet.Settle();
+        ryderSet.Settle();
 
         GameObject[] expressions =
         {
@@ -411,6 +428,10 @@ public class WestTube : MonoBehaviour
 
         if (speaker == "Ryder")
             ShowExpression("masked");
+
+        // Light whoever is talking; on narration lines both are dimmed.
+        stage.Focus(speaker);
+
         textBox.GetComponent<TMP_Text>().text = body;
         DialogueText.ApplyStyle(textBox.GetComponent<TMP_Text>(), DialogueText.ShouldUseItalics(textToSpeak, speaker));
         currentTextLength = body.Length;
@@ -648,6 +669,8 @@ public class WestTube : MonoBehaviour
         else if (!string.IsNullOrEmpty(dialogueLine.expression))
             ShowExpression(dialogueLine.expression);
 
+        stage.Focus(speaker);
+
         textBox.GetComponent<TMP_Text>().text = body;
         DialogueText.ApplyStyle(textBox.GetComponent<TMP_Text>(), DialogueText.ShouldUseItalics(textToSpeak, speaker));
         currentTextLength = body.Length;
@@ -690,6 +713,7 @@ public class WestTube : MonoBehaviour
     {
         nextButton.SetActive(false);
         ShowExpression("happy");
+        stage.Focus("Agnes");
         textBox.SetActive(true);
         fadeOut.SetActive(true);
         yield return new WaitForSeconds(4f);

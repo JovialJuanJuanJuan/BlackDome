@@ -33,13 +33,13 @@ public static class ExpressionFade
     /// <summary>
     /// True when the sprite is switched on and fully opaque, so re-showing it is a no-op.
     /// </summary>
-    public static bool IsVisible(GameObject target)
+    public static bool IsVisible(GameObject target, float expectedAlpha = 1f)
     {
         if (target == null || !target.activeSelf)
             return false;
 
         CanvasGroup group = target.GetComponent<CanvasGroup>();
-        return group == null || group.alpha >= 0.999f;
+        return group == null || group.alpha >= expectedAlpha - 0.001f;
     }
 
     /// <summary>
@@ -96,6 +96,7 @@ public static class ExpressionFade
 
         ExpressionSprite sprite = ExpressionSprite.For(target);
         sprite.RestoreScale();
+        sprite.RestorePosition();
         sprite.Group.alpha = 0f;
         target.SetActive(false);
     }
@@ -105,7 +106,15 @@ public static class ExpressionFade
     /// character's entrance and gets the full pop; when another sprite is already showing,
     /// it is a quiet expression change with only a slight shift in size.
     /// </summary>
-    public static IEnumerator CrossFade(GameObject[] sprites, GameObject target, float entranceDuration)
+    /// <param name="alphaTarget">
+    /// Opacity the arriving sprite settles at. The stage lowers it for the character who is
+    /// listening, and it is read every frame so a focus change mid-switch still lands correctly.
+    /// </param>
+    public static IEnumerator CrossFade(
+        GameObject[] sprites,
+        GameObject target,
+        float entranceDuration,
+        System.Func<float> alphaTarget)
     {
         if (target == null)
             yield break;
@@ -177,7 +186,8 @@ public static class ExpressionFade
                 {
                     // Arrive: fade up quickly, size snaps down with a small overshoot
                     float t = Mathf.Clamp01((elapsed - inStart) / inLength);
-                    states[i].Group.alpha = Mathf.Lerp(startAlphas[i], 1f, EaseOutCubic(t));
+                    float goal = alphaTarget != null ? Mathf.Clamp01(alphaTarget()) : 1f;
+                    states[i].Group.alpha = Mathf.Lerp(startAlphas[i], goal, EaseOutCubic(t));
                     states[i].SetScale(Mathf.LerpUnclamped(overshoot, 1f, EaseOutBack(t)));
                 }
                 else
@@ -193,11 +203,11 @@ public static class ExpressionFade
             yield return null;
         }
 
-        Finish(sprites, states, target);
+        Finish(sprites, states, target, alphaTarget != null ? Mathf.Clamp01(alphaTarget()) : 1f);
     }
 
     // Settles every sprite on its final state so nothing is left half sized or half faded.
-    static void Finish(GameObject[] sprites, ExpressionSprite[] states, GameObject target)
+    static void Finish(GameObject[] sprites, ExpressionSprite[] states, GameObject target, float targetAlpha)
     {
         for (int i = 0; i < sprites.Length; i++)
         {
@@ -208,7 +218,7 @@ public static class ExpressionFade
 
             if (sprites[i] == target)
             {
-                states[i].Group.alpha = 1f;
+                states[i].Group.alpha = targetAlpha;
             }
             else
             {

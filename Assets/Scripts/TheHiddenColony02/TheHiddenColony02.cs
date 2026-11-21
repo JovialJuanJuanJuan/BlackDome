@@ -89,20 +89,36 @@ public class TheHiddenColony02 : MonoBehaviour
         nextButton.SetActive(false); // Ensure it's hidden at start
     }
 
-    // Expression switching (blend, pop, hide) lives in ExpressionSet
-    ExpressionSet expressionSet;
+    // Agnes and Morgana each keep their own expression sprites. While only one of them is on
+    // stage she stays centred as before; once both are present they take the left and right
+    // marks, and the stage dims whoever is not talking.
+    ExpressionSet agnesSet;
+    ExpressionSet morganaSet;
+    CharacterStage stage;
 
     void Awake()
     {
-        expressionSet = new ExpressionSet(this, GetExpressionObjects());
+        agnesSet = new ExpressionSet(this, GetAgnesExpressions());
+        morganaSet = new ExpressionSet(this, GetMorganaExpressions());
+        stage = new CharacterStage(
+            this,
+            new CharacterStage.Slot("Agnes", agnesSet, CharacterStage.LeftHome),
+            new CharacterStage.Slot("Morgana", morganaSet, CharacterStage.RightHome));
     }
 
-    GameObject[] GetExpressionObjects()
+    GameObject[] GetAgnesExpressions()
     {
         return new GameObject[]
         {
             charNeutral, charSurprised, charHappy, charEmbarrassed,
-            charConfused, charSad, charExcited,
+            charConfused, charSad, charExcited
+        };
+    }
+
+    GameObject[] GetMorganaExpressions()
+    {
+        return new GameObject[]
+        {
             morganaNeutral, morganaSurprised, morganaHappy, morganaEmbarrassed,
             morganaConfused, morganaSad, morganaExcited
         };
@@ -110,14 +126,15 @@ public class TheHiddenColony02 : MonoBehaviour
 
     void HideAllExpressions()
     {
-        expressionSet.HideAll();
+        agnesSet.HideAll();
+        morganaSet.HideAll();
     }
 
     void ShowExpression(string expression)
     {
         if (expressionsHiddenUntilTunnelEntrance)
         {
-            expressionSet.HideAll();
+            HideAllExpressions();
             return;
         }
 
@@ -142,11 +159,11 @@ public class TheHiddenColony02 : MonoBehaviour
         // An unknown expression leaves nobody on screen, same as before
         if (target == null)
         {
-            expressionSet.HideAll();
+            (morgana ? morganaSet : agnesSet).HideAll();
             return;
         }
 
-        expressionSet.Show(target);
+        stage.Show(morgana ? "Morgana" : "Agnes", target, ExpressionFade.SwitchDuration);
     }
 
     /// <summary>
@@ -155,7 +172,7 @@ public class TheHiddenColony02 : MonoBehaviour
     /// </summary>
     void FadeOutAgnesExpression()
     {
-        expressionSet.Settle();
+        agnesSet.Settle();
 
         GameObject[] agnesExpressions =
         {
@@ -172,7 +189,8 @@ public class TheHiddenColony02 : MonoBehaviour
 
     void FadeOutActiveExpressions()
     {
-        expressionSet.Settle();
+        agnesSet.Settle();
+        morganaSet.Settle();
 
         GameObject[] expressions =
         {
@@ -443,6 +461,9 @@ public class TheHiddenColony02 : MonoBehaviour
 
         charName.GetComponent<TMP_Text>().text = speaker;
 
+        // Light whoever is talking; on narration lines both are dimmed.
+        stage.Focus(speaker);
+
         textBox.GetComponent<TMP_Text>().text = body;
         DialogueText.ApplyStyle(textBox.GetComponent<TMP_Text>(), DialogueText.ShouldUseItalics(textToSpeak, speaker));
         currentTextLength = body.Length;
@@ -702,6 +723,8 @@ public class TheHiddenColony02 : MonoBehaviour
         if (!string.IsNullOrEmpty(dialogueLine.expression))
             ShowExpression(dialogueLine.expression);
 
+        stage.Focus(speaker);
+
         textBox.GetComponent<TMP_Text>().text = body;
         DialogueText.ApplyStyle(textBox.GetComponent<TMP_Text>(), DialogueText.ShouldUseItalics(textToSpeak, speaker));
         currentTextLength = body.Length;
@@ -749,6 +772,7 @@ public class TheHiddenColony02 : MonoBehaviour
     {
         nextButton.SetActive(false);
         ShowExpression("happy");
+        stage.Focus(currentCharacter);
         textBox.SetActive(true);
         fadeOut.SetActive(true);
         yield return new WaitForSeconds(4f);

@@ -13,6 +13,7 @@ public class ExpressionSet
 
     GameObject current;
     Coroutine switchRoutine;
+    float targetAlpha = 1f;
 
     public ExpressionSet(MonoBehaviour runner, GameObject[] sprites)
     {
@@ -26,6 +27,22 @@ public class ExpressionSet
         get { return current; }
     }
 
+    /// <summary>
+    /// Opacity this set settles at. The stage lowers it for the character who is listening, so an
+    /// expression change while listening arrives dimmed instead of flashing bright.
+    /// </summary>
+    public float TargetAlpha
+    {
+        get { return targetAlpha; }
+        set { targetAlpha = Mathf.Clamp01(value); }
+    }
+
+    /// <summary>True while an expression switch is still animating.</summary>
+    public bool IsSwitching
+    {
+        get { return switchRoutine != null; }
+    }
+
     /// <summary>Switches to <paramref name="target"/>, unless it is already showing.</summary>
     public void Show(GameObject target)
     {
@@ -37,12 +54,18 @@ public class ExpressionSet
         if (target == null)
             return;
 
-        if (target == current && ExpressionFade.IsVisible(target))
+        if (target == current && ExpressionFade.IsVisible(target, targetAlpha))
             return;
 
         StopSwitch();
         current = target;
-        switchRoutine = runner.StartCoroutine(ExpressionFade.CrossFade(sprites, target, duration));
+        switchRoutine = runner.StartCoroutine(SwitchTo(target, duration));
+    }
+
+    IEnumerator SwitchTo(GameObject target, float duration)
+    {
+        yield return ExpressionFade.CrossFade(sprites, target, duration, () => targetAlpha);
+        switchRoutine = null;
     }
 
     /// <summary>Takes every sprite off screen at once (scene starts, cut-aways).</summary>
