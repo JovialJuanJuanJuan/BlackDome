@@ -154,7 +154,7 @@ public class IntoTheWestTube : MonoBehaviour
                 break;
             case 3:
                 ShowExpression("smile");
-                textToSpeak = "[From time to time, he saw people walking from Dome to Dome, their expressions calm and controlled...";
+                textToSpeak = "[From time to time, he saw people walking from Dome to Dome, their expressions calm and controlled...]";
                 break;
             case 4:
                 ShowExpression("smile");
@@ -162,7 +162,7 @@ public class IntoTheWestTube : MonoBehaviour
                 break;
             case 5:
                 ShowExpression("smile");
-                textToSpeak = "[After walking for what seemed likes ages, Agnes stopped dead in her tracks.]";
+                textToSpeak = "[After walking for what seemed like ages, Agnes stopped dead in her tracks.]";
                 break;
             case 6:
                 ShowExpression("smile");
@@ -286,7 +286,7 @@ public class IntoTheWestTube : MonoBehaviour
         string[] choice1Dialogue =
         {
             "[Agnes turned to Bay with a smile on her face.]",
-            "Oh, that's a fancy codename for DCP officers",
+            "Oh, that's a fancy codename for DCP officers.",
             "People don't even read these doors, they just assume it's for whatever business goes on in controlling the tubes.",
             "Come on, let's go."
         };
@@ -366,7 +366,7 @@ public class IntoTheWestTube : MonoBehaviour
     string[] afterChoiceDialogue =
     {
         "[Bay wasn't able to ask any further questions.]",
-        "[Agnes opened the door slowly so not to make any sound...]",
+        "[Agnes opened the door slowly so as not to make any sound...]",
         "[...and closed it right as they were both inside.]",
         "[The place was dark save for the blinking lightbulbs above.]",
         "[It was a narrow passage, yet Agnes was able to determine exactly where to go.]",

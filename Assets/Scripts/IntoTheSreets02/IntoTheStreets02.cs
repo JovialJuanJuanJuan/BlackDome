@@ -114,7 +114,7 @@ public class IntoTheStreets02 : MonoBehaviour
                 break;
             case 1:
                 ShowExpression("smile");
-                textToSpeak = "[She wears a black full-body suit, loose enough to let her body breath.]";
+                textToSpeak = "[She wears a black full-body suit, loose enough to let her body breathe.]";
                 break;
             case 2:
                 ShowExpression("smile");
@@ -134,7 +134,7 @@ public class IntoTheStreets02 : MonoBehaviour
                 break;
             case 6:
                 ShowExpression("confused");
-                textToSpeak = "Wait, aren't you that boy who was unconcious in the plaza?";
+                textToSpeak = "Wait, aren't you that boy who was unconscious in the plaza?";
                 break;
             case 7:
                 ShowExpression("happy");
@@ -154,7 +154,7 @@ public class IntoTheStreets02 : MonoBehaviour
                 break;
             case 11:
                 ShowExpression("smile");
-                textToSpeak = "You're pretty quiet. Man of few words. huh?";
+                textToSpeak = "You're pretty quiet. Man of few words, huh?";
                 break;
             case 12:
                 ShowExpression("smile");
@@ -162,7 +162,7 @@ public class IntoTheStreets02 : MonoBehaviour
                 break;
             case 13:
                 ShowExpression("smile");
-                textToSpeak = "[The girl sarcastically, letting out a short giggle.]";
+                textToSpeak = "[The girl said sarcastically, letting out a short giggle.]";
                 break;
             case 14:
                 ShowExpression("smile");
@@ -202,7 +202,7 @@ public class IntoTheStreets02 : MonoBehaviour
                 break;
             case 23:
                 ShowExpression("smile");
-                textToSpeak = "Bay , huh? Fancy name. I like it.";
+                textToSpeak = "Bay, huh? Fancy name. I like it.";
                 break;
             case 24:
                 ShowExpression("smile");

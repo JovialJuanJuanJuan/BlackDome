@@ -145,7 +145,7 @@ public class InsideTheTranspod01 : MonoBehaviour
                 break;
             case 2:
                 ShowExpression("smile");
-                textToSpeak = "[Agnes noticed his expression and smiled.";
+                textToSpeak = "[Agnes noticed his expression and smiled.]";
                 break;
             case 3:
                 ShowExpression("smile");
@@ -221,7 +221,7 @@ public class InsideTheTranspod01 : MonoBehaviour
                 break;
             case 21:
                 ShowExpression("smile");
-                textToSpeak = "[He noticed Transpods like the one they were riding, but they were black and floated close to each others.]";
+                textToSpeak = "[He noticed Transpods like the one they were riding, but they were black and floated close to each other.]";
                 break;
             case 22:
                 ShowExpression("smile");
@@ -364,7 +364,7 @@ public class InsideTheTranspod01 : MonoBehaviour
 
         string[] choice2Dialogue =
         {
-            "[At your warning, Agnes quickly looked out thw window.]",
+            "[At your warning, Agnes quickly looked out the window.]",
             "[Her eyes widening as she let out a soft gasp.]",
             "Uh oh, I thought they were not around here right now!",
             "Thanks for noticing!"
@@ -423,8 +423,8 @@ public class InsideTheTranspod01 : MonoBehaviour
         "I think they can even scan inside Transpods too, such technology.",
         "[She pressed some buttons on the Transpod pad and it started floating to another location.]",
         "People hate them, we all hate them. Though, it is what it is.",
-        "Do the right thing and they won't even acknowledgue you.",
-        "Do the slightliest bit of bad, and they'll sniff you up till they find you.",
+        "Do the right thing and they won't even acknowledge you.",
+        "Do the slightest bit of bad, and they'll sniff you out till they find you.",
         "Good thing you're with me, let's get somewhere safer.",
         "[Bay took a deep gulp.]",
         "[Hearing that made him overly nervous, sweat beads forming on his forehead.]",

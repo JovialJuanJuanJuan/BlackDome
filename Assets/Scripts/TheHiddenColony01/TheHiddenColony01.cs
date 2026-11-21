@@ -90,7 +90,7 @@ public class TheHiddenColony01 : MonoBehaviour
                 textToSpeak = "[As he followed her, he locked eyes with everyone.]";
                 break;
             case 2:
-                textToSpeak = "[None gave off any malice, only mild curiosity when their eyes meet Bay's.]";
+                textToSpeak = "[None gave off any malice, only mild curiosity when their eyes met Bay's.]";
                 break;
             case 3:
                 textToSpeak = "[There was a long table centered on the room, with some scratches.]";
@@ -129,7 +129,7 @@ public class TheHiddenColony01 : MonoBehaviour
                 textToSpeak = "And look who I found...";
                 break;
             case 15:
-                textToSpeak = "...I knew we have to get him when I heard the local news.";
+                textToSpeak = "...I knew we had to get him when I heard the local news.";
                 break;
             case 16:
                 textToSpeak = "Luckily for us, I was able to get a hold of him before they got him.";
@@ -162,13 +162,13 @@ public class TheHiddenColony01 : MonoBehaviour
                 textToSpeak = "[She said the last part almost to herself.]";
                 break;
             case 26:
-                textToSpeak = "[Everyone started talking at all once.]";
+                textToSpeak = "[Everyone started talking all at once.]";
                 break;
             case 27:
                 textToSpeak = "[Bay turned his head back at the hooded individual, who was now typing something on the keyboard.]";
                 break;
             case 28:
-                textToSpeak = "[His curiosity peeked, who was that?]";
+                textToSpeak = "[His curiosity piqued, who was that?]";
                 break;
             case 29:
                 textToSpeak = "[Agnes turned to Bay, then began speaking with a smile on her face:]";
@@ -186,7 +186,7 @@ public class TheHiddenColony01 : MonoBehaviour
                 textToSpeak = "[Everyone was getting their turn to greet and welcome Bay into The Hidden Colony.]";
                 break;
             case 34:
-                textToSpeak = "[He smiled through all of this, he didn't recall this feeling.";
+                textToSpeak = "[He smiled through all of this, he didn't recall this feeling.]";
                 break;
             case 35:
                 textToSpeak = "[But he knew that it was stupid to overthink everything right now.]";

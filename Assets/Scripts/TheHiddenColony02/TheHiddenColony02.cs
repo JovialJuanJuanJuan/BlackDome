@@ -296,7 +296,7 @@ public class TheHiddenColony02 : MonoBehaviour
                 break;
             case 5:
                 ShowExpression("happy");
-                textToSpeak = "LET OUS OUTSIDE, THEY'RE HIDING IT FROM US.";
+                textToSpeak = "LET US OUTSIDE, THEY'RE HIDING IT FROM US.";
                 break;
             case 6:
                 ShowExpression("confused");
@@ -367,7 +367,7 @@ public class TheHiddenColony02 : MonoBehaviour
                 break;
             case 22:
                 ShowExpression("smile");
-                textToSpeak = "She'll put ya somewhere you'll fit nicely, don't worry. She's the bossy around here anyways.";
+                textToSpeak = "She'll put ya somewhere you'll fit nicely, don't worry. She's the boss around here anyways.";
                 break;
             case 23:
                 ShowExpression("smile");
@@ -633,7 +633,7 @@ public class TheHiddenColony02 : MonoBehaviour
         new DialogueLine("Agnes", "I'll eventually find something you can do. Meanwhile..."),
         new DialogueLine("Agnes", "...I know the perfect job you can do for me."),
         new DialogueLine("", AgnesExitLine),
-        new DialogueLine("", "[What did she gave in store for him?]"),
+        new DialogueLine("", "[What did she have in store for him?]"),
         new DialogueLine("", "[Whatever it was, he had to be prepared.]")
     };
 

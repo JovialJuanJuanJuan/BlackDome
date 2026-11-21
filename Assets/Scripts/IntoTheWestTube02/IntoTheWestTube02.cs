@@ -31,7 +31,7 @@ public class IntoTheWestTube02 : MonoBehaviour
     int introIndex = 0;
     bool isTyping = false; // Prevents spamming Next
 
-    // The last intro line ("[Without twinking it twice, she twisted it and it swung open.]")
+    // The last intro line ("[Without thinking twice, she twisted it and it swung open.]")
     const int LastIntroIndex = 10;
 
     void Update()
@@ -84,7 +84,7 @@ public class IntoTheWestTube02 : MonoBehaviour
                 textToSpeak = "[It wasn't long before they reached the end of the narrow passage...]";
                 break;
             case 1:
-                textToSpeak = "[...where they were met with a undusted grey door.]";
+                textToSpeak = "[...where they were met with an undusted grey door.]";
                 break;
             case 2:
                 textToSpeak = "[Bay noticed the handwritten text on the door:]";
@@ -108,10 +108,10 @@ public class IntoTheWestTube02 : MonoBehaviour
                 textToSpeak = "I'm sure you'll like it, I'll tell you more later.";
                 break;
             case 9:
-                textToSpeak = "[Agnes stepped in front of him. and grabbed the handle.]";
+                textToSpeak = "[Agnes stepped in front of him and grabbed the handle.]";
                 break;
             case 10:
-                textToSpeak = "[Without twinking it twice, she twisted it and it swung open.]";
+                textToSpeak = "[Without thinking twice, she twisted it and it swung open.]";
                 break;
 
         }

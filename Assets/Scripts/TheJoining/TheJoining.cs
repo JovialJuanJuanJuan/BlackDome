@@ -159,7 +159,7 @@ public class TheJoining : MonoBehaviour
                 textToSpeak = "[He was confused, a lot had happened in so little time.]";
                 break;
             case 4:
-                textToSpeak = "[But, he imagined The Underdomers must move as quick everyday to avoid getting caught.]";
+                textToSpeak = "[But, he imagined The Underdomers must move as quickly every day to avoid getting caught.]";
                 break;
             case 5:
                 textToSpeak = "[At the end of the passage, there were a handful of small black lockers.]";
@@ -228,7 +228,7 @@ public class TheJoining : MonoBehaviour
             case 24:
                 // The music starts draining here and is gone by the final line
                 SlowFadeMusicOut();
-                textToSpeak = "[He held it close to hist chest, he was about to commit...]";
+                textToSpeak = "[He held it close to his chest, he was about to commit...]";
                 break;
             case 25:
                 textToSpeak = "[...commit to the Underdomers...]";

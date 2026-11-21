@@ -68,7 +68,7 @@ public class UnconStart : MonoBehaviour
         switch (index)
         {
             case 0:
-                textToSpeak = "He could only hear the sounds of people around him, being concious enough to know that he was in a public place, but not concious enough to know where he was or what was going on.";
+                textToSpeak = "He could only hear the sounds of people around him, being conscious enough to know that he was in a public place, but not conscious enough to know where he was or what was going on.";
                 break;
 
             case 1:
@@ -108,7 +108,7 @@ public class UnconStart : MonoBehaviour
                 break;
 
             case 10:
-                textToSpeak = "Anyone who stood around him just a few seconds ago were now walking away, resuming their daily lives as if nothing had ever happened.";
+                textToSpeak = "Anyone who stood around him just a few seconds ago was now walking away, resuming their daily lives as if nothing had ever happened.";
                 break;
 
             case 11:

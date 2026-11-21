@@ -97,13 +97,13 @@ public class IntroSequenceEvents : MonoBehaviour
                 textToSpeak = "You know how I know? Perhaps not...";
                 break;
             case 6:
-                textToSpeak = "...but it is a fact that already many take for granted.";
+                textToSpeak = "...but it is a fact that many already take for granted.";
                 break;
             case 7:
                 textToSpeak = "Darkness can consume you in the scarcity of light.";
                 break;
             case 8:
-                textToSpeak = "For it's the latter reason that you and I can have a world as bright as...";
+                textToSpeak = "It's for this reason that you and I can have a world as bright as...";
                 break;
             case 9:
                 textToSpeak = "But it is not the outside world.";
@@ -175,7 +175,7 @@ public class IntroSequenceEvents : MonoBehaviour
 
         introIndex++;
 
-        if (introIndex <= 18)
+        if (introIndex <= 19)
         {
             StartCoroutine(PlayIntroLine(introIndex));
         }

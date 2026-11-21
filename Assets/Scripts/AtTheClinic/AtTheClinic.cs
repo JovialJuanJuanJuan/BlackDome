@@ -113,7 +113,7 @@ public class Scene02Events : MonoBehaviour
                 break;
 
             case 4:
-                textToSpeak = "[He still couldn’t recall anything that had happened to him before arriving to this place.]";
+                textToSpeak = "[He still couldn’t recall anything that had happened to him before arriving at this place.]";
                 break;
 
             case 5:

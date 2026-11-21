@@ -228,7 +228,7 @@ public class WestTube : MonoBehaviour
                 break;
             case 1:
                 ShowExpression("smile");
-                textToSpeak = "[The tall buildings started to dissapear, the modern, dome-shaped houses now filling the space.]";
+                textToSpeak = "[The tall buildings started to disappear, the modern, dome-shaped houses now filling the space.]";
                 break;
             case 2:
                 ShowExpression("smile");
@@ -248,7 +248,7 @@ public class WestTube : MonoBehaviour
                 break;
             case 6:
                 ShowExpression("confused");
-                textToSpeak = "Shortly, they scan the dome to check if anything bad is happening.";
+                textToSpeak = "In short, they scan the dome to check if anything bad is happening.";
                 break;
             case 7:
                 ShowExpression("happy");
@@ -280,7 +280,7 @@ public class WestTube : MonoBehaviour
                 break;
             case 13:
                 ShowExpression("smile");
-                textToSpeak = "They only let people in only if you have a reason to go. Usually, people who work on another dome...";
+                textToSpeak = "They only let people in if you have a reason to go. Usually, people who work on another dome...";
                 break;
             case 14:
                 ShowExpression("smile");
@@ -320,11 +320,11 @@ public class WestTube : MonoBehaviour
                 break;
             case 23:
                 ShowExpression("smile");
-                textToSpeak = "[Bay noticed there was almost no one here, other than a few passerby and the DCP officer, which he knows is Ryder.]";
+                textToSpeak = "[Bay noticed there was almost no one here, other than a few passersby and the DCP officer, whom he knew was Ryder.]";
                 break;
             case 24:
                 ShowExpression("smile");
-                textToSpeak = "[The passerby wore their black full-suits, just like Agnes.]";
+                textToSpeak = "[The passersby wore their black full-suits, just like Agnes.]";
                 break;
             case 25:
                 expressionsHiddenUntilTunnelEntrance = false;
@@ -334,7 +334,7 @@ public class WestTube : MonoBehaviour
                 break;
             case 26:
                 ShowExpression("happy");
-                textToSpeak = "[He wore a black-armored suit and a same-colored gas mask that made Bay shiver.]";
+                textToSpeak = "[He wore a black-armored suit and a similarly colored gas mask that made Bay shiver.]";
                 break;
             case 27:
                 ShowExpression("happy");
@@ -394,7 +394,7 @@ public class WestTube : MonoBehaviour
                 break;
             case 41:
                 ShowExpression("embarrassed");
-                textToSpeak = "[He had a threatening tone, but it was clear he was half-joking. What do you say?";
+                textToSpeak = "[He had a threatening tone, but it was clear he was half-joking. What do you say?]";
                 break;
 
         }
@@ -584,8 +584,8 @@ public class WestTube : MonoBehaviour
         new DialogueLine("", "[Ryder stepped out of their way, letting them continue.]"),
         new DialogueLine("Ryder", "Whatever, just don't do anything dumb that might get me in trouble."),
         new DialogueLine("Ryder", "I still got to fill my monthly quota."),
-        new DialogueLine("Ryder", "Have you with your... new recruit."),
-        new DialogueLine("", "[Bay noticed the change in his tone, and what did he mean new recruit?]"),
+        new DialogueLine("Ryder", "Have fun with your... new recruit."),
+        new DialogueLine("", "[Bay noticed the change in his tone, and what did he mean by new recruit?]"),
         new DialogueLine("", "[Agnes started walking with purpose towards the tube, Bay following behind.]"),
         new DialogueLine("", "[Ryder looked back at the two before standing back at the entrance of the tube.]"),
         new DialogueLine("Ryder", "Come on, let's go..."),

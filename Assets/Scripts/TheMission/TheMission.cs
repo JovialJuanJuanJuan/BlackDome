@@ -47,7 +47,7 @@ public class TheMission : MonoBehaviour
     public GameObject Picture3;
 
     // The line where Agnes turns around and walks off. Her sprite fades out as it finishes.
-    const string AgnesExitLine = "[With that, Agnes turned and walked away, leaving Bay to contemplate the gravity of the situation]";
+    const string AgnesExitLine = "[With that, Agnes turned and walked away, leaving Bay to contemplate the gravity of the situation.]";
 
     // The last line inside the room. The room shots fade out as it finishes, leaving Bay out
     // in the narrow passage.
@@ -393,7 +393,7 @@ public class TheMission : MonoBehaviour
             case 21:
                 speaker = "Morgana";
                 ShowExpression("happy");
-                textToSpeak = "Don't worry, they don't call me the Sneak Queen for nothing";
+                textToSpeak = "Don't worry, they don't call me the Sneak Queen for nothing.";
                 break;
             case 22:
                 ShowExpression("neutral");
@@ -526,7 +526,7 @@ public class TheMission : MonoBehaviour
                 break;
             case 48:
                 ShowExpression("neutral");
-                textToSpeak = "[Bay couldn't shake off that feeling of unease as he stepped out back into the narrow passage.]";
+                textToSpeak = RoomExitLine;
                 break;
             case 49:
                 ShowExpression("neutral");
