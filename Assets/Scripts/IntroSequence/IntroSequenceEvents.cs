@@ -41,6 +41,8 @@ public class IntroSequenceEvents : MonoBehaviour
     void Start()
     {
         tmp = textBox.GetComponent<TMP_Text>();
+        // The whole intro is the narrator speaking, with no nameplate, so it is all in italics.
+        tmp.fontStyle = FontStyles.Italic;
 
         // The intro always opens on the scene's own background; the first line brings Picture1 up.
         HidePictureImmediately(picture1);

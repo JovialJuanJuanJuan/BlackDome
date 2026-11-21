@@ -147,40 +147,40 @@ public class TheJoining : MonoBehaviour
         switch (index)
         {
             case 0:
-                textToSpeak = "[Bay had followed Agnes through a narrow passage...]";
+                textToSpeak = "~Bay had followed Agnes through a narrow passage...";
                 break;
             case 1:
-                textToSpeak = "[...similar to the one they had just travelled through not too long ago.]";
+                textToSpeak = "~...similar to the one they had just travelled through not too long ago.";
                 break;
             case 2:
-                textToSpeak = "[There were papers taped to the walls, rushed handwriting filling the sheets.]";
+                textToSpeak = "~There were papers taped to the walls, rushed handwriting filling the sheets.";
                 break;
             case 3:
-                textToSpeak = "[He was confused, a lot had happened in so little time.]";
+                textToSpeak = "~He was confused, a lot had happened in so little time.";
                 break;
             case 4:
-                textToSpeak = "[But, he imagined The Underdomers must move as quickly every day to avoid getting caught.]";
+                textToSpeak = "~But, he imagined The Underdomers must move as quickly every day to avoid getting caught.";
                 break;
             case 5:
-                textToSpeak = "[At the end of the passage, there were a handful of small black lockers.]";
+                textToSpeak = "~At the end of the passage, there were a handful of small black lockers.";
                 break;
             case 6:
-                textToSpeak = "[Agnes pulled a key from her pocket and inserted it into one of the lockers.]";
+                textToSpeak = "~Agnes pulled a key from her pocket and inserted it into one of the lockers.";
                 break;
             case 7:
-                textToSpeak = "[Once open, she pulled a paper out and handed it directly to Bay.]";
+                textToSpeak = "~Once open, she pulled a paper out and handed it directly to Bay.";
                 break;
             case 8:
-                textToSpeak = "[He felt as though this paper held the entire weight of the world on it.]";
+                textToSpeak = "~He felt as though this paper held the entire weight of the world on it.";
                 break;
             case 9:
-                textToSpeak = "[A confidential message? Only for him to read?]";
+                textToSpeak = "~A confidential message? Only for him to read?";
                 break;
             case 10:
-                textToSpeak = "[Agnes smiled, noticing his confusion and concern.]";
+                textToSpeak = "~Agnes smiled, noticing his confusion and concern.";
                 break;
             case 11:
-                textToSpeak = "[She began speaking through the heavy atmosphere:]";
+                textToSpeak = "~She began speaking through the heavy atmosphere:";
                 break;
             case 12:
                 // Agnes speaks for the first time here, so her expressions return
@@ -218,37 +218,41 @@ public class TheJoining : MonoBehaviour
                 break;
             case 19:
                 ShowExpression("smile");
-                textToSpeak = "[She gave him a quick smile, putting him at ease.]";
+                textToSpeak = "~She gave him a quick smile, putting him at ease.";
                 break;
             case 20:
-                textToSpeak = "[Joining the Underdomers. A group full of teenagers like him.]";
+                textToSpeak = "~Joining the Underdomers. A group full of teenagers like him.";
                 break;
             case 21:
-                textToSpeak = "[It felt thrilling, yet a little intimidating.]";
+                textToSpeak = "~It felt thrilling, yet a little intimidating.";
                 break;
             case 22:
-                textToSpeak = "[He didn't have time to think about it, Agnes handed him a clipboard and a pen to write.]";
+                textToSpeak = "~He didn't have time to think about it, Agnes handed him a clipboard and a pen to write.";
                 break;
             case 23:
-                textToSpeak = "[He took the clipboard and pen, feeling a mix of excitement and nervousness.]";
+                textToSpeak = "~He took the clipboard and pen, feeling a mix of excitement and nervousness.";
                 break;
             case 24:
                 // The music starts draining here and is gone by the final line
                 SlowFadeMusicOut();
-                textToSpeak = "[He held it close to his chest, he was about to commit...]";
+                textToSpeak = "~He held it close to his chest, he was about to commit...";
                 break;
             case 25:
-                textToSpeak = "[...commit to the Underdomers...]";
+                textToSpeak = "~...commit to the Underdomers...";
                 break;
             case 26:
-                textToSpeak = "[...for a greater cause.]";
+                textToSpeak = "~...for a greater cause.";
                 break;
 
         }
 
-        charName.GetComponent<TMP_Text>().text = textToSpeak.StartsWith("[") ? "" : "Agnes";
-        textBox.GetComponent<TMP_Text>().text = textToSpeak;
-        currentTextLength = textToSpeak.Length;
+        bool narration = DialogueText.IsNarration(textToSpeak);
+        string body = DialogueText.Body(textToSpeak);
+        string speaker = narration ? "" : "Agnes";
+        charName.GetComponent<TMP_Text>().text = speaker;
+        textBox.GetComponent<TMP_Text>().text = body;
+        DialogueText.ApplyStyle(textBox.GetComponent<TMP_Text>(), DialogueText.ShouldUseItalics(textToSpeak, speaker));
+        currentTextLength = body.Length;
         TextCreator.runTextPrint = true;
 
         yield return new WaitForSeconds(0.05f);

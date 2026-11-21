@@ -110,19 +110,19 @@ public class IntoTheStreets02 : MonoBehaviour
         {
             case 0:
                 ShowExpression("smile");
-                textToSpeak = "[A young girl, with long light blonde hair and blue, crystalline eyes.]";
+                textToSpeak = "~A young girl, with long light blonde hair and blue, crystalline eyes.";
                 break;
             case 1:
                 ShowExpression("smile");
-                textToSpeak = "[She wears a black full-body suit, loose enough to let her body breathe.]";
+                textToSpeak = "~She wears a black full-body suit, loose enough to let her body breathe.";
                 break;
             case 2:
                 ShowExpression("smile");
-                textToSpeak = "[The girl looked up at Bay, who was still looking at her.]";
+                textToSpeak = "~The girl looked up at Bay, who was still looking at her.";
                 break;
             case 3:
                 ShowExpression("smile");
-                textToSpeak = "[The girl opened her mouth to speak:]";
+                textToSpeak = "~The girl opened her mouth to speak:";
                 break;
             case 4:
                 ShowExpression("happy");
@@ -130,7 +130,7 @@ public class IntoTheStreets02 : MonoBehaviour
                 break;
             case 5:
                 ShowExpression("happy");
-                textToSpeak = "[The girl chuckled, then returned her gaze to Bay.]";
+                textToSpeak = "~The girl chuckled, then returned her gaze to Bay.";
                 break;
             case 6:
                 ShowExpression("confused");
@@ -146,11 +146,11 @@ public class IntoTheStreets02 : MonoBehaviour
                 break;
             case 9:
                 ShowExpression("smile");
-                textToSpeak = "[Bay looked puzzled, confused. He looked at the vehicle behind her. Transpod? He tried to recall if he had ever heard that word.]";
+                textToSpeak = "~Bay looked puzzled, confused. He looked at the vehicle behind her. Transpod? He tried to recall if he had ever heard that word.";
                 break;
             case 10:
                 ShowExpression("neutral");
-                textToSpeak = "[But nothing came to him.]";
+                textToSpeak = "~But nothing came to him.";
                 break;
             case 11:
                 ShowExpression("happy");
@@ -162,7 +162,7 @@ public class IntoTheStreets02 : MonoBehaviour
                 break;
             case 13:
                 ShowExpression("happy");
-                textToSpeak = "[The girl said sarcastically, letting out a short giggle.]";
+                textToSpeak = "~The girl said sarcastically, letting out a short giggle.";
                 break;
             case 14:
                 ShowExpression("neutral");
@@ -174,7 +174,7 @@ public class IntoTheStreets02 : MonoBehaviour
                 break;
             case 16:
                 ShowExpression("surprised");
-                textToSpeak = "[As Bay started to look even more puzzled, the girl finally came to her senses.]";
+                textToSpeak = "~As Bay started to look even more puzzled, the girl finally came to her senses.";
                 break;
             case 17:
                 ShowExpression("embarrassed");
@@ -190,7 +190,7 @@ public class IntoTheStreets02 : MonoBehaviour
                 break;
             case 20:
                 ShowExpression("smile");
-                textToSpeak = "[His name. That was one of the things he could actually recall, so he let it out:]";
+                textToSpeak = "~His name. That was one of the things he could actually recall, so he let it out:";
                 break;
             case 21:
                 ShowExpression("surprised");
@@ -198,7 +198,7 @@ public class IntoTheStreets02 : MonoBehaviour
                 break;
             case 22:
                 ShowExpression("smile");
-                textToSpeak = "[Agnes looked at Bay, smiling.]";
+                textToSpeak = "~Agnes looked at Bay, smiling.";
                 break;
             case 23:
                 ShowExpression("happy");
@@ -206,7 +206,7 @@ public class IntoTheStreets02 : MonoBehaviour
                 break;
             case 24:
                 ShowExpression("embarrassed");
-                textToSpeak = "[There were a few seconds of awkward silence before Agnes spoke again.]";
+                textToSpeak = "~There were a few seconds of awkward silence before Agnes spoke again.";
                 break;
             case 25:
                 ShowExpression("excited");
@@ -218,19 +218,23 @@ public class IntoTheStreets02 : MonoBehaviour
                 break;
             case 27:
                 ShowExpression("happy");
-                textToSpeak = "[She didn't finish her sentence when she began to walk towards the Transpod's entrance.]";
+                textToSpeak = "~She didn't finish her sentence when she began to walk towards the Transpod's entrance.";
                 break;
             case 28:
                 ShowExpression("happy");
-                textToSpeak = "[Bay had no choice but to follow her, and he did.]";
+                textToSpeak = "~Bay had no choice but to follow her, and he did.";
                 break;
 
         }
 
         // Bay's own line ("Bay. Bay Ausman.") is spoken by the player character.
-        charName.GetComponent<TMP_Text>().text = textToSpeak.StartsWith("[") ? "" : (index == 21 ? "You" : "Agnes");
-        textBox.GetComponent<TMP_Text>().text = textToSpeak;
-        currentTextLength = textToSpeak.Length;
+        bool narration = DialogueText.IsNarration(textToSpeak);
+        string body = DialogueText.Body(textToSpeak);
+        string speaker = narration ? "" : (index == 21 ? "You" : "Agnes");
+        charName.GetComponent<TMP_Text>().text = speaker;
+        textBox.GetComponent<TMP_Text>().text = body;
+        DialogueText.ApplyStyle(textBox.GetComponent<TMP_Text>(), DialogueText.ShouldUseItalics(textToSpeak, speaker));
+        currentTextLength = body.Length;
         TextCreator.runTextPrint = true;
 
         yield return new WaitForSeconds(0.05f);

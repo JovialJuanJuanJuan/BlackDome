@@ -31,7 +31,7 @@ public class IntoTheWestTube02 : MonoBehaviour
     int introIndex = 0;
     bool isTyping = false; // Prevents spamming Next
 
-    // The last intro line ("[Without thinking twice, she twisted it and it swung open.]")
+    // The last intro line ("~Without thinking twice, she twisted it and it swung open.")
     const int LastIntroIndex = 10;
 
     void Update()
@@ -81,19 +81,19 @@ public class IntoTheWestTube02 : MonoBehaviour
         switch (index)
         {
             case 0:
-                textToSpeak = "[It wasn't long before they reached the end of the narrow passage...]";
+                textToSpeak = "~It wasn't long before they reached the end of the narrow passage...";
                 break;
             case 1:
-                textToSpeak = "[...where they were met with an undusted grey door.]";
+                textToSpeak = "~...where they were met with an undusted grey door.";
                 break;
             case 2:
-                textToSpeak = "[Bay noticed the handwritten text on the door:]";
+                textToSpeak = "~Bay noticed the handwritten text on the door:";
                 break;
             case 3:
-                textToSpeak = "[\"The Hidden Colony\"]";
+                textToSpeak = "~\"The Hidden Colony\"";
                 break;
             case 4:
-                textToSpeak = "[After what seemed like ages, Agnes finally broke the silence:]";
+                textToSpeak = "~After what seemed like ages, Agnes finally broke the silence:";
                 break;
             case 5:
                 textToSpeak = "Okay, here we are. The Hidden Colony.";
@@ -108,17 +108,21 @@ public class IntoTheWestTube02 : MonoBehaviour
                 textToSpeak = "I'm sure you'll like it, I'll tell you more later.";
                 break;
             case 9:
-                textToSpeak = "[Agnes stepped in front of him and grabbed the handle.]";
+                textToSpeak = "~Agnes stepped in front of him and grabbed the handle.";
                 break;
             case 10:
-                textToSpeak = "[Without thinking twice, she twisted it and it swung open.]";
+                textToSpeak = "~Without thinking twice, she twisted it and it swung open.";
                 break;
 
         }
 
-        charName.GetComponent<TMP_Text>().text = textToSpeak.StartsWith("[") ? "" : "Agnes";
-        textBox.GetComponent<TMP_Text>().text = textToSpeak;
-        currentTextLength = textToSpeak.Length;
+        bool narration = DialogueText.IsNarration(textToSpeak);
+        string body = DialogueText.Body(textToSpeak);
+        string speaker = narration ? "" : "Agnes";
+        charName.GetComponent<TMP_Text>().text = speaker;
+        textBox.GetComponent<TMP_Text>().text = body;
+        DialogueText.ApplyStyle(textBox.GetComponent<TMP_Text>(), DialogueText.ShouldUseItalics(textToSpeak, speaker));
+        currentTextLength = body.Length;
         TextCreator.runTextPrint = true;
 
         yield return new WaitForSeconds(0.05f);

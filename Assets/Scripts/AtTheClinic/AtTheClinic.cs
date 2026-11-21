@@ -97,31 +97,31 @@ public class Scene02Events : MonoBehaviour
         switch (index)
         {
             case 0:
-                textToSpeak = "[Bay slowly opened his eyes, his world slowly unblurring as everything started to become clear.]";
+                textToSpeak = "~Bay slowly opened his eyes, his world slowly unblurring as everything started to become clear.";
                 break;
 
             case 1:
-                textToSpeak = "[He was in a clinical environment, a dark windowless room that carried the scent of disinfectants and bleach...]";
+                textToSpeak = "~He was in a clinical environment, a dark windowless room that carried the scent of disinfectants and bleach...";
                 break;
 
             case 2:
-                textToSpeak = "[...yet dusty at the same time.]";
+                textToSpeak = "~...yet dusty at the same time.";
                 break;
 
             case 3:
-                textToSpeak = "[There was no one in the room, nor did it look like anyone was currently inside the building.]";
+                textToSpeak = "~There was no one in the room, nor did it look like anyone was currently inside the building.";
                 break;
 
             case 4:
-                textToSpeak = "[He still couldn’t recall anything that had happened to him before arriving at this place.]";
+                textToSpeak = "~He still couldn’t recall anything that had happened to him before arriving at this place.";
                 break;
 
             case 5:
-                textToSpeak = "[He moved to sit on the bed, then hopped off and unhurriedly made his way to the white door.]";
+                textToSpeak = "~He moved to sit on the bed, then hopped off and unhurriedly made his way to the white door.";
                 break;
 
             case 6:
-                textToSpeak = "[He turned around and scanned the room one last time. Will you do something before exiting the room?]";
+                textToSpeak = "~He turned around and scanned the room one last time. Will you do something before exiting the room?";
                 break;
 
             default:
@@ -133,9 +133,11 @@ public class Scene02Events : MonoBehaviour
         charName.GetComponent<TMPro.TMP_Text>().text = "";
 
         // Set dialogue text
-        textBox.GetComponent<TMPro.TMP_Text>().text = textToSpeak;
-
-        currentTextLength = textToSpeak.Length;
+        bool italics = DialogueText.ShouldUseItalics(textToSpeak, "");
+        string body = DialogueText.Body(textToSpeak);
+        textBox.GetComponent<TMPro.TMP_Text>().text = body;
+        DialogueText.ApplyStyle(textBox.GetComponent<TMPro.TMP_Text>(), italics);
+        currentTextLength = body.Length;
 
         // Reset text counter
         TextCreator.charCount = 0;
@@ -248,9 +250,9 @@ public class Scene02Events : MonoBehaviour
 
         string[] choice1Dialogue =
         {
-            "[Bay decided to turn around and see if there was anything that could help him put an answer to his doubts.]",
-            "[As he searched, he only found unimportant documents that didn’t help him much.]",
-            "[After a few minutes, Bay found nothing so he decided to leave the room.]"
+            "~Bay decided to turn around and see if there was anything that could help him put an answer to his doubts.",
+            "~As he searched, he only found unimportant documents that didn’t help him much.",
+            "~After a few minutes, Bay found nothing so he decided to leave the room."
         };
 
 
@@ -328,9 +330,9 @@ public class Scene02Events : MonoBehaviour
 
         string[] choice2Dialogue =
         {
-            "[Bay decided to turn back around and leave the room.]",
-            "[Nothing relevant lay inside.]",
-            "[Bay slowly made his way to the door and walked out.]"
+            "~Bay decided to turn back around and leave the room.",
+            "~Nothing relevant lay inside.",
+            "~Bay slowly made his way to the door and walked out."
         };
 
 
@@ -382,9 +384,11 @@ public class Scene02Events : MonoBehaviour
         // Set dialogue
         textToSpeak = dialogueLine;
 
-        textBox.GetComponent<TMPro.TMP_Text>().text = textToSpeak;
-
-        currentTextLength = textToSpeak.Length;
+        bool italics = DialogueText.ShouldUseItalics(textToSpeak, "");
+        string body = DialogueText.Body(textToSpeak);
+        textBox.GetComponent<TMPro.TMP_Text>().text = body;
+        DialogueText.ApplyStyle(textBox.GetComponent<TMPro.TMP_Text>(), italics);
+        currentTextLength = body.Length;
 
 
         // Reset typewriter counter

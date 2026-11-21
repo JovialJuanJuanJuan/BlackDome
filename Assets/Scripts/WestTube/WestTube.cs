@@ -224,19 +224,19 @@ public class WestTube : MonoBehaviour
         {
             case 0:
                 ShowExpression("smile");
-                textToSpeak = "[Agnes guided the Transpod towards a farther area from where they were.]";
+                textToSpeak = "~Agnes guided the Transpod towards a farther area from where they were.";
                 break;
             case 1:
                 ShowExpression("smile");
-                textToSpeak = "[The tall buildings started to disappear, the modern, dome-shaped houses now filling the space.]";
+                textToSpeak = "~The tall buildings started to disappear, the modern, dome-shaped houses now filling the space.";
                 break;
             case 2:
                 ShowExpression("smile");
-                textToSpeak = "[Agnes managed to land somewhere safely, although it looked like it wasn't her first time doing so.]";
+                textToSpeak = "~Agnes managed to land somewhere safely, although it looked like it wasn't her first time doing so.";
                 break;
             case 3:
                 ShowExpression("smile");
-                textToSpeak = "[She looked at Bay, who was now calmer, and smiled at him.]";
+                textToSpeak = "~She looked at Bay, who was now calmer, and smiled at him.";
                 break;
             case 4:
                 ShowExpression("embarrassed");
@@ -259,16 +259,16 @@ public class WestTube : MonoBehaviour
                 expressionsHiddenUntilTunnelEntrance = true;
                 StartCoroutine(FadeAndDisable(Picture1));
                 FadeOutActiveExpressions();
-                textToSpeak = "[The Transpod's door opened, and they stepped out. The Transpod's door closed and the window opaqued to black.]";
+                textToSpeak = "~The Transpod's door opened, and they stepped out. The Transpod's door closed and the window opaqued to black.";
                 break;
             case 9:
                 ShowExpression("smile");
-                textToSpeak = "[Bay looked around, taking in the sights of the city.]";
+                textToSpeak = "~Bay looked around, taking in the sights of the city.";
                 break;
             case 10:
                 ShowExpression("smile");
                 StartCoroutine(FadeAndDisable(Picture2));
-                textToSpeak = "[Suddenly, Agnes pointed at something in the distance.]";
+                textToSpeak = "~Suddenly, Agnes pointed at something in the distance.";
                 break;
             case 11:
                 ShowExpression("smile");
@@ -288,11 +288,11 @@ public class WestTube : MonoBehaviour
                 break;
             case 15:
                 ShowExpression("smile");
-                textToSpeak = "[She smiled mischievously, it was clear she had something in mind.]";
+                textToSpeak = "~She smiled mischievously, it was clear she had something in mind.";
                 break;
             case 16:
                 ShowExpression("smile");
-                textToSpeak = "[She had done this before.]";
+                textToSpeak = "~She had done this before.";
                 break;
             case 17:
                 ShowExpression("embarrassed");
@@ -304,7 +304,7 @@ public class WestTube : MonoBehaviour
                 break;
             case 19:
                 ShowExpression("happy");
-                textToSpeak = "[Bay was confused, where was she getting at?]";
+                textToSpeak = "~Bay was confused, where was she getting at?";
                 break;
             case 20:
                 ShowExpression("happy");
@@ -316,25 +316,25 @@ public class WestTube : MonoBehaviour
                 break;
             case 22:
                 ShowExpression("smile");
-                textToSpeak = "[Bay followed Agnes as she began walking. They climbed up a set of wide stairs that led to the West Tube.]";
+                textToSpeak = "~Bay followed Agnes as she began walking. They climbed up a set of wide stairs that led to the West Tube.";
                 break;
             case 23:
                 ShowExpression("smile");
-                textToSpeak = "[Bay noticed there was almost no one here, other than a few passersby and the DCP officer, whom he knew was Ryder.]";
+                textToSpeak = "~Bay noticed there was almost no one here, other than a few passersby and the DCP officer, whom he knew was Ryder.";
                 break;
             case 24:
                 ShowExpression("smile");
-                textToSpeak = "[The passersby wore their black full-suits, just like Agnes.]";
+                textToSpeak = "~The passersby wore their black full-suits, just like Agnes.";
                 break;
             case 25:
                 expressionsHiddenUntilTunnelEntrance = false;
                 ShowExpression("smile");
                 StartCoroutine(FadeAndDisable(Picture3));
-                textToSpeak = "[Finally, they reached the tunnel entrance. A man was standing right there.]";
+                textToSpeak = "~Finally, they reached the tunnel entrance. A man was standing right there.";
                 break;
             case 26:
                 ShowExpression("happy");
-                textToSpeak = "[He wore a black-armored suit and a similarly colored gas mask that made Bay shiver.]";
+                textToSpeak = "~He wore a black-armored suit and a similarly colored gas mask that made Bay shiver.";
                 break;
             case 27:
                 ShowExpression("happy");
@@ -342,19 +342,19 @@ public class WestTube : MonoBehaviour
                 break;
             case 28:
                 ShowExpression("happy");
-                textToSpeak = "[Agnes said with great joy, knowing well it was her brother underneath that intimidating mask.]";
+                textToSpeak = "~Agnes said with great joy, knowing well it was her brother underneath that intimidating mask.";
                 break;
             case 29:
                 ShowExpression("neutral");
-                textToSpeak = "[Still, she had to put on an act to avoid suspicion, and she did it well.]";
+                textToSpeak = "~Still, she had to put on an act to avoid suspicion, and she did it well.";
                 break;
             case 30:
                 ShowExpression("neutral");
-                textToSpeak = "[Her brother looked at her, then at Bay — his eyes lingering on Bay for a moment before returning to Agnes.]";
+                textToSpeak = "~Her brother looked at her, then at Bay — his eyes lingering on Bay for a moment before returning to Agnes.";
                 break;
             case 31:
                 ShowExpression("neutral");
-                textToSpeak = "[He began speaking, his voice heavily distorted through the mask, like a robotic voice.]";
+                textToSpeak = "~He began speaking, his voice heavily distorted through the mask, like a robotic voice.";
                 break;
             case 32:
                 ShowExpression("happy");
@@ -362,11 +362,11 @@ public class WestTube : MonoBehaviour
                 break;
             case 33:
                 ShowExpression("embarrassed");
-                textToSpeak = "[The mask drained all human warmth from his voice, but he was probably smiling under it.]";
+                textToSpeak = "~The mask drained all human warmth from his voice, but he was probably smiling under it.";
                 break;
             case 34:
                 ShowExpression("embarrassed");
-                textToSpeak = "[Agnes blushed, taking a quick look at Bay before returning her gaze to her brother.]";
+                textToSpeak = "~Agnes blushed, taking a quick look at Bay before returning her gaze to her brother.";
                 break;
             case 35:
                 ShowExpression("embarrassed");
@@ -374,11 +374,11 @@ public class WestTube : MonoBehaviour
                 break;
             case 36:
                 ShowExpression("embarrassed");
-                textToSpeak = "[Agnes didn't know how to respond, but she knew she had to keep up the act.]";
+                textToSpeak = "~Agnes didn't know how to respond, but she knew she had to keep up the act.";
                 break;
             case 37:
                 ShowExpression("embarrassed");
-                textToSpeak = "[Ryder looked at them, an awkward silence filling the air. He then spoke again:]";
+                textToSpeak = "~Ryder looked at them, an awkward silence filling the air. He then spoke again:";
                 break;
             case 38:
                 ShowExpression("embarrassed");
@@ -386,7 +386,7 @@ public class WestTube : MonoBehaviour
                 break;
             case 39:
                 ShowExpression("surprised");
-                textToSpeak = "[But then, Ryder took a small step towards Bay, locking eyes with him.]";
+                textToSpeak = "~But then, Ryder took a small step towards Bay, locking eyes with him.";
                 break;
             case 40:
                 ShowExpression("embarrassed");
@@ -394,12 +394,16 @@ public class WestTube : MonoBehaviour
                 break;
             case 41:
                 ShowExpression("surprised");
-                textToSpeak = "[He had a threatening tone, but it was clear he was half-joking. What do you say?]";
+                textToSpeak = "~He had a threatening tone, but it was clear he was half-joking. What do you say?";
                 break;
 
         }
 
-        string speaker = textToSpeak.StartsWith("[")
+        // Narration has no character name, and is set in italics by DialogueText.ApplyStyle.
+        bool narration = DialogueText.IsNarration(textToSpeak);
+        string body = DialogueText.Body(textToSpeak);
+
+        string speaker = narration
             ? ""
             : index == 32 || index == 38 || index == 40 ? "Ryder" : "Agnes";
 
@@ -407,8 +411,9 @@ public class WestTube : MonoBehaviour
 
         if (speaker == "Ryder")
             ShowExpression("masked");
-        textBox.GetComponent<TMP_Text>().text = textToSpeak;
-        currentTextLength = textToSpeak.Length;
+        textBox.GetComponent<TMP_Text>().text = body;
+        DialogueText.ApplyStyle(textBox.GetComponent<TMP_Text>(), DialogueText.ShouldUseItalics(textToSpeak, speaker));
+        currentTextLength = body.Length;
         TextCreator.runTextPrint = true;
 
         yield return new WaitForSeconds(0.05f);
@@ -503,7 +508,7 @@ public class WestTube : MonoBehaviour
 
         DialogueLine[] choice1Dialogue =
         {
-            new DialogueLine("", "[Ryder looked at Bay, then slightly nodded.]"),
+            new DialogueLine("", "~Ryder looked at Bay, then slightly nodded."),
             new DialogueLine("Ryder", "That's what I wanted to hear, carry on.")
         };
 
@@ -532,7 +537,7 @@ public class WestTube : MonoBehaviour
 
         DialogueLine[] choice2Dialogue =
         {
-            new DialogueLine("", "[Ryder looked at Bay, slightly nodding at his response.]")
+            new DialogueLine("", "~Ryder looked at Bay, slightly nodding at his response.")
         };
 
         yield return StartCoroutine(PlayDialogueLines(choice2Dialogue));
@@ -560,8 +565,8 @@ public class WestTube : MonoBehaviour
 
         DialogueLine[] choice3Dialogue =
         {
-            new DialogueLine("", "[Ryder looked at Bay, he was being directly challenged.]"),
-            new DialogueLine("", "[He let out a small laugh through the mask, coming out as a distorted mess.]"),
+            new DialogueLine("", "~Ryder looked at Bay, he was being directly challenged."),
+            new DialogueLine("", "~He let out a small laugh through the mask, coming out as a distorted mess."),
             new DialogueLine("Ryder", "You've got guts, boy."),
             new DialogueLine("Ryder", "You look like a good person, but the moment you act up..."),
             new DialogueLine("Ryder", "...my fist will end up permanently marked on your cheek.")
@@ -579,15 +584,15 @@ public class WestTube : MonoBehaviour
 
     DialogueLine[] aftermathDialogue =
     {
-        new DialogueLine("", "[Agnes' eyes widened.]"),
+        new DialogueLine("", "~Agnes' eyes widened."),
         new DialogueLine("Agnes", "Don't be too harsh with him, he's just... different.", "embarrassed"),
-        new DialogueLine("", "[Ryder stepped out of their way, letting them continue.]"),
+        new DialogueLine("", "~Ryder stepped out of their way, letting them continue."),
         new DialogueLine("Ryder", "Whatever, just don't do anything dumb that might get me in trouble."),
         new DialogueLine("Ryder", "I still got to fill my monthly quota."),
         new DialogueLine("Ryder", "Have fun with your... new recruit."),
-        new DialogueLine("", "[Bay noticed the change in his tone, and what did he mean by new recruit?]"),
-        new DialogueLine("", "[Agnes started walking with purpose towards the tube, Bay following behind.]"),
-        new DialogueLine("", "[Ryder looked back at the two before standing back at the entrance of the tube.]"),
+        new DialogueLine("", "~Bay noticed the change in his tone, and what did he mean by new recruit?"),
+        new DialogueLine("", "~Agnes started walking with purpose towards the tube, Bay following behind."),
+        new DialogueLine("", "~Ryder looked back at the two before standing back at the entrance of the tube."),
         new DialogueLine("Ryder", "Come on, let's go..."),
         new DialogueLine("Ryder", "...or else we're gonna be late.")
     };
@@ -631,17 +636,21 @@ public class WestTube : MonoBehaviour
         // Set dialogue
         textToSpeak = dialogueLine.text;
 
-        // Narration (lines wrapped in brackets) has no character name
-        charName.GetComponent<TMP_Text>().text = textToSpeak.StartsWith("[") ? "" : dialogueLine.speaker;
+        // Narration has no character name, and is set in italics by DialogueText.ApplyStyle.
+        bool narration = DialogueText.IsNarration(textToSpeak);
+        string body = DialogueText.Body(textToSpeak);
+
+        string speaker = narration ? "" : dialogueLine.speaker;
+        charName.GetComponent<TMP_Text>().text = speaker;
 
         if (dialogueLine.speaker == "Ryder")
             ShowExpression("masked");
         else if (!string.IsNullOrEmpty(dialogueLine.expression))
             ShowExpression(dialogueLine.expression);
 
-        textBox.GetComponent<TMP_Text>().text = textToSpeak;
-
-        currentTextLength = textToSpeak.Length;
+        textBox.GetComponent<TMP_Text>().text = body;
+        DialogueText.ApplyStyle(textBox.GetComponent<TMP_Text>(), DialogueText.ShouldUseItalics(textToSpeak, speaker));
+        currentTextLength = body.Length;
 
         // Reset typewriter counter
         TextCreator.charCount = 0;

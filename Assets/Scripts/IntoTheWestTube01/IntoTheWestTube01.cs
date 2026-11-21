@@ -45,7 +45,7 @@ public class IntoTheWestTube : MonoBehaviour
     // Used to make choice dialogue wait for the player to click Next
     bool waitingForChoiceNext = false;
 
-    // The intro line "[What do you say?]" — the choices appear right after it
+    // The intro line "~What do you say?" — the choices appear right after it
     const int ChoicePointIndex = 9;
 
     void Update()
@@ -142,27 +142,27 @@ public class IntoTheWestTube : MonoBehaviour
         {
             case 0:
                 ShowExpression("neutral");
-                textToSpeak = "[They were further into the Tube, and they had reached the Tube Intersection.]";
+                textToSpeak = "~They were further into the Tube, and they had reached the Tube Intersection.";
                 break;
             case 1:
                 ShowExpression("neutral");
-                textToSpeak = "[A four-way intersection that connected the domes from each direction.]";
+                textToSpeak = "~A four-way intersection that connected the domes from each direction.";
                 break;
             case 2:
                 ShowExpression("neutral");
-                textToSpeak = "[Bay looked around, ashen dust floated in the atmosphere.]";
+                textToSpeak = "~Bay looked around, ashen dust floated in the atmosphere.";
                 break;
             case 3:
                 ShowExpression("neutral");
-                textToSpeak = "[From time to time, he saw people walking from Dome to Dome, their expressions calm and controlled...]";
+                textToSpeak = "~From time to time, he saw people walking from Dome to Dome, their expressions calm and controlled...";
                 break;
             case 4:
                 ShowExpression("neutral");
-                textToSpeak = "[...in every sense of the word.]";
+                textToSpeak = "~...in every sense of the word.";
                 break;
             case 5:
                 ShowExpression("neutral");
-                textToSpeak = "[After walking for what seemed like ages, Agnes stopped dead in her tracks.]";
+                textToSpeak = "~After walking for what seemed like ages, Agnes stopped dead in her tracks.";
                 break;
             case 6:
                 ShowExpression("happy");
@@ -170,22 +170,26 @@ public class IntoTheWestTube : MonoBehaviour
                 break;
             case 7:
                 ShowExpression("happy");
-                textToSpeak = "[Bay turned his head, they were standing before a maintenance door with a sign.]";
+                textToSpeak = "~Bay turned his head, they were standing before a maintenance door with a sign.";
                 break;
             case 8:
                 ShowExpression("smile");
-                textToSpeak = "[The sign read: 'Domemployers Maintenance Access Only.' in bold, capital letters.]";
+                textToSpeak = "~The sign read: 'Domemployers Maintenance Access Only.' in bold, capital letters.";
                 break;
             case 9:
                 ShowExpression("smile");
-                textToSpeak = "[What do you say?]";
+                textToSpeak = "~What do you say?";
                 break;
 
         }
 
-        charName.GetComponent<TMP_Text>().text = textToSpeak.StartsWith("[") ? "" : "Agnes";
-        textBox.GetComponent<TMP_Text>().text = textToSpeak;
-        currentTextLength = textToSpeak.Length;
+        bool narration = DialogueText.IsNarration(textToSpeak);
+        string body = DialogueText.Body(textToSpeak);
+        string speaker = narration ? "" : "Agnes";
+        charName.GetComponent<TMP_Text>().text = speaker;
+        textBox.GetComponent<TMP_Text>().text = body;
+        DialogueText.ApplyStyle(textBox.GetComponent<TMP_Text>(), DialogueText.ShouldUseItalics(textToSpeak, speaker));
+        currentTextLength = body.Length;
         TextCreator.runTextPrint = true;
 
         yield return new WaitForSeconds(0.05f);
@@ -199,7 +203,7 @@ public class IntoTheWestTube : MonoBehaviour
         }
 
         // -------------------------------------------------
-        // CHOICE POINT (after the "[What do you say?]" line)
+        // CHOICE POINT (after the "~What do you say?" line)
         // -------------------------------------------------
 
         if (index == ChoicePointIndex)
@@ -285,7 +289,7 @@ public class IntoTheWestTube : MonoBehaviour
 
         string[] choice1Dialogue =
         {
-            "[Agnes turned to Bay with a smile on her face.]",
+            "~Agnes turned to Bay with a smile on her face.",
             "Oh, that's a fancy codename for DCP officers.",
             "People don't even read these doors, they just assume it's for whatever business goes on in controlling the tubes.",
             "Come on, let's go."
@@ -316,7 +320,7 @@ public class IntoTheWestTube : MonoBehaviour
 
         string[] choice2Dialogue =
         {
-            "[Agnes turned to Bay with a slow smile on her face.]",
+            "~Agnes turned to Bay with a slow smile on her face.",
             "Oh, we're at the place",
             "You'll learn soon enough. See that door sign? Domemployers is just a fancy codename for DCP officers.",
             "Come on, we don't have time to spare!"
@@ -347,7 +351,7 @@ public class IntoTheWestTube : MonoBehaviour
 
         string[] choice3Dialogue =
         {
-            "[Agnes turned to Bay, with a natural yet enigmatic smile.]",
+            "~Agnes turned to Bay, with a natural yet enigmatic smile.",
             "Oh, you'll find it soon enough. Don't sweat it.",
             "Hey, you see that door sign? Domemployers is just a codename for DCP officers.",
             "Come on, let's not keep them waiting."
@@ -365,19 +369,19 @@ public class IntoTheWestTube : MonoBehaviour
 
     string[] afterChoiceDialogue =
     {
-        "[Bay wasn't able to ask any further questions.]",
-        "[Agnes opened the door slowly so as not to make any sound...]",
-        "[...and closed it right as they were both inside.]",
-        "[The place was dark save for the blinking lightbulbs above.]",
-        "[It was a narrow passage, yet Agnes was able to determine exactly where to go.]",
-        "[His question of whether she knew the place was slowly being answered.]",
+        "~Bay wasn't able to ask any further questions.",
+        "~Agnes opened the door slowly so as not to make any sound...",
+        "~...and closed it right as they were both inside.",
+        "~The place was dark save for the blinking lightbulbs above.",
+        "~It was a narrow passage, yet Agnes was able to determine exactly where to go.",
+        "~His question of whether she knew the place was slowly being answered.",
         "Follow me.",
-        "[Agnes whispered, they began to fast walk to avoid making any noise.]",
-        "[The atmosphere here was thicker than it was in the Tube.]",
-        "[It felt...]",
-        "[...suffocating.]",
-        "[He knew he had no choice but to follow her through the narrow passage...]",
-        "[...down wherever she planned to take him.]"
+        "~Agnes whispered, they began to fast walk to avoid making any noise.",
+        "~The atmosphere here was thicker than it was in the Tube.",
+        "~It felt...",
+        "~...suffocating.",
+        "~He knew he had no choice but to follow her through the narrow passage...",
+        "~...down wherever she planned to take him."
     };
 
     // =====================================================
@@ -418,11 +422,14 @@ public class IntoTheWestTube : MonoBehaviour
 
         // Set dialogue
         textToSpeak = dialogueLine;
-        charName.GetComponent<TMP_Text>().text = textToSpeak.StartsWith("[") ? "" : "Agnes";
 
-        textBox.GetComponent<TMP_Text>().text = textToSpeak;
-
-        currentTextLength = textToSpeak.Length;
+        bool narration = DialogueText.IsNarration(textToSpeak);
+        string body = DialogueText.Body(textToSpeak);
+        string speaker = narration ? "" : "Agnes";
+        charName.GetComponent<TMP_Text>().text = speaker;
+        textBox.GetComponent<TMP_Text>().text = body;
+        DialogueText.ApplyStyle(textBox.GetComponent<TMP_Text>(), DialogueText.ShouldUseItalics(textToSpeak, speaker));
+        currentTextLength = body.Length;
 
         // Reset typewriter counter
         TextCreator.charCount = 0;
@@ -436,7 +443,7 @@ public class IntoTheWestTube : MonoBehaviour
         // Wait until the entire line has finished typing
         yield return new WaitUntil(() => textLength >= currentTextLength);
 
-        if (dialogueLine == "[...and closed it right as they were both inside.]")
+        if (dialogueLine == "~...and closed it right as they were both inside.")
         {
             yield return StartCoroutine(FadeOutPictureOnly(Picture2));
         }

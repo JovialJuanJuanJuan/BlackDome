@@ -47,11 +47,11 @@ public class TheMission : MonoBehaviour
     public GameObject Picture3;
 
     // The line where Agnes turns around and walks off. Her sprite fades out as it finishes.
-    const string AgnesExitLine = "[With that, Agnes turned and walked away, leaving Bay to contemplate the gravity of the situation.]";
+    const string AgnesExitLine = "~With that, Agnes turned and walked away, leaving Bay to contemplate the gravity of the situation.";
 
     // The last line inside the room. The room shots fade out as it finishes, leaving Bay out
     // in the narrow passage.
-    const string RoomExitLine = "[Bay couldn't shake off that feeling of unease as he stepped out back into the narrow passage.]";
+    const string RoomExitLine = "~Bay couldn't shake off that feeling of unease as he stepped out back into the narrow passage.";
 
     // The closing lines dim the room and drain the music, so the scene ends dark and quiet
     const float BlackscreenFadeDuration = 6f;
@@ -294,11 +294,11 @@ public class TheMission : MonoBehaviour
                 break;
             case 1:
                 ShowExpression("neutral");
-                textToSpeak = "[Bay became acquainted with the surroundings of the underground city, and how fast The Underdomers operate.]";
+                textToSpeak = "~Bay became acquainted with the surroundings of the underground city, and how fast The Underdomers operate.";
                 break;
             case 2:
                 ShowExpression("neutral");
-                textToSpeak = "[Agnes had put him with the Research & Technology Committee, sitting next to Morgana.]";
+                textToSpeak = "~Agnes had put him with the Research & Technology Committee, sitting next to Morgana.";
                 break;
             case 3:
                 // Morgana's first line, so she walks into frame here
@@ -317,11 +317,11 @@ public class TheMission : MonoBehaviour
                 break;
             case 5:
                 ShowExpression("happy");
-                textToSpeak = "[She said with genuine amusement, and Bay too, who was surprised at his own technical abilities.]";
+                textToSpeak = "~She said with genuine amusement, and Bay too, who was surprised at his own technical abilities.";
                 break;
             case 6:
                 ShowExpression("neutral");
-                textToSpeak = "[How did he know how to operate a computer? He didn't recall ever using one before.]";
+                textToSpeak = "~How did he know how to operate a computer? He didn't recall ever using one before.";
                 break;
             case 7:
                 speaker = "Morgana";
@@ -339,13 +339,13 @@ public class TheMission : MonoBehaviour
                 expressionsHiddenUntilMorganaAppears = true;
                 FadeOutMorganaExpression();
                 StartCoroutine(FadeOutPosterPictures());
-                textToSpeak = "[She opened a poster, displaying on her monitor screen.]";
+                textToSpeak = "~She opened a poster, displaying on her monitor screen.";
                 break;
             case 10:
-                textToSpeak = "[It was similar to the one he had read when he entered The Hidden Colony.]";
+                textToSpeak = "~It was similar to the one he had read when he entered The Hidden Colony.";
                 break;
             case 11:
-                textToSpeak = "[This one read:]";
+                textToSpeak = "~This one read:";
                 break;
             case 12:
                 // Poster slogans, so no speaker name
@@ -397,23 +397,23 @@ public class TheMission : MonoBehaviour
                 break;
             case 22:
                 ShowExpression("neutral");
-                textToSpeak = "[Sneaking out and trying to stick posters everywhere, it sounded dangerous but...]";
+                textToSpeak = "~Sneaking out and trying to stick posters everywhere, it sounded dangerous but...";
                 break;
             case 23:
                 ShowExpression("happy");
-                textToSpeak = "[...for whatever reason, he felt the thrill of it.]";
+                textToSpeak = "~...for whatever reason, he felt the thrill of it.";
                 break;
             case 24:
                 ShowExpression("neutral");
-                textToSpeak = "[He didn't feel as confused as he used to be, just a few days before.]";
+                textToSpeak = "~He didn't feel as confused as he used to be, just a few days before.";
                 break;
             case 25:
                 ShowExpression("neutral");
-                textToSpeak = "[His mind was clearer, there was a purpose he must chase...]";
+                textToSpeak = "~His mind was clearer, there was a purpose he must chase...";
                 break;
             case 26:
                 ShowExpression("happy");
-                textToSpeak = "[...just like them.]";
+                textToSpeak = "~...just like them.";
                 break;
             case 27:
                 speaker = "Morgana";
@@ -427,15 +427,15 @@ public class TheMission : MonoBehaviour
                 break;
             case 29:
                 ShowExpression("happy");
-                textToSpeak = "[Morgana pulled something out of her pocket, a pair of Flocks.]";
+                textToSpeak = "~Morgana pulled something out of her pocket, a pair of Flocks.";
                 break;
             case 30:
                 ShowExpression("happy");
-                textToSpeak = "[She handed the Flocks to Bay, who grabbed them and promptly put them on his ear.]";
+                textToSpeak = "~She handed the Flocks to Bay, who grabbed them and promptly put them on his ear.";
                 break;
             case 31:
                 ShowExpression("happy");
-                textToSpeak = "[Just like she had said, they adjusted perfectly around his ear so they wouldn't fall.]";
+                textToSpeak = "~Just like she had said, they adjusted perfectly around his ear so they wouldn't fall.";
                 break;
             case 32:
                 speaker = "Morgana";
@@ -469,14 +469,14 @@ public class TheMission : MonoBehaviour
                 break;
             case 37:
                 ShowExpression("happy");
-                textToSpeak = "[Morgana flashed him a grin, then walked to a room he presumed was a storage room.]";
+                textToSpeak = "~Morgana flashed him a grin, then walked to a room he presumed was a storage room.";
                 break;
             case 38:
                 // Morgana leaves the room and Agnes walks in
                 currentCharacter = "Agnes";
                 lastExpression = "neutral";
                 ShowExpression("neutral");
-                textToSpeak = "[As Morgana entered the door, Bay saw Agnes approaching him with a determined look on her face.]";
+                textToSpeak = "~As Morgana entered the door, Bay saw Agnes approaching him with a determined look on her face.";
                 break;
             case 39:
                 speaker = "Agnes";
@@ -522,7 +522,7 @@ public class TheMission : MonoBehaviour
                 speaker = "";
                 currentCharacter = "Morgana";
                 ShowExpression("happy");
-                textToSpeak = "[Morgana returned, and she let him out alongside the other members of the Committee.]";
+                textToSpeak = "~Morgana returned, and she let him out alongside the other members of the Committee.";
                 break;
             case 48:
                 ShowExpression("neutral");
@@ -530,11 +530,11 @@ public class TheMission : MonoBehaviour
                 break;
             case 49:
                 ShowExpression("neutral");
-                textToSpeak = "[He knew it was risky, that they could get caught. What would happen then, he didn't know.]";
+                textToSpeak = "~He knew it was risky, that they could get caught. What would happen then, he didn't know.";
                 break;
             case 50:
                 ShowExpression("happy");
-                textToSpeak = "[Morgana gave him a reassuring smile, easing some of his anxiety. She began speaking:]";
+                textToSpeak = "~Morgana gave him a reassuring smile, easing some of his anxiety. She began speaking:";
                 break;
             case 51:
                 speaker = "Morgana";
@@ -562,10 +562,13 @@ public class TheMission : MonoBehaviour
                 break;
         }
 
-        charName.GetComponent<TMP_Text>().text = speaker;
+        bool italics = DialogueText.ShouldUseItalics(textToSpeak, speaker);
+        string body = DialogueText.Body(textToSpeak);
 
-        textBox.GetComponent<TMP_Text>().text = textToSpeak;
-        currentTextLength = textToSpeak.Length;
+        charName.GetComponent<TMP_Text>().text = speaker;
+        textBox.GetComponent<TMP_Text>().text = body;
+        DialogueText.ApplyStyle(textBox.GetComponent<TMP_Text>(), italics);
+        currentTextLength = body.Length;
         TextCreator.runTextPrint = true;
 
         yield return new WaitForSeconds(0.05f);

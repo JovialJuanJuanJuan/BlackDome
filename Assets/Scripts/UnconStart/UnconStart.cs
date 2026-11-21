@@ -156,9 +156,12 @@ public class UnconStart : MonoBehaviour
         charName.GetComponent<TMPro.TMP_Text>().text = "";
 
         // Set dialogue text
-        textBox.GetComponent<TMPro.TMP_Text>().text = textToSpeak;
-
-        currentTextLength = textToSpeak.Length;
+        // No nameplate in this scene: narration is italic, while a whole quoted line is speech.
+        bool italics = DialogueText.ShouldUseItalics(textToSpeak, "");
+        string body = DialogueText.Body(textToSpeak);
+        textBox.GetComponent<TMPro.TMP_Text>().text = body;
+        DialogueText.ApplyStyle(textBox.GetComponent<TMPro.TMP_Text>(), italics);
+        currentTextLength = body.Length;
 
         // Reset text counter
         TextCreator.charCount = 0;

@@ -48,7 +48,7 @@ public class TheHiddenColony02 : MonoBehaviour
     public GameObject ChoiceButton3;
 
     // The line where Agnes turns around and walks off. Her sprite fades out as it finishes.
-    const string AgnesExitLine = "[She flashed her signature mischievous smile to him, and turned around as she began walking.]";
+    const string AgnesExitLine = "~She flashed her signature mischievous smile to him, and turned around as she began walking.";
 
     int introIndex = 0;
     bool isTyping = false; // Prevents spamming Next
@@ -275,20 +275,20 @@ public class TheHiddenColony02 : MonoBehaviour
         {
             case 0:
                 ShowExpression("smile");
-                textToSpeak = "[Bay began to approach the individual, who was inside their own world.]";
+                textToSpeak = "~Bay began to approach the individual, who was inside their own world.";
                 break;
             case 1:
                 ShowExpression("smile");
-                textToSpeak = "[When he got close enough, he noticed the person was making some kind of poster.]";
+                textToSpeak = "~When he got close enough, he noticed the person was making some kind of poster.";
                 break;
             case 2:
                 ShowExpression("smile");
-                textToSpeak = "[He managed to read it once he was close enough...]";
+                textToSpeak = "~He managed to read it once he was close enough...";
                 break;
             case 3:
                 ShowExpression("smile");
                 StartCoroutine(FadeAndDisable(Picture1));
-                textToSpeak = "[...his eyes widened, something between confusion and astonishment washed over him.]";
+                textToSpeak = "~...his eyes widened, something between confusion and astonishment washed over him.";
                 break;
             case 4:
                 ShowExpression("embarrassed");
@@ -309,32 +309,32 @@ public class TheHiddenColony02 : MonoBehaviour
             case 8:
                 ShowExpression("smile");
                 FadeOutActiveExpressions();
-                textToSpeak = "[When Bay got close enough, the individual turned abruptly from their chair...]";
+                textToSpeak = "~When Bay got close enough, the individual turned abruptly from their chair...";
                 break;
             case 9:
                 ShowExpression("smile");
-                textToSpeak = "[...he finally saw their face.]";
+                textToSpeak = "~...he finally saw their face.";
                 break;
             case 10:
                 ShowExpression("smile");
                 StartCoroutine(FadeAndDisable(Picture2));
-                textToSpeak = "[It was a girl, maybe fifteen years old or so.]";
+                textToSpeak = "~It was a girl, maybe fifteen years old or so.";
                 break;
             case 11:
                 ShowExpression("smile");
-                textToSpeak = "[She took off her hood, revealing her short blonde hair and green eyes.]";
+                textToSpeak = "~She took off her hood, revealing her short blonde hair and green eyes.";
                 break;
             case 12:
                 ShowExpression("smile");
-                textToSpeak = "[She looked familiar, but he couldn't quite put his finger on where he saw her before.]";
+                textToSpeak = "~She looked familiar, but he couldn't quite put his finger on where he saw her before.";
                 break;
             case 13:
                 ShowExpression("smile");
-                textToSpeak = "[She was wearing headphones, which she didn't take off before she completely faced him.]";
+                textToSpeak = "~She was wearing headphones, which she didn't take off before she completely faced him.";
                 break;
             case 14:
                 ShowExpression("smile");
-                textToSpeak = "[She began speaking:]";
+                textToSpeak = "~She began speaking:";
                 break;
             case 15:
                 expressionsHiddenUntilTunnelEntrance = false;
@@ -359,7 +359,7 @@ public class TheHiddenColony02 : MonoBehaviour
                 break;
             case 20:
                 ShowExpression("smile");
-                textToSpeak = "[She gave him a knowing grin.]";
+                textToSpeak = "~She gave him a knowing grin.";
                 break;
             case 21:
                 ShowExpression("happy");
@@ -393,11 +393,11 @@ public class TheHiddenColony02 : MonoBehaviour
                 break;
             case 28:
                 ShowExpression("happy");
-                textToSpeak = "[Agnes overheard the conversation and was already between Bay and Morgana.]";
+                textToSpeak = "~Agnes overheard the conversation and was already between Bay and Morgana.";
                 break;
             case 29:
                 ShowExpression("happy");
-                textToSpeak = "[She gave her a look, then she faced Bay.]";
+                textToSpeak = "~She gave her a look, then she faced Bay.";
                 break;
             case 30:
                 // Agnes only appears from this line onwards
@@ -422,25 +422,30 @@ public class TheHiddenColony02 : MonoBehaviour
                 break;
             case 34:
                 ShowExpression("embarrassed");
-                textToSpeak = "[Agnes turned herself sideways, and right off the bat...]";
+                textToSpeak = "~Agnes turned herself sideways, and right off the bat...";
                 break;
             case 35:
                 ShowExpression("embarrassed");
-                textToSpeak = "[...Bay noticed the strange device she was wearing on her ear.]";
+                textToSpeak = "~...Bay noticed the strange device she was wearing on her ear.";
                 break;
 
         }
 
+        // Narration has no character name, and is set in italics by DialogueText.ApplyStyle.
+        bool narration = DialogueText.IsNarration(textToSpeak);
+        string body = DialogueText.Body(textToSpeak);
+
         // No character name until Morgana introduces herself (case 15).
         // Morgana speaks from case 15, Agnes from case 30 onwards.
-        string speaker = index < 15 || textToSpeak.StartsWith("[")
+        string speaker = index < 15 || narration
             ? ""
             : index >= 30 ? "Agnes" : "Morgana";
 
         charName.GetComponent<TMP_Text>().text = speaker;
 
-        textBox.GetComponent<TMP_Text>().text = textToSpeak;
-        currentTextLength = textToSpeak.Length;
+        textBox.GetComponent<TMP_Text>().text = body;
+        DialogueText.ApplyStyle(textBox.GetComponent<TMP_Text>(), DialogueText.ShouldUseItalics(textToSpeak, speaker));
+        currentTextLength = body.Length;
         TextCreator.runTextPrint = true;
 
         yield return new WaitForSeconds(0.05f);
@@ -535,7 +540,7 @@ public class TheHiddenColony02 : MonoBehaviour
 
         DialogueLine[] choice1Dialogue =
         {
-            new DialogueLine("", "[Agnes put her finger over the device. There was a small blinking blue light.]"),
+            new DialogueLine("", "~Agnes put her finger over the device. There was a small blinking blue light."),
             new DialogueLine("Agnes", "We call these Flocks."),
             new DialogueLine("Agnes", "They are wearable communication devices developed by the Research & Technology Committee and Engineering Committee..."),
             new DialogueLine("Agnes", "...aka, us!"),
@@ -568,7 +573,7 @@ public class TheHiddenColony02 : MonoBehaviour
 
         DialogueLine[] choice2Dialogue =
         {
-            new DialogueLine("", "[Agnes put her finger over the device. There was a small blinking blue light.]"),
+            new DialogueLine("", "~Agnes put her finger over the device. There was a small blinking blue light."),
             new DialogueLine("Agnes", "Yup, you're right!"),
             new DialogueLine("Agnes", "We call these Flocks."),
             new DialogueLine("Agnes", "They are wearable communication devices developed by the Research & Technology Committee and Engineering Committee..."),
@@ -604,7 +609,7 @@ public class TheHiddenColony02 : MonoBehaviour
         {
             new DialogueLine("Agnes", "Oh, they sure aren't!"),
             new DialogueLine("Agnes", "They adjust perfectly around your ear, no matter how big or small it is."),
-            new DialogueLine("", "[Agnes put her finger over the device. There was a small blinking blue light.]"),
+            new DialogueLine("", "~Agnes put her finger over the device. There was a small blinking blue light."),
             new DialogueLine("Agnes", "We call these Flocks."),
             new DialogueLine("Agnes", "They are wearable communication devices developed by the Research & Technology Committee and Engineering Committee..."),
             new DialogueLine("Agnes", "...aka, us!"),
@@ -624,17 +629,17 @@ public class TheHiddenColony02 : MonoBehaviour
 
     DialogueLine[] aftermathDialogue =
     {
-        new DialogueLine("", "[She turned back towards Bay to face him, Morgana watching the two.]"),
+        new DialogueLine("", "~She turned back towards Bay to face him, Morgana watching the two."),
         new DialogueLine("Agnes", "Anyways, we have to get to work."),
         new DialogueLine("Agnes", "As you saw, Morgana is designing a poster."),
         new DialogueLine("Agnes", "We'll go print a bunch of those and stick them around the Dome."),
-        new DialogueLine("", "[Morgana grinned, proud of herself for being mentioned.]"),
+        new DialogueLine("", "~Morgana grinned, proud of herself for being mentioned."),
         new DialogueLine("Agnes", "Don't worry, you don't have to get yourself mixed with these numbskulls if you don't want to."),
         new DialogueLine("Agnes", "I'll eventually find something you can do. Meanwhile..."),
         new DialogueLine("Agnes", "...I know the perfect job you can do for me."),
         new DialogueLine("", AgnesExitLine),
-        new DialogueLine("", "[What did she have in store for him?]"),
-        new DialogueLine("", "[Whatever it was, he had to be prepared.]")
+        new DialogueLine("", "~What did she have in store for him?"),
+        new DialogueLine("", "~Whatever it was, he had to be prepared.")
     };
 
     // =====================================================
@@ -676,8 +681,12 @@ public class TheHiddenColony02 : MonoBehaviour
         // Set dialogue
         textToSpeak = dialogueLine.text;
 
-        // Narration (lines wrapped in brackets) has no character name
-        charName.GetComponent<TMP_Text>().text = textToSpeak.StartsWith("[") ? "" : dialogueLine.speaker;
+        // Narration has no character name, and is set in italics by DialogueText.ApplyStyle.
+        bool narration = DialogueText.IsNarration(textToSpeak);
+        string body = DialogueText.Body(textToSpeak);
+
+        string speaker = narration ? "" : dialogueLine.speaker;
+        charName.GetComponent<TMP_Text>().text = speaker;
 
         if (!string.IsNullOrEmpty(dialogueLine.speaker))
             currentCharacter = dialogueLine.speaker;
@@ -693,9 +702,9 @@ public class TheHiddenColony02 : MonoBehaviour
         if (!string.IsNullOrEmpty(dialogueLine.expression))
             ShowExpression(dialogueLine.expression);
 
-        textBox.GetComponent<TMP_Text>().text = textToSpeak;
-
-        currentTextLength = textToSpeak.Length;
+        textBox.GetComponent<TMP_Text>().text = body;
+        DialogueText.ApplyStyle(textBox.GetComponent<TMP_Text>(), DialogueText.ShouldUseItalics(textToSpeak, speaker));
+        currentTextLength = body.Length;
 
         // Reset typewriter counter
         TextCreator.charCount = 0;

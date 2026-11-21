@@ -137,19 +137,19 @@ public class InsideTheTranspod01 : MonoBehaviour
         {
             case 0:
                 ShowExpression("happy");
-                textToSpeak = "[Once inside, the Transpod's door closed automatically when it detected Agnes' presence.]";
+                textToSpeak = "~Once inside, the Transpod's door closed automatically when it detected Agnes' presence.";
                 break;
             case 1:
                 ShowExpression("happy");
-                textToSpeak = "[Bay looked around the Transpod, amazed.]";
+                textToSpeak = "~Bay looked around the Transpod, amazed.";
                 break;
             case 2:
                 ShowExpression("smile");
-                textToSpeak = "[Agnes noticed his expression and smiled.]";
+                textToSpeak = "~Agnes noticed his expression and smiled.";
                 break;
             case 3:
                 ShowExpression("smile");
-                textToSpeak = "[The girl opened her mouth to speak:]";
+                textToSpeak = "~The girl opened her mouth to speak:";
                 break;
             case 4:
                 ShowExpression("happy");
@@ -165,23 +165,23 @@ public class InsideTheTranspod01 : MonoBehaviour
                 break;
             case 7:
                 ShowExpression("smile");
-                textToSpeak = "[Agnes continued to talk about her Transpod passionately, but once it was over—her expression changed.]";
+                textToSpeak = "~Agnes continued to talk about her Transpod passionately, but once it was over—her expression changed.";
                 break;
             case 8:
                 ShowExpression("neutral");
-                textToSpeak = "[She fiddled with a few buttons and the Transpod rocketed off the ground and began floating.]";
+                textToSpeak = "~She fiddled with a few buttons and the Transpod rocketed off the ground and began floating.";
                 break;
             case 9:
                 ShowExpression("smile");
-                textToSpeak = "[Bay felt that despite the fast launch, he didn't get flung around.]";
+                textToSpeak = "~Bay felt that despite the fast launch, he didn't get flung around.";
                 break;
             case 10:
                 ShowExpression("neutral");
-                textToSpeak = "[But Agnes' expression was more... purposeful now.]";
+                textToSpeak = "~But Agnes' expression was more... purposeful now.";
                 break;
             case 11:
                 ShowExpression("neutral");
-                textToSpeak = "[Whatever came out of her mouth next, was something he needed to hear.]";
+                textToSpeak = "~Whatever came out of her mouth next, was something he needed to hear.";
                 break;
             case 12:
                 ShowExpression("neutral");
@@ -189,7 +189,7 @@ public class InsideTheTranspod01 : MonoBehaviour
                 break;
             case 13:
                 ShowExpression("neutral");
-                textToSpeak = "[She looked out the window, both ways before coming to face him again. Her expression was serious now.]";
+                textToSpeak = "~She looked out the window, both ways before coming to face him again. Her expression was serious now.";
                 break;
             case 14:
                 ShowExpression("neutral");
@@ -217,22 +217,26 @@ public class InsideTheTranspod01 : MonoBehaviour
                 break;
             case 20:
                 ShowExpression("neutral");
-                textToSpeak = "[As she spat new information at him, he looked out the window out of curiosity.]";
+                textToSpeak = "~As she spat new information at him, he looked out the window out of curiosity.";
                 break;
             case 21:
                 ShowExpression("confused");
-                textToSpeak = "[He noticed Transpods like the one they were riding, but they were black and floated close to each other.]";
+                textToSpeak = "~He noticed Transpods like the one they were riding, but they were black and floated close to each other.";
                 break;
             case 22:
                 ShowExpression("neutral");
-                textToSpeak = "[What do you say?]";
+                textToSpeak = "~What do you say?";
                 break;
 
         }
 
-        charName.GetComponent<TMP_Text>().text = textToSpeak.StartsWith("[") ? "" : "Agnes";
-        textBox.GetComponent<TMP_Text>().text = textToSpeak;
-        currentTextLength = textToSpeak.Length;
+        bool narration = DialogueText.IsNarration(textToSpeak);
+        string body = DialogueText.Body(textToSpeak);
+        string speaker = narration ? "" : "Agnes";
+        charName.GetComponent<TMP_Text>().text = speaker;
+        textBox.GetComponent<TMP_Text>().text = body;
+        DialogueText.ApplyStyle(textBox.GetComponent<TMP_Text>(), DialogueText.ShouldUseItalics(textToSpeak, speaker));
+        currentTextLength = body.Length;
         TextCreator.runTextPrint = true;
 
         yield return new WaitForSeconds(0.05f);
@@ -333,8 +337,8 @@ public class InsideTheTranspod01 : MonoBehaviour
 
         string[] choice1Dialogue =
         {
-            "[As you mentioned the odd colored Transpods, Agnes quickly took a peek out the window.]",
-            "[Her eyes widening as she let out a soft gasp.]",
+            "~As you mentioned the odd colored Transpods, Agnes quickly took a peek out the window.",
+            "~Her eyes widening as she let out a soft gasp.",
             "Uh oh, that's not good news.",
             "Thanks for noticing..."
         };
@@ -364,8 +368,8 @@ public class InsideTheTranspod01 : MonoBehaviour
 
         string[] choice2Dialogue =
         {
-            "[At your warning, Agnes quickly looked out the window.]",
-            "[Her eyes widening as she let out a soft gasp.]",
+            "~At your warning, Agnes quickly looked out the window.",
+            "~Her eyes widening as she let out a soft gasp.",
             "Uh oh, I thought they were not around here right now!",
             "Thanks for noticing!"
         };
@@ -395,8 +399,8 @@ public class InsideTheTranspod01 : MonoBehaviour
 
         string[] choice3Dialogue =
         {
-            "[Agnes smiled, thinking you were looking at other people's Transpods.]",
-            "[She looked out the window.]",
+            "~Agnes smiled, thinking you were looking at other people's Transpods.",
+            "~She looked out the window.",
             "Wait...",
             "Those are definitely not sick!",
             "Thanks for noticing though..."
@@ -421,16 +425,16 @@ public class InsideTheTranspod01 : MonoBehaviour
         "Everyone hates them, including me.",
         "We better get moving, they're on our tail.",
         "I think they can even scan inside Transpods too, such technology.",
-        "[She pressed some buttons on the Transpod pad and it started floating to another location.]",
+        "~She pressed some buttons on the Transpod pad and it started floating to another location.",
         "People hate them, we all hate them. Though, it is what it is.",
         "Do the right thing and they won't even acknowledge you.",
         "Do the slightest bit of bad, and they'll sniff you out till they find you.",
         "Good thing you're with me, let's get somewhere safer.",
-        "[Bay took a deep gulp.]",
-        "[Hearing that made him overly nervous, sweat beads forming on his forehead.]",
-        "[DCP Officers are able to scan your every movement.]",
-        "[And that felt... exposing.]",
-        "[Agnes looked the same, but she managed to get the Transpod somewhere off their radars.]"
+        "~Bay took a deep gulp.",
+        "~Hearing that made him overly nervous, sweat beads forming on his forehead.",
+        "~DCP Officers are able to scan your every movement.",
+        "~And that felt... exposing.",
+        "~Agnes looked the same, but she managed to get the Transpod somewhere off their radars."
     };
 
     // =====================================================
@@ -471,11 +475,14 @@ public class InsideTheTranspod01 : MonoBehaviour
 
         // Set dialogue
         textToSpeak = dialogueLine;
-        charName.GetComponent<TMP_Text>().text = textToSpeak.StartsWith("[") ? "" : "Agnes";
 
-        textBox.GetComponent<TMP_Text>().text = textToSpeak;
-
-        currentTextLength = textToSpeak.Length;
+        bool narration = DialogueText.IsNarration(textToSpeak);
+        string body = DialogueText.Body(textToSpeak);
+        string speaker = narration ? "" : "Agnes";
+        charName.GetComponent<TMP_Text>().text = speaker;
+        textBox.GetComponent<TMP_Text>().text = body;
+        DialogueText.ApplyStyle(textBox.GetComponent<TMP_Text>(), DialogueText.ShouldUseItalics(textToSpeak, speaker));
+        currentTextLength = body.Length;
 
         // Reset typewriter counter
         TextCreator.charCount = 0;

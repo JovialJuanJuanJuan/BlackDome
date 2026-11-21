@@ -31,7 +31,7 @@ public class TheHiddenColony01 : MonoBehaviour
     int introIndex = 0;
     bool isTyping = false; // Prevents spamming Next
 
-    // The last intro line ("[When everyone went back to their daily routes, Bay began to approach the person.]")
+    // The last intro line ("~When everyone went back to their daily routes, Bay began to approach the person.")
     const int LastIntroIndex = 40;
 
     const int Picture1FadeIndex = 10;
@@ -84,43 +84,43 @@ public class TheHiddenColony01 : MonoBehaviour
         switch (index)
         {
             case 0:
-                textToSpeak = "[Just as Agnes said, there were a lot of new faces.]";
+                textToSpeak = "~Just as Agnes said, there were a lot of new faces.";
                 break;
             case 1:
-                textToSpeak = "[As he followed her, he locked eyes with everyone.]";
+                textToSpeak = "~As he followed her, he locked eyes with everyone.";
                 break;
             case 2:
-                textToSpeak = "[None gave off any malice, only mild curiosity when their eyes met Bay's.]";
+                textToSpeak = "~None gave off any malice, only mild curiosity when their eyes met Bay's.";
                 break;
             case 3:
-                textToSpeak = "[There was a long table centered on the room, with some scratches.]";
+                textToSpeak = "~There was a long table centered on the room, with some scratches.";
                 break;
             case 4:
-                textToSpeak = "[On the side walls, there are bulletin boards and corkboards with pinned papers...]";
+                textToSpeak = "~On the side walls, there are bulletin boards and corkboards with pinned papers...";
                 break;
             case 5:
-                textToSpeak = "[...waiting for anyone who approached.]";
+                textToSpeak = "~...waiting for anyone who approached.";
                 break;
             case 6:
-                textToSpeak = "[There were six computers on the far end wall next to the door...]";
+                textToSpeak = "~There were six computers on the far end wall next to the door...";
                 break;
             case 7:
-                textToSpeak = "[...one of them being used by a hooded individual.]";
+                textToSpeak = "~...one of them being used by a hooded individual.";
                 break;
             case 8:
-                textToSpeak = "[The room smelled of stale air from the amount of dust floating in the air.]";
+                textToSpeak = "~The room smelled of stale air from the amount of dust floating in the air.";
                 break;
             case 9:
-                textToSpeak = "[He finally stopped when Agnes did, and stood before everyone.]";
+                textToSpeak = "~He finally stopped when Agnes did, and stood before everyone.";
                 break;
             case 10:
-                textToSpeak = "[There must be around eighteen teenagers his age.]";
+                textToSpeak = "~There must be around eighteen teenagers his age.";
                 break;
             case 11:
-                textToSpeak = "[Some older, some younger.]";
+                textToSpeak = "~Some older, some younger.";
                 break;
             case 12:
-                textToSpeak = "[Agnes began speaking:]";
+                textToSpeak = "~Agnes began speaking:";
                 break;
             case 13:
                 textToSpeak = "Hey y'all, I'm back!";
@@ -135,10 +135,10 @@ public class TheHiddenColony01 : MonoBehaviour
                 textToSpeak = "Luckily for us, I was able to get a hold of him before they got him.";
                 break;
             case 17:
-                textToSpeak = "[Chatter and cheers exploded instantly when Agnes finished her sentence.]";
+                textToSpeak = "~Chatter and cheers exploded instantly when Agnes finished her sentence.";
                 break;
             case 18:
-                textToSpeak = "[After a few seconds, she continued:]";
+                textToSpeak = "~After a few seconds, she continued:";
                 break;
             case 19:
                 textToSpeak = "As you may already know, the DCA recently increased the amount of DCP officers roaming around.";
@@ -159,59 +159,63 @@ public class TheHiddenColony01 : MonoBehaviour
                 textToSpeak = "We need to get ready for this, we really do.";
                 break;
             case 25:
-                textToSpeak = "[She said the last part almost to herself.]";
+                textToSpeak = "~She said the last part almost to herself.";
                 break;
             case 26:
-                textToSpeak = "[Everyone started talking all at once.]";
+                textToSpeak = "~Everyone started talking all at once.";
                 break;
             case 27:
-                textToSpeak = "[Bay turned his head back at the hooded individual, who was now typing something on the keyboard.]";
+                textToSpeak = "~Bay turned his head back at the hooded individual, who was now typing something on the keyboard.";
                 break;
             case 28:
-                textToSpeak = "[His curiosity piqued, who was that?]";
+                textToSpeak = "~His curiosity piqued, who was that?";
                 break;
             case 29:
-                textToSpeak = "[Agnes turned to Bay, then began speaking with a smile on her face:]";
+                textToSpeak = "~Agnes turned to Bay, then began speaking with a smile on her face:";
                 break;
             case 30:
                 textToSpeak = "Hey, let me get you acquainted with everyone. Let's go!";
                 break;
             case 31:
-                textToSpeak = "[Her voice was off, but he didn't question it.]";
+                textToSpeak = "~Her voice was off, but he didn't question it.";
                 break;
             case 32:
-                textToSpeak = "[Everyone was already coming at him all at once.]";
+                textToSpeak = "~Everyone was already coming at him all at once.";
                 break;
             case 33:
-                textToSpeak = "[Everyone was getting their turn to greet and welcome Bay into The Hidden Colony.]";
+                textToSpeak = "~Everyone was getting their turn to greet and welcome Bay into The Hidden Colony.";
                 break;
             case 34:
-                textToSpeak = "[He smiled through all of this, he didn't recall this feeling.]";
+                textToSpeak = "~He smiled through all of this, he didn't recall this feeling.";
                 break;
             case 35:
-                textToSpeak = "[But he knew that it was stupid to overthink everything right now.]";
+                textToSpeak = "~But he knew that it was stupid to overthink everything right now.";
                 break;
             case 36:
-                textToSpeak = "[He had a place where he was welcome.]";
+                textToSpeak = "~He had a place where he was welcome.";
                 break;
             case 37:
-                textToSpeak = "[He glanced between the heads of the people.]";
+                textToSpeak = "~He glanced between the heads of the people.";
                 break;
             case 38:
-                textToSpeak = "[The same hooded individual had stood up to stretch.]";
+                textToSpeak = "~The same hooded individual had stood up to stretch.";
                 break;
             case 39:
-                textToSpeak = "[They were wearing a long oversized hoodie and black baggy shorts.]";
+                textToSpeak = "~They were wearing a long oversized hoodie and black baggy shorts.";
                 break;
             case 40:
-                textToSpeak = "[When everyone went back to their daily routes, Bay began to approach the person.]";
+                textToSpeak = "~When everyone went back to their daily routes, Bay began to approach the person.";
                 break;
 
         }
 
-        charName.GetComponent<TMP_Text>().text = textToSpeak.StartsWith("[") ? "" : "Agnes";
-        textBox.GetComponent<TMP_Text>().text = textToSpeak;
-        currentTextLength = textToSpeak.Length;
+        bool narration = DialogueText.IsNarration(textToSpeak);
+        string body = DialogueText.Body(textToSpeak);
+        string speaker = narration ? "" : "Agnes";
+        charName.GetComponent<TMP_Text>().text = speaker;
+        textBox.GetComponent<TMP_Text>().text = body;
+        DialogueText.ApplyStyle(textBox.GetComponent<TMP_Text>(), DialogueText.ShouldUseItalics(textToSpeak, speaker));
+        currentTextLength = body.Length;
         TextCreator.runTextPrint = true;
 
         yield return new WaitForSeconds(0.05f);
