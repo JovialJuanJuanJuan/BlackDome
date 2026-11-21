@@ -141,35 +141,35 @@ public class IntoTheWestTube : MonoBehaviour
         switch (index)
         {
             case 0:
-                ShowExpression("smile");
+                ShowExpression("neutral");
                 textToSpeak = "[They were further into the Tube, and they had reached the Tube Intersection.]";
                 break;
             case 1:
-                ShowExpression("smile");
+                ShowExpression("neutral");
                 textToSpeak = "[A four-way intersection that connected the domes from each direction.]";
                 break;
             case 2:
-                ShowExpression("smile");
+                ShowExpression("neutral");
                 textToSpeak = "[Bay looked around, ashen dust floated in the atmosphere.]";
                 break;
             case 3:
-                ShowExpression("smile");
+                ShowExpression("neutral");
                 textToSpeak = "[From time to time, he saw people walking from Dome to Dome, their expressions calm and controlled...]";
                 break;
             case 4:
-                ShowExpression("smile");
+                ShowExpression("neutral");
                 textToSpeak = "[...in every sense of the word.]";
                 break;
             case 5:
-                ShowExpression("smile");
+                ShowExpression("neutral");
                 textToSpeak = "[After walking for what seemed like ages, Agnes stopped dead in her tracks.]";
                 break;
             case 6:
-                ShowExpression("smile");
+                ShowExpression("happy");
                 textToSpeak = "Here we are.";
                 break;
             case 7:
-                ShowExpression("smile");
+                ShowExpression("happy");
                 textToSpeak = "[Bay turned his head, they were standing before a maintenance door with a sign.]";
                 break;
             case 8:

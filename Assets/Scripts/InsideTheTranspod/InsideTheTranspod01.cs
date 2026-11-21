@@ -136,11 +136,11 @@ public class InsideTheTranspod01 : MonoBehaviour
         switch (index)
         {
             case 0:
-                ShowExpression("smile");
+                ShowExpression("happy");
                 textToSpeak = "[Once inside, the Transpod's door closed automatically when it detected Agnes' presence.]";
                 break;
             case 1:
-                ShowExpression("smile");
+                ShowExpression("happy");
                 textToSpeak = "[Bay looked around the Transpod, amazed.]";
                 break;
             case 2:
@@ -152,15 +152,15 @@ public class InsideTheTranspod01 : MonoBehaviour
                 textToSpeak = "[The girl opened her mouth to speak:]";
                 break;
             case 4:
-                ShowExpression("smile");
+                ShowExpression("happy");
                 textToSpeak = "Pretty cool, huh?";
                 break;
             case 5:
-                ShowExpression("smile");
+                ShowExpression("happy");
                 textToSpeak = "Transpods have this mechanism where it's able to detect its owner, and it opens and closes automatically when it does.";
                 break;
             case 6:
-                ShowExpression("smile");
+                ShowExpression("neutral");
                 textToSpeak = "Transpods are blank when manufactured by default, and they are assigned to you once you're old enough.";
                 break;
             case 7:
@@ -168,7 +168,7 @@ public class InsideTheTranspod01 : MonoBehaviour
                 textToSpeak = "[Agnes continued to talk about her Transpod passionately, but once it was over—her expression changed.]";
                 break;
             case 8:
-                ShowExpression("smile");
+                ShowExpression("neutral");
                 textToSpeak = "[She fiddled with a few buttons and the Transpod rocketed off the ground and began floating.]";
                 break;
             case 9:
@@ -176,31 +176,31 @@ public class InsideTheTranspod01 : MonoBehaviour
                 textToSpeak = "[Bay felt that despite the fast launch, he didn't get flung around.]";
                 break;
             case 10:
-                ShowExpression("smile");
+                ShowExpression("neutral");
                 textToSpeak = "[But Agnes' expression was more... purposeful now.]";
                 break;
             case 11:
-                ShowExpression("smile");
+                ShowExpression("neutral");
                 textToSpeak = "[Whatever came out of her mouth next, was something he needed to hear.]";
                 break;
             case 12:
-                ShowExpression("smile");
+                ShowExpression("neutral");
                 textToSpeak = "So, now that we're alone—nobody can listen to us.";
                 break;
             case 13:
-                ShowExpression("smile");
+                ShowExpression("neutral");
                 textToSpeak = "[She looked out the window, both ways before coming to face him again. Her expression was serious now.]";
                 break;
             case 14:
-                ShowExpression("smile");
+                ShowExpression("neutral");
                 textToSpeak = "I know who you are, Bay.";
                 break;
             case 15:
-                ShowExpression("smile");
+                ShowExpression("neutral");
                 textToSpeak = "You are from The Surface, you are what they call a Dustbreather.";
                 break;
             case 16:
-                ShowExpression("smile");
+                ShowExpression("sad");
                 textToSpeak = "They don't like people like you around here, you better be safe.";
                 break;
             case 17:
@@ -208,23 +208,23 @@ public class InsideTheTranspod01 : MonoBehaviour
                 textToSpeak = "Right now, they are probably looking for you. I can help you disguise yourself, give you a place to live.";
                 break;
             case 18:
-                ShowExpression("smile");
+                ShowExpression("confused");
                 textToSpeak = "But, it may be difficult—there are those who already know what you look like.";
                 break;
             case 19:
-                ShowExpression("smile");
+                ShowExpression("sad");
                 textToSpeak = "They are the ones who we should look out for, in case they snitch...";
                 break;
             case 20:
-                ShowExpression("smile");
+                ShowExpression("neutral");
                 textToSpeak = "[As she spat new information at him, he looked out the window out of curiosity.]";
                 break;
             case 21:
-                ShowExpression("smile");
+                ShowExpression("confused");
                 textToSpeak = "[He noticed Transpods like the one they were riding, but they were black and floated close to each other.]";
                 break;
             case 22:
-                ShowExpression("smile");
+                ShowExpression("neutral");
                 textToSpeak = "[What do you say?]";
                 break;
 

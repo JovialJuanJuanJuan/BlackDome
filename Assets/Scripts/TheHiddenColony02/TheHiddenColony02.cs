@@ -342,23 +342,23 @@ public class TheHiddenColony02 : MonoBehaviour
                 textToSpeak = "Oh, you must be the new Dommie. Bay, ain't it?";
                 break;
             case 16:
-                ShowExpression("smile");
+                ShowExpression("happy");
                 textToSpeak = "Nice to meet ya, name's Morgana.";
                 break;
             case 17:
-                ShowExpression("embarrassed");
+                ShowExpression("happy");
                 textToSpeak = "I'm the Chairperson of the Research & Technology Committee.";
                 break;
             case 18:
-                ShowExpression("happy");
+                ShowExpression("excited");
                 textToSpeak = "Right now I'm making a poster, we'll print it and then spread them around like crazy 'round the Dome.";
                 break;
             case 19:
-                ShowExpression("happy");
+                ShowExpression("neutral");
                 textToSpeak = "Luckily, they ain't know where we are. But they'll soon do if we keep at it.";
                 break;
             case 20:
-                ShowExpression("happy");
+                ShowExpression("smile");
                 textToSpeak = "[She gave him a knowing grin.]";
                 break;
             case 21:
@@ -370,25 +370,25 @@ public class TheHiddenColony02 : MonoBehaviour
                 textToSpeak = "She'll put ya somewhere you'll fit nicely, don't worry. She's the boss around here anyways.";
                 break;
             case 23:
-                ShowExpression("smile");
+                ShowExpression("neutral");
                 textToSpeak = "We are The Underdomers, and this is our home...";
                 break;
             case 24:
-                ShowExpression("smile");
+                ShowExpression("happy");
                 textToSpeak = "...The Hidden Colony.";
                 break;
             case 25:
                 // Agnes stays hidden until she actually steps in at case 30,
                 // so the character sprite is not shown during Morgana's lines.
-                ShowExpression("smile");
+                ShowExpression("neutral");
                 textToSpeak = "We know what that Dome Control Administration group is doing, I reckon you already know a bit?";
                 break;
             case 26:
-                ShowExpression("happy");
+                ShowExpression("sad");
                 textToSpeak = "They don't want anyone knowing 'bout what's up there, outside...";
                 break;
             case 27:
-                ShowExpression("happy");
+                ShowExpression("neutral");
                 textToSpeak = "...what they call The Surface.";
                 break;
             case 28:

@@ -275,11 +275,11 @@ public class WestTube : MonoBehaviour
                 textToSpeak = "You see that? We call that tunnel the West Tube.";
                 break;
             case 12:
-                ShowExpression("smile");
+                ShowExpression("neutral");
                 textToSpeak = "There are four of those around the dome. South Tube, East Tube, North Tube, and West Tube.";
                 break;
             case 13:
-                ShowExpression("smile");
+                ShowExpression("neutral");
                 textToSpeak = "They only let people in if you have a reason to go. Usually, people who work on another dome...";
                 break;
             case 14:
@@ -345,15 +345,15 @@ public class WestTube : MonoBehaviour
                 textToSpeak = "[Agnes said with great joy, knowing well it was her brother underneath that intimidating mask.]";
                 break;
             case 29:
-                ShowExpression("happy");
+                ShowExpression("neutral");
                 textToSpeak = "[Still, she had to put on an act to avoid suspicion, and she did it well.]";
                 break;
             case 30:
-                ShowExpression("happy");
+                ShowExpression("neutral");
                 textToSpeak = "[Her brother looked at her, then at Bay — his eyes lingering on Bay for a moment before returning to Agnes.]";
                 break;
             case 31:
-                ShowExpression("happy");
+                ShowExpression("neutral");
                 textToSpeak = "[He began speaking, his voice heavily distorted through the mask, like a robotic voice.]";
                 break;
             case 32:
@@ -385,7 +385,7 @@ public class WestTube : MonoBehaviour
                 textToSpeak = "Whatever, carry on then...";
                 break;
             case 39:
-                ShowExpression("embarrassed");
+                ShowExpression("surprised");
                 textToSpeak = "[But then, Ryder took a small step towards Bay, locking eyes with him.]";
                 break;
             case 40:
@@ -393,7 +393,7 @@ public class WestTube : MonoBehaviour
                 textToSpeak = "Don't you dare lay a hand on my little sister, or else...";
                 break;
             case 41:
-                ShowExpression("embarrassed");
+                ShowExpression("surprised");
                 textToSpeak = "[He had a threatening tone, but it was clear he was half-joking. What do you say?]";
                 break;
 

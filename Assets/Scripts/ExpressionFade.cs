@@ -43,6 +43,35 @@ public static class ExpressionFade
     }
 
     /// <summary>
+    /// Some sprites (Agnes's neutral one) carry an Animator that plays the character's entrance,
+    /// and expressions are switched by turning the sprite objects on and off. Left alone the
+    /// entrance would therefore replay every time the expression came back to that sprite, so it
+    /// is allowed to play on the sprite's first appearance in the scene and switched off after.
+    /// </summary>
+    static void PrepareEntranceAnimation(GameObject target)
+    {
+        if (target == null)
+            return;
+
+        ExpressionSprite sprite = ExpressionSprite.For(target);
+        if (sprite == null)
+            return;
+
+        if (target.activeSelf)
+        {
+            // Already on screen without us switching it on, so its entrance is behind it.
+            sprite.HasAppeared = true;
+            return;
+        }
+
+        Animator animator = target.GetComponent<Animator>();
+        if (animator != null && sprite.HasAppeared)
+            animator.enabled = false;
+
+        sprite.HasAppeared = true;
+    }
+
+    /// <summary>
     /// Shows a sprite at full opacity and authored size with no animation (resets, scene starts).
     /// </summary>
     public static void ShowInstantly(GameObject target)
@@ -51,6 +80,7 @@ public static class ExpressionFade
             return;
 
         ExpressionSprite sprite = ExpressionSprite.For(target);
+        PrepareEntranceAnimation(target);
         sprite.RestoreScale();
         sprite.Group.alpha = 1f;
         target.SetActive(true);
@@ -91,6 +121,7 @@ public static class ExpressionFade
 
         ExpressionSprite incoming = ExpressionSprite.For(target);
         bool wasActive = target.activeSelf;
+        PrepareEntranceAnimation(target);
         target.SetActive(true);
         if (!wasActive)
             incoming.Group.alpha = 0f;

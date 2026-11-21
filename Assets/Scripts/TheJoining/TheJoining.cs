@@ -189,28 +189,35 @@ public class TheJoining : MonoBehaviour
                 textToSpeak = "Don't worry, silly. It's not anything serious.";
                 break;
             case 13:
+                ShowExpression("happy");
                 textToSpeak = "This is the most important part of them all...";
                 break;
             case 14:
+                ShowExpression("excited");
                 textToSpeak = "...and the most exciting part, too.";
                 break;
             case 15:
+                ShowExpression("excited");
                 textToSpeak = "It's time for you...";
                 break;
             case 16:
                 // The music is cut right on the reveal, leaving the line in silence
                 QuickCutMusic();
+                ShowExpression("excited");
                 textToSpeak = "...to join us, The Underdomers!";
                 break;
             case 17:
                 // ...and comes back on the same beat it left, exactly where it paused
                 ResumeMusic();
+                ShowExpression("happy");
                 textToSpeak = "And, in order to join us, you must sign your name in this paper!";
                 break;
             case 18:
+                ShowExpression("happy");
                 textToSpeak = "Go ahead, I'll wait.";
                 break;
             case 19:
+                ShowExpression("smile");
                 textToSpeak = "[She gave him a quick smile, putting him at ease.]";
                 break;
             case 20:

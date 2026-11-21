@@ -141,7 +141,7 @@ public class IntoTheStreets02 : MonoBehaviour
                 textToSpeak = "I guess you must not remember, but you had a pretty rough fall!";
                 break;
             case 8:
-                ShowExpression("smile");
+                ShowExpression("happy");
                 textToSpeak = "You're probably crazy strong for sticking the landing though, I can barely go around without getting a scratch.";
                 break;
             case 9:
@@ -149,11 +149,11 @@ public class IntoTheStreets02 : MonoBehaviour
                 textToSpeak = "[Bay looked puzzled, confused. He looked at the vehicle behind her. Transpod? He tried to recall if he had ever heard that word.]";
                 break;
             case 10:
-                ShowExpression("smile");
+                ShowExpression("neutral");
                 textToSpeak = "[But nothing came to him.]";
                 break;
             case 11:
-                ShowExpression("smile");
+                ShowExpression("happy");
                 textToSpeak = "You're pretty quiet. Man of few words, huh?";
                 break;
             case 12:
@@ -161,19 +161,19 @@ public class IntoTheStreets02 : MonoBehaviour
                 textToSpeak = "Well, it's not like I just invaded your personal space.";
                 break;
             case 13:
-                ShowExpression("smile");
+                ShowExpression("happy");
                 textToSpeak = "[The girl said sarcastically, letting out a short giggle.]";
                 break;
             case 14:
-                ShowExpression("smile");
+                ShowExpression("neutral");
                 textToSpeak = "You don't look like you're from around these streets.";
                 break;
             case 15:
-                ShowExpression("smile");
+                ShowExpression("neutral");
                 textToSpeak = "You probably came from The Surface, right?";
                 break;
             case 16:
-                ShowExpression("smile");
+                ShowExpression("surprised");
                 textToSpeak = "[As Bay started to look even more puzzled, the girl finally came to her senses.]";
                 break;
             case 17:
@@ -189,11 +189,11 @@ public class IntoTheStreets02 : MonoBehaviour
                 textToSpeak = "What's your name?";
                 break;
             case 20:
-                ShowExpression("happy");
+                ShowExpression("smile");
                 textToSpeak = "[His name. That was one of the things he could actually recall, so he let it out:]";
                 break;
             case 21:
-                ShowExpression("happy");
+                ShowExpression("surprised");
                 textToSpeak = "Bay. Bay Ausman.";
                 break;
             case 22:
@@ -201,19 +201,19 @@ public class IntoTheStreets02 : MonoBehaviour
                 textToSpeak = "[Agnes looked at Bay, smiling.]";
                 break;
             case 23:
-                ShowExpression("smile");
+                ShowExpression("happy");
                 textToSpeak = "Bay, huh? Fancy name. I like it.";
                 break;
             case 24:
-                ShowExpression("smile");
+                ShowExpression("embarrassed");
                 textToSpeak = "[There were a few seconds of awkward silence before Agnes spoke again.]";
                 break;
             case 25:
-                ShowExpression("smile");
+                ShowExpression("excited");
                 textToSpeak = "Hey, you wanna check out my Transpod? I decorated it with a bunch of stuff I have.";
                 break;
             case 26:
-                ShowExpression("happy");
+                ShowExpression("excited");
                 textToSpeak = "Come on, I'll even give you a free ride!";
                 break;
             case 27:

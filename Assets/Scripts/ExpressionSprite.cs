@@ -28,6 +28,12 @@ public class ExpressionSprite : MonoBehaviour
         transform.localScale = baseScale * multiplier;
     }
 
+    /// <summary>
+    /// True once the sprite has been on screen. Its entrance Animator is only allowed to play on
+    /// that first appearance, so the flag keeps the entrance from replaying on later switches.
+    /// </summary>
+    public bool HasAppeared { get; set; }
+
     /// <summary>Puts the sprite back to its authored size.</summary>
     public void RestoreScale()
     {
