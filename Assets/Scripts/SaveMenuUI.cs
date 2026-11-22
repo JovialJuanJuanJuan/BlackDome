@@ -51,6 +51,8 @@ public sealed class SaveMenuUI : MonoBehaviour
     const float PauseMusicLevel = 0.50f;
     const float PauseMusicFadeIn = 0.90f;
     const float PauseMusicFadeOut = 0.55f;
+    const float OpenFade = 0.16f;
+    const float CloseFade = 0.20f;
 
     static readonly Color BackdropColor = new Color(0.002f, 0.002f, 0.003f, 0.94f);
     static readonly Color WindowFace = new Color(0.012f, 0.012f, 0.013f, 1f);
@@ -184,13 +186,15 @@ public sealed class SaveMenuUI : MonoBehaviour
 
     public bool IsOpen
     {
-        get { return mode != Mode.Closed; }
+        get { return mode != Mode.Closed || closing; }
     }
 
     Canvas canvas;
     Canvas pauseHintCanvas;
     RectTransform windowRect;
-    CanvasGroup windowGroup;
+    CanvasGroup rootGroup;
+    bool closing;
+    float closeElapsed;
     GameObject pausePanel;
     GameObject slotsPanel;
     GameObject loadingPanel;
@@ -302,6 +306,9 @@ public sealed class SaveMenuUI : MonoBehaviour
 
     public void HandleEscape()
     {
+        if (closing)
+            return;
+
         if (confirmPanel != null && confirmPanel.activeSelf)
         {
             HideConfirm();
@@ -336,14 +343,25 @@ public sealed class SaveMenuUI : MonoBehaviour
         if (canvas == null)
             return;
 
+        // A second close while the first is still fading must not snap the screen back to full
+        // and run the fade again.
+        if (closing && next == Mode.Closed)
+            return;
+
         Mode previous = mode;
         mode = next;
+
+        closing = false;
+        if (rootGroup != null)
+        {
+            rootGroup.alpha = 1f;
+            rootGroup.blocksRaycasts = true;
+        }
 
         if (next == Mode.Closed)
         {
             StopPauseMusic();
-            canvas.enabled = false;
-            ClearCardTextures();
+            BeginClose();
             return;
         }
 
@@ -604,6 +622,7 @@ public sealed class SaveMenuUI : MonoBehaviour
             loadingPanel.SetActive(false);
 
         mode = Mode.Closed;
+        closing = false;
         canvas.enabled = false;
         ClearCardTextures();
         StopPauseMusic();
@@ -659,6 +678,7 @@ public sealed class SaveMenuUI : MonoBehaviour
         UpdateToast();
         UpdatePauseHint();
         UpdateEnter();
+        UpdateClose();
         UpdatePauseMusic(Time.unscaledDeltaTime);
         TickPlates();
         TickCards();
@@ -673,9 +693,13 @@ public sealed class SaveMenuUI : MonoBehaviour
     void BeginEnter()
     {
         enterStart = Time.unscaledTime;
+        closing = false;
 
-        if (windowGroup != null)
-            windowGroup.alpha = 0f;
+        if (rootGroup != null)
+        {
+            rootGroup.alpha = 0f;
+            rootGroup.blocksRaycasts = true;
+        }
 
         for (int i = 0; i < cards.Count; i++)
             cards[i].group.alpha = 0f;
@@ -690,8 +714,8 @@ public sealed class SaveMenuUI : MonoBehaviour
         float windowProgress = Mathf.Clamp01(elapsed / 0.16f);
         float windowEased = 1f - Mathf.Pow(1f - windowProgress, 3f);
 
-        if (windowGroup != null)
-            windowGroup.alpha = windowEased;
+        if (rootGroup != null)
+            rootGroup.alpha = windowEased;
 
         if (windowRect != null)
             windowRect.localScale = Vector3.one * Mathf.LerpUnclamped(0.982f, 1f, windowEased);
@@ -711,6 +735,52 @@ public sealed class SaveMenuUI : MonoBehaviour
 
         if (done)
             enterStart = -1f;
+    }
+
+    /// <summary>
+    /// Closing is the entrance run backwards: the whole canvas, backdrop included, fades to
+    /// nothing before it is switched off, so the menu never pops out of existence.
+    /// </summary>
+    void BeginClose()
+    {
+        if (canvas == null || closing)
+            return;
+
+        closing = true;
+        closeElapsed = 0f;
+
+        // A close can cut an entrance short, so the entrance is stopped before it keeps writing
+        // the window's alpha under the fade.
+        enterStart = -1f;
+
+        if (rootGroup != null)
+            rootGroup.blocksRaycasts = false;
+    }
+
+    void UpdateClose()
+    {
+        if (!closing || canvas == null)
+            return;
+
+        closeElapsed += Time.unscaledDeltaTime;
+        float progress = Mathf.Clamp01(closeElapsed / CloseFade);
+
+        if (rootGroup != null)
+            rootGroup.alpha = 1f - progress;
+
+        if (progress < 1f)
+            return;
+
+        closing = false;
+        canvas.enabled = false;
+        ClearCardTextures();
+        HideConfirm();
+
+        if (rootGroup != null)
+        {
+            rootGroup.alpha = 1f;
+            rootGroup.blocksRaycasts = true;
+        }
     }
 
     void TickPlates()
@@ -804,7 +874,7 @@ public sealed class SaveMenuUI : MonoBehaviour
         if (pauseHintCanvas == null)
             return;
 
-        bool show = mode == Mode.Closed
+        bool show = !IsOpen
             && SaveGameManager.Instance != null
             && SaveGameManager.Instance.CanPause;
 
@@ -840,37 +910,91 @@ public sealed class SaveMenuUI : MonoBehaviour
 
         // A small tab in the left corner, with real breathing room from the screen edge so it
         // does not crowd the frame or look pasted onto it.
+        // A corner tab rather than a floating button: two pause bars, then the word, then open
+        // space, all on the menu's own slanted plate with a thin white cut edge. The state runs
+        // through the same plate effect the menu plates use, so it hovers and dips like them.
         RectTransform rect = CreateRect("PauseButton", root);
         rect.anchorMin = new Vector2(0f, 1f);
         rect.anchorMax = new Vector2(0f, 1f);
         rect.pivot = new Vector2(0f, 1f);
-        rect.sizeDelta = new Vector2(150f, 50f);
-        rect.anchoredPosition = new Vector2(34f, -34f);
+        rect.sizeDelta = new Vector2(176f, 46f);
+        rect.anchoredPosition = new Vector2(26f, -26f);
 
-        Button button = CreateDarkPlate(
+        Vector2 plateSize = rect.sizeDelta;
+
+        SkewedPanel edge = CreateSkew(
             rect,
-            "MENU",
-            () =>
-            {
-                if (SaveGameManager.Instance != null)
-                    SaveGameManager.Instance.PauseGame();
-            },
-            13f,
-            Muted,
-            0f);
+            "Edge",
+            plateSize + new Vector2(6f, 6f),
+            Vector2.zero,
+            PlateEdgeIdle,
+            PlateSlant);
 
-        TMP_Text label = button.GetComponentInChildren<TMP_Text>();
-        if (label != null)
+        SkewedPanel face = CreateSkew(rect, "Face", plateSize, Vector2.zero, PlateFace, PlateSlant);
+        face.raycastTarget = true;
+
+        SkewedPanel sheen = CreateSkew(
+            rect,
+            "Sheen",
+            plateSize,
+            Vector2.zero,
+            new Color(1f, 1f, 1f, 0f),
+            PlateSlant);
+
+        Button button = rect.gameObject.AddComponent<Button>();
+        button.targetGraphic = face;
+        button.transition = Selectable.Transition.None;
+        button.onClick.AddListener(() =>
         {
-            label.characterSpacing = 5f;
-            label.alignment = TextAlignmentOptions.Center;
+            if (SaveGameManager.Instance != null)
+                SaveGameManager.Instance.PauseGame();
+        });
 
-            // The slab leans right, so its visual centre sits half the slant to the right of
-            // the rect. Nudging the label the same amount keeps it centred in the plate.
-            RectTransform labelRect = label.rectTransform;
-            labelRect.offsetMin = new Vector2(PlateSlant * 0.5f, 0f);
-            labelRect.offsetMax = new Vector2(PlateSlant * 0.5f, 0f);
+        for (int i = 0; i < 2; i++)
+        {
+            RectTransform barRect = CreateRect("Bar" + i, rect);
+            barRect.anchorMin = new Vector2(0f, 0.5f);
+            barRect.anchorMax = new Vector2(0f, 0.5f);
+            barRect.pivot = new Vector2(0f, 0.5f);
+            barRect.sizeDelta = new Vector2(5f, 15f);
+            barRect.anchoredPosition = new Vector2(26f + i * 10f, 0f);
+
+            SkewedPanel bar = barRect.gameObject.AddComponent<SkewedPanel>();
+            bar.Slant = 2f;
+            bar.color = Ink;
+            bar.raycastTarget = false;
         }
+
+        RectTransform labelRect = CreateRect("Label", rect);
+        Stretch(labelRect, 52f, 0f, 12f, 0f);
+
+        TMP_Text label = AddText(
+            labelRect,
+            "MENU",
+            13f,
+            InvertedIdle,
+            TextAlignmentOptions.Left,
+            BoldFont,
+            FontStyles.Bold);
+        label.characterSpacing = 6f;
+
+        var fx = new PlateFx
+        {
+            rect = rect,
+            home = rect.anchoredPosition,
+            slide = 0f,
+            edge = edge,
+            sheen = sheen,
+            label = label,
+            labelIdle = InvertedIdle,
+            labelHover = Color.white,
+            edgeIdle = PlateEdgeIdle,
+            edgeHover = PlateEdgeHover,
+            pressScale = 0.98f,
+        };
+
+        plates.Add(fx);
+        HookPlate(button, fx);
 
         pauseHintCanvas.enabled = false;
     }
@@ -901,6 +1025,7 @@ public sealed class SaveMenuUI : MonoBehaviour
 
         RectTransform root = CreateRect("Root", canvasObject.transform);
         Stretch(root, 0f, 0f, 0f, 0f);
+        rootGroup = root.gameObject.AddComponent<CanvasGroup>();
 
         RectTransform backdrop = CreateRect("Backdrop", root);
         Stretch(backdrop, 0f, 0f, 0f, 0f);
@@ -918,8 +1043,6 @@ public sealed class SaveMenuUI : MonoBehaviour
     {
         windowRect = CreateRect("Window", root);
         SetCentered(windowRect, new Vector2(WindowWidth, WindowHeight), Vector2.zero);
-
-        windowGroup = windowRect.gameObject.AddComponent<CanvasGroup>();
 
         // Slate shadow, a white cut edge, then the black poster face: three slanted slabs.
         CreateSkew(
@@ -1012,10 +1135,10 @@ public sealed class SaveMenuUI : MonoBehaviour
         Stretch(panel, 0f, 0f, 0f, 0f);
         pausePanel = panel.gameObject;
 
-        MakeMenuPlate(panel, "ResumeButton", "01", "RESUME", new Vector2(0f, 156f), new Vector2(640f, 84f), ResumePressed);
-        MakeMenuPlate(panel, "SaveButton", "02", "SAVE GAME", new Vector2(0f, 52f), new Vector2(640f, 84f), OpenSave);
-        MakeMenuPlate(panel, "LoadButton", "03", "LOAD GAME", new Vector2(0f, -52f), new Vector2(640f, 84f), OpenPauseLoad);
-        MakeMenuPlate(panel, "MenuButton", "04", "RETURN TO MAIN MENU", new Vector2(0f, -156f), new Vector2(640f, 84f), ReturnToMenuPressed);
+        MakeMenuPlate(panel, "ResumeButton", "RESUME", new Vector2(0f, 156f), new Vector2(640f, 84f), ResumePressed);
+        MakeMenuPlate(panel, "SaveButton", "SAVE GAME", new Vector2(0f, 52f), new Vector2(640f, 84f), OpenSave);
+        MakeMenuPlate(panel, "LoadButton", "LOAD GAME", new Vector2(0f, -52f), new Vector2(640f, 84f), OpenPauseLoad);
+        MakeMenuPlate(panel, "MenuButton", "RETURN TO MAIN MENU", new Vector2(0f, -156f), new Vector2(640f, 84f), ReturnToMenuPressed);
     }
 
     void BuildSlotsPanel(RectTransform body)
@@ -1355,7 +1478,6 @@ public sealed class SaveMenuUI : MonoBehaviour
     Button MakeMenuPlate(
         Transform parent,
         string name,
-        string index,
         string label,
         Vector2 position,
         Vector2 size,
@@ -1372,32 +1494,9 @@ public sealed class SaveMenuUI : MonoBehaviour
             text.alignment = TextAlignmentOptions.Left;
 
             RectTransform textRect = text.rectTransform;
-            textRect.offsetMin = new Vector2(68f, 0f);
+            textRect.offsetMin = new Vector2(36f, 0f);
             textRect.offsetMax = new Vector2(-24f, 0f);
         }
-
-        RectTransform indexRect = CreateRect("Index", rect);
-        indexRect.anchorMin = new Vector2(0f, 0.5f);
-        indexRect.anchorMax = new Vector2(0f, 0.5f);
-        indexRect.pivot = new Vector2(0f, 0.5f);
-        indexRect.sizeDelta = new Vector2(34f, 20f);
-        indexRect.anchoredPosition = new Vector2(28f, 0f);
-
-        TMP_Text indexText = AddText(indexRect, index, 13f, SteelDim, TextAlignmentOptions.Left, BoldFont, FontStyles.Bold);
-        indexText.characterSpacing = 3f;
-
-        // A thin steel tick between the number and the label, like a ruled index.
-        RectTransform tick = CreateRect("Tick", rect);
-        tick.anchorMin = new Vector2(0f, 0.5f);
-        tick.anchorMax = new Vector2(0f, 0.5f);
-        tick.pivot = new Vector2(0f, 0.5f);
-        tick.sizeDelta = new Vector2(2f, 26f);
-        tick.anchoredPosition = new Vector2(58f, 0f);
-
-        SkewedPanel bar = tick.gameObject.AddComponent<SkewedPanel>();
-        bar.Slant = 2f;
-        bar.color = new Color(Steel.r, Steel.g, Steel.b, 0.5f);
-        bar.raycastTarget = false;
 
         return button;
     }

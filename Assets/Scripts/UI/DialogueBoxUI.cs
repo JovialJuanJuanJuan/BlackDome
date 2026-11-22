@@ -6,12 +6,11 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 /// <summary>
-/// Re-skins the in-scene dialogue box after the card RidingBlue uses, in Black Dome's black
-/// palette: a bottom card whose top corners are rounded, a vertical gradient that keeps the
-/// text readable, a cold hairline rim that dissolves down the sides and a soft shadow floating
-/// above the card. The component finds the existing dialogue objects in each scene and installs
-/// itself after every scene loads, so all dialogue scenes (and any new scene that follows the
-/// same naming) share the same presentation.
+/// Re-skins the in-scene dialogue box in the same Persona language as the pause menu: a
+/// near-black slab cut with a white edge, a slate shadow above it, a white name tag carrying
+/// black type and an inverted NEXT plate. The component finds the existing dialogue objects in
+/// each scene and installs itself after every scene loads, so all dialogue scenes (and any new
+/// scene that follows the same naming) share the same presentation.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class DialogueBoxUI : MonoBehaviour
@@ -28,53 +27,65 @@ public sealed class DialogueBoxUI : MonoBehaviour
     // The box repeats RidingBlue's authored layout value for value, so both games share one
     // arrangement: the same card height, the same text blocks and the same button placement.
     // Numbers are in canvas units for the 1920x1080 reference.
-    private const float PanelHeight = 349.7563f;          // 1080 - 730.2437
-    private const float NameMarginRight = -1655.8954f;    // keeps the name's text area 2075.9 wide
-    private const float BodyMarginLeft = 20.646973f;
+    private const float PanelHeight = 280f;               // trimmed so the card sits lower on the art
+    private const float BodyMarginLeft = 60f;
     private const float BodyMarginRight = 61.94104f;
-    // The choice plates stack up the right edge of the frame, clear of the card and of the
-    // middle of the screen where the art and the dialogue text are.
+    // The choice plates are centred on the frame and stacked in the open screen above the card,
+    // with the whole stack centred in that space so every choice set sits in the same place.
     private const float ChoiceGap = 34f;
-    private const float ChoiceRightMargin = 60f;
-    private const float ChoiceBottomClearance = 10f;
+    private const float ChoiceBottomClearance = 18f;
     private const float ChoiceTopMargin = 24f;
+
+    /// <summary>
+    /// A choice set dims the screen behind it, so the answer is the only thing in focus while it
+    /// is up. The chosen plate then fades away in place.
+    /// </summary>
+    private const float ChoiceDimOpacity = 0.62f;
+    private const float ChoiceDimFadeIn = 0.18f;
+    private const float ChoiceDimFadeOut = 0.32f;
+    private const float ChoiceGhostFade = 0.26f;
+
+    private static readonly Color ChoiceGhostFace = new Color(0.012f, 0.012f, 0.013f, 1f);
+    private static readonly Color ChoiceGhostEdge = new Color(1f, 1f, 1f, 0.95f);
 
     /// <summary>The name kicks up a little and flashes when a new speaker takes over.</summary>
     private const float NamePulseDuration = 0.26f;
     private const float NamePulseScale = 1.06f;
 
-    // RidingBlue ships a 200x50 name box; it is grown upwards here so the larger type keeps its
-    // left edge and lifts clear of the divider.
-    private static readonly Vector2 NameSize = new Vector2(420f, 64f);
-    private static readonly Vector2 NamePosition = new Vector2(227.8f, 304f);
-    private static readonly Vector2 SplitterSize = new Vector2(514.529f, 2f);
-    private static readonly Vector2 SplitterPosition = new Vector2(248.06453f, 249.538f);
+    // The name sits on a white tag that rests on the card's top edge. The tag is cut to the name,
+    // so a short speaker gets a short tab instead of a wide white block; these are its starting
+    // size, its left edge and the limits it is fitted between.
+    private const float NameLeft = 29f;
+    private const float NamePadRight = 14f;
+    private const float NameMinWidth = 150f;
+    private const float NameMaxWidth = 620f;
+    private static readonly Vector2 NameSize = new Vector2(NameMinWidth, 52f);
+    private static readonly Vector2 NamePosition = new Vector2(104f, 282f);
     private static readonly Vector2 BodySize = new Vector2(1928.509f, 175.1409f);
     private static readonly Vector2 BodyPosition = new Vector2(977f, 126f);
-    private static readonly Vector2 NextSize = new Vector2(263.63232f, 59.106506f);
+    private static readonly Vector2 NextSize = new Vector2(263.63232f, 66f);
     private static readonly Vector2 NextPosition = new Vector2(-183f, 83f);
-    private static readonly Vector2 ChoiceSize = new Vector2(650.01f, 134.3603f);
+    private static readonly Vector2 ChoiceSize = new Vector2(820f, 124f);
 
     private static readonly Color DialogueText = Color.white;
     private static readonly Color DefaultAccent = new Color(0.92f, 0.92f, 0.92f, 0.85f);
-    private static readonly Color SplitterColor = new Color(1f, 1f, 1f, 0.6f);
 
     /// <summary>
-    /// The card lifts off the scene along its top edge and sinks into near-black at the bottom.
-    /// The ramp is strictly neutral — equal red, green and blue — so it reads as black rather
-    /// than as a tinted panel. Both ends stay close to zero so the card never turns grey.
+    /// The card is cut from the same slabs as the pause poster: a slate shadow, a white cut edge
+    /// and a near-black face. The card runs the full width of the frame, so the cut edge above it
+    /// and the tag resting on it are what carry the Persona shape.
     /// </summary>
-    private static readonly Color GradientTop = new Color(0.055f, 0.055f, 0.055f, 0.945f);
-    private static readonly Color GradientBottom = new Color(0.004f, 0.004f, 0.004f, 0.995f);
-    private static readonly Color FrameColor = new Color(1f, 1f, 1f, 0.6f);
-    private static readonly Color ShadowColor = new Color(0f, 0f, 0f, 0.4f);
+    private static readonly Color CardFaceColor = new Color(0.012f, 0.012f, 0.013f, 0.85f);
+    private static readonly Color CardEdgeColor = new Color(0.93f, 0.93f, 0.94f, 0.92f);
+    private static readonly Color CardShadowColor = new Color(0.13f, 0.13f, 0.14f, 0.40f);
+    private static readonly Color TagFace = new Color(0.94f, 0.94f, 0.95f, 1f);
+    private static readonly Color TagInk = new Color(0.05f, 0.05f, 0.05f, 1f);
+    private static readonly Color SteelAccent = new Color(0.56f, 0.70f, 0.84f, 1f);
 
-    /// <summary>Only the top corners are rounded, because the card is flush with the screen edge.</summary>
-    private const float CardCornerRadius = 26f;
-    private const float CardFrameWidth = 2f;
-    private const float CardFrameBand = 40f;
-    private const float CardShadowHeight = 72f;
-    private const float CardShadowOverhang = 60f;
+    private const float CardSlant = 40f;
+    private const float CardRuleThickness = 3f;
+    private const float NameTagSlant = 18f;
+    private const float NamePadLeft = 30f;
 
     private static readonly Dictionary<string, Color> SpeakerAccents =
         new Dictionary<string, Color>(System.StringComparer.OrdinalIgnoreCase)
@@ -95,11 +106,15 @@ public sealed class DialogueBoxUI : MonoBehaviour
     private readonly List<Button> choiceButtons = new List<Button>();
     private GameObject fadeOutObject;
 
-    private RawImage panelFillGraphic;
-    private RawImage panelFrameGraphic;
-    private Texture2D panelFillTexture;
-    private Texture2D panelFrameTexture;
-    private Vector2 panelCardSize;
+    private RectTransform nameTagRect;
+    private string nameTagText;
+    private Color pulseColor = Color.white;
+
+    private Image choiceDim;
+    private RectTransform choiceDimRect;
+    private float choiceDimAlpha;
+    private bool choiceChosen;
+    private bool choicesRaised;
 
     private Vector2 panelRestPosition;
     private Coroutine panelTransition;
@@ -172,6 +187,7 @@ public sealed class DialogueBoxUI : MonoBehaviour
         ApplyTextStyle();
         ApplyButtonStyle();
         SilenceChoiceClickSound();
+        EnsureChoiceDim();
         ApplySpeakerStyle(string.Empty);
 
         panelRestPosition = panelRect.anchoredPosition;
@@ -332,10 +348,9 @@ public sealed class DialogueBoxUI : MonoBehaviour
     }
 
     /// <summary>
-    /// Stacks the choice plates up the right edge of the frame, the last plate just clear of the
-    /// card and the rest rising above it in reading order. The middle of the screen is left open,
-    /// so the choices no longer sit on top of the art or the dialogue text, and a stack too tall
-    /// for the frame tightens its gap instead of running off the top.
+    /// Centres the choice plates on the frame and centres the whole stack in the open screen above
+    /// the card, so every set sits in the same place and the answer is the only thing in the middle
+    /// of the view. A stack too tall for the space closes its gap instead of running off the top.
     /// </summary>
     private void ApplyChoiceLayout(float canvasHeight)
     {
@@ -345,17 +360,18 @@ public sealed class DialogueBoxUI : MonoBehaviour
         }
 
         int count = choiceButtons.Count;
-        float lowestCenter = PanelHeight + ChoiceBottomClearance + ChoiceSize.y * 0.5f;
-        float spacing = ChoiceSize.y + ChoiceGap;
-        float ceiling = canvasHeight - ChoiceTopMargin - ChoiceSize.y * 0.5f;
+        float ceiling = canvasHeight - ChoiceTopMargin;
+        float floor = PanelHeight + ChoiceBottomClearance;
+        float gap = ChoiceGap;
 
-        if (count > 1 && lowestCenter + spacing * (count - 1) > ceiling)
+        if (count > 1)
         {
-            spacing = Mathf.Max(ChoiceSize.y, (ceiling - lowestCenter) / (count - 1));
+            float room = ceiling - floor - count * ChoiceSize.y;
+            gap = Mathf.Clamp(room / (count - 1), 0f, ChoiceGap);
         }
 
-        // Anchored to the right edge, so the margin holds at any aspect ratio.
-        float rightOffset = -(ChoiceSize.x * 0.5f + ChoiceRightMargin);
+        float stackHeight = count * ChoiceSize.y + (count - 1) * gap;
+        float topCenter = (ceiling + floor) * 0.5f + stackHeight * 0.5f - ChoiceSize.y * 0.5f;
         float canvasCenter = canvasHeight * 0.5f;
 
         for (int i = 0; i < count; i++)
@@ -366,13 +382,13 @@ public sealed class DialogueBoxUI : MonoBehaviour
                 continue;
             }
 
-            rect.anchorMin = new Vector2(1f, 0.5f);
-            rect.anchorMax = new Vector2(1f, 0.5f);
+            rect.anchorMin = new Vector2(0.5f, 0.5f);
+            rect.anchorMax = new Vector2(0.5f, 0.5f);
             rect.pivot = new Vector2(0.5f, 0.5f);
             rect.sizeDelta = ChoiceSize;
             rect.anchoredPosition = new Vector2(
-                rightOffset,
-                lowestCenter + spacing * (count - 1 - i) - canvasCenter);
+                0f,
+                topCenter - i * (ChoiceSize.y + gap) - canvasCenter);
             rect.localScale = Vector3.one;
             rect.localRotation = Quaternion.identity;
         }
@@ -383,122 +399,193 @@ public sealed class DialogueBoxUI : MonoBehaviour
         panelGraphic.color = new Color(1f, 1f, 1f, 0f);
         panelGraphic.raycastTarget = false;
 
-        // The card is drawn from three layers: the shadow spills up out of its top edge, the fill
-        // carries the gradient and the rounded top corners, and the rim traces the upper contour.
-        DialogueGradient.EnsureShadow(
-            panelRect,
-            "DialogueFX_Shadow",
-            ShadowColor,
-            CardShadowHeight,
-            CardShadowOverhang).transform.SetSiblingIndex(0);
+        ClearLegacyCardLayers();
 
-        panelFillGraphic = DialogueGradient.EnsureFill(panelRect, "DialogueFX_Gradient");
-        panelFrameGraphic = DialogueGradient.EnsureBand(
-            panelRect,
-            "DialogueFX_Frame",
-            CardFrameBand + CardFrameWidth * 2f);
+        SkewedPanel shadow = EnsureCardSlab(
+            "DialogueFX_CardShadow",
+            CardShadowColor,
+            new Vector2(24f, 24f),
+            new Vector2(10f, 10f));
 
-        // Shadow behind the card, rim over it, and the divider, text and buttons above both.
-        panelFillGraphic.transform.SetSiblingIndex(1);
-        panelFrameGraphic.transform.SetSiblingIndex(2);
-        EnsureSplitter().transform.SetSiblingIndex(3);
+        SkewedPanel face = EnsureCardSlab(
+            "DialogueFX_CardFace",
+            CardFaceColor,
+            Vector2.zero,
+            Vector2.zero);
+
+        // The card shows the art through it, so the cut edge is a thin white rule laid along the
+        // top instead of a white slab behind the face, which would wash the whole card grey.
+        SkewedPanel rule = EnsureCardRule("DialogueFX_CardEdge", CardEdgeColor);
+
+        // Shadow at the back, the face over it, the cut edge over that. The scene's own name,
+        // body and buttons stay above all three.
+        shadow.transform.SetSiblingIndex(0);
+        face.transform.SetSiblingIndex(1);
+        rule.transform.SetSiblingIndex(2);
+
+        BuildNameTag();
     }
 
     /// <summary>
-    /// The hairline divider that sits under the speaker name, drawn where RidingBlue draws it.
+    /// Drops the rounded gradient card the box used to be drawn from, so a scene that already
+    /// carries it comes up as the slab instead of wearing two cards at once.
     /// </summary>
-    private RawImage EnsureSplitter()
+    private void ClearLegacyCardLayers()
     {
-        RawImage splitter = DialogueGradient.EnsureSplitter(
-            panelRect,
-            "Splitter",
-            SplitterSize,
-            SplitterPosition,
-            SplitterColor);
+        string[] legacy = { "DialogueFX_Gradient", "DialogueFX_Frame", "DialogueFX_Shadow", "Splitter" };
 
-        return splitter;
+        for (int i = 0; i < legacy.Length; i++)
+        {
+            Transform existing = panelRect.Find(legacy[i]);
+            if (existing != null)
+            {
+                Destroy(existing.gameObject);
+            }
+        }
+    }
+
+    /// <summary>A slab that hugs the card, grown and nudged to sit in its own layer.</summary>
+    private SkewedPanel EnsureCardSlab(string objectName, Color color, Vector2 grow, Vector2 offset)
+    {
+        RectTransform rect = EnsureChild(panelRect, objectName);
+
+        SkewedPanel slab = rect.GetComponent<SkewedPanel>();
+        if (slab == null)
+        {
+            slab = rect.gameObject.AddComponent<SkewedPanel>();
+        }
+
+        slab.Slant = CardSlant;
+        slab.color = color;
+        slab.raycastTarget = false;
+
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.one;
+        rect.pivot = new Vector2(0.5f, 0.5f);
+        rect.offsetMin = new Vector2(-grow.x * 0.5f + offset.x, -grow.y * 0.5f + offset.y);
+        rect.offsetMax = new Vector2(grow.x * 0.5f + offset.x, grow.y * 0.5f + offset.y);
+        rect.localRotation = Quaternion.identity;
+        rect.localScale = Vector3.one;
+
+        return slab;
     }
 
     /// <summary>
-    /// The card's fill and rim are baked at the panel's own size, so they are rebuilt only when
-    /// layout changes the rect (a resolution switch, say). Everything else is free to stretch.
+    /// The thin white cut edge along the card's top: it hugs the same line the face's top edge
+    /// runs on, so it reads as the panel's own edge rather than a bar laid over it.
     /// </summary>
-    private void RefreshPanelCard()
+    private SkewedPanel EnsureCardRule(string objectName, Color color)
     {
-        if (panelRect == null || panelFillGraphic == null || panelFrameGraphic == null)
+        RectTransform rect = EnsureChild(panelRect, objectName);
+
+        SkewedPanel slab = rect.GetComponent<SkewedPanel>();
+        if (slab == null)
+        {
+            slab = rect.gameObject.AddComponent<SkewedPanel>();
+        }
+
+        slab.Slant = 0f;
+        slab.color = color;
+        slab.raycastTarget = false;
+
+        rect.anchorMin = new Vector2(0f, 1f);
+        rect.anchorMax = new Vector2(1f, 1f);
+        rect.pivot = new Vector2(0.5f, 1f);
+        rect.offsetMin = new Vector2(CardSlant, -CardRuleThickness);
+        rect.offsetMax = new Vector2(CardSlant, 0f);
+        rect.localRotation = Quaternion.identity;
+        rect.localScale = Vector3.one;
+
+        return slab;
+    }
+
+    /// <summary>
+    /// The white label block the speaker's name sits on: the pause menu's header tag, resting on
+    /// the card's top edge. It is dropped in just behind the name so the black type stays on top.
+    /// </summary>
+    private void BuildNameTag()
+    {
+        if (nameText == null)
         {
             return;
         }
 
-        Vector2 size = panelRect.rect.size;
-        if (size.x < 2f || size.y < 2f)
+        RectTransform nameRect = nameText.rectTransform;
+        RectTransform rect = EnsureChild(nameRect.parent, "DialogueFX_NameTag");
+        nameTagRect = rect;
+
+        SkewedPanel tag = rect.GetComponent<SkewedPanel>();
+        if (tag == null)
         {
-            return;
+            tag = rect.gameObject.AddComponent<SkewedPanel>();
         }
 
-        if (panelFillTexture != null
-            && Mathf.Abs(size.x - panelCardSize.x) < 1f
-            && Mathf.Abs(size.y - panelCardSize.y) < 1f)
+        tag.Slant = NameTagSlant;
+        tag.color = TagFace;
+        tag.raycastTarget = false;
+
+        rect.anchorMin = nameRect.anchorMin;
+        rect.anchorMax = nameRect.anchorMax;
+        rect.pivot = nameRect.pivot;
+        rect.sizeDelta = nameRect.sizeDelta + new Vector2(14f, 10f);
+        rect.anchoredPosition = nameRect.anchoredPosition;
+        rect.localRotation = Quaternion.identity;
+        rect.localScale = Vector3.one;
+
+        rect.SetSiblingIndex(Mathf.Max(0, nameRect.GetSiblingIndex()));
+    }
+
+    private static RectTransform EnsureChild(Transform parent, string objectName)
+    {
+        Transform existing = parent.Find(objectName);
+        if (existing != null)
         {
-            return;
+            RectTransform existingRect = existing as RectTransform;
+            if (existingRect != null)
+            {
+                return existingRect;
+            }
         }
 
-        panelCardSize = size;
-
-        DialogueGradient.DestroyTexture(panelFillTexture);
-        DialogueGradient.DestroyTexture(panelFrameTexture);
-
-        panelFillTexture = DialogueGradient.CreatePanelFill(
-            size,
-            CardCornerRadius,
-            GradientTop,
-            GradientBottom);
-
-        panelFrameTexture = DialogueGradient.CreatePanelFrame(
-            size,
-            CardCornerRadius,
-            CardFrameWidth,
-            CardFrameBand,
-            FrameColor);
-
-        panelFillGraphic.texture = panelFillTexture;
-        panelFrameGraphic.texture = panelFrameTexture;
+        GameObject child = new GameObject(objectName, typeof(RectTransform));
+        RectTransform rect = child.GetComponent<RectTransform>();
+        rect.SetParent(parent, false);
+        return rect;
     }
 
     private void ApplyTextStyle()
     {
         if (nameText != null)
         {
-            nameText.fontSize = 58f;
+            // Black on the white tag: the name is a label now, not a coloured headline, so it
+            // needs none of the drop shadow it used to carry over the art.
+            // Small, bold and tracked like the menu's own tag, so the name reads as a label on
+            // the tab rather than a headline squeezed into a white box.
+            nameText.fontSize = 28f;
             nameText.enableAutoSizing = false;
-            nameText.fontStyle = FontStyles.Bold;
-            nameText.alignment = TextAlignmentOptions.TopLeft;
-            nameText.characterSpacing = 0f;
+            nameText.fontStyle = FontStyles.Bold | FontStyles.UpperCase;
+            nameText.alignment = TextAlignmentOptions.Left;
+            nameText.characterSpacing = 6f;
             nameText.lineSpacing = 0f;
-            nameText.margin = new Vector4(0f, 0f, NameMarginRight, 0f);
-            nameText.color = DialogueText;
+            nameText.textWrappingMode = TextWrappingModes.NoWrap;
+            nameText.margin = new Vector4(NamePadLeft, 0f, 14f, 0f);
+            nameText.color = TagInk;
             nameText.raycastTarget = false;
 
             Shadow nameShadow = nameText.GetComponent<Shadow>();
-            if (nameShadow == null)
+            if (nameShadow != null)
             {
-                nameShadow = nameText.gameObject.AddComponent<Shadow>();
+                nameShadow.enabled = false;
             }
-
-            // A firmer drop shadow than the body carries, so the name stays legible and reads as
-            // the loudest label on the card.
-            nameShadow.effectColor = new Color(0f, 0f, 0f, 0.9f);
-            nameShadow.effectDistance = new Vector2(2f, -2f);
-            nameShadow.useGraphicAlpha = true;
         }
 
         if (bodyText != null)
         {
-            bodyText.fontSize = 38f;
+            bodyText.fontSize = 34f;
             bodyText.enableAutoSizing = false;
             bodyText.fontStyle = FontStyles.Normal;
             bodyText.alignment = TextAlignmentOptions.TopLeft;
-            bodyText.lineSpacing = 0f;
+            bodyText.lineSpacing = 6f;
             bodyText.characterSpacing = 0f;
             bodyText.color = DialogueText;
             bodyText.margin = new Vector4(BodyMarginLeft, 0f, BodyMarginRight, 0f);
@@ -539,6 +626,11 @@ public sealed class DialogueBoxUI : MonoBehaviour
             }
 
             effect.Initialize(DialogueButtonFx.ButtonRole.Choice, i);
+
+            // The scenes hide the whole set on click, so the fade of the picked plate is drawn
+            // from a snapshot taken just after that (see FadeChosenChoice).
+            int chosen = i;
+            choice.onClick.AddListener(() => OnChoiceSelected(chosen));
         }
     }
 
@@ -570,9 +662,10 @@ public sealed class DialogueBoxUI : MonoBehaviour
             accent = paletteAccent;
         }
 
-        // Mostly white with only a hint of the speaker's colour, so the name stays the brightest
-        // thing on the card instead of sinking into a tint.
-        nameColor = Color.Lerp(DialogueText, accent, 0.35f);
+        // The type stays black on the white tag; the speaker's colour only shows as the flash on
+        // a change, so the name never stops reading as a label.
+        nameColor = TagInk;
+        pulseColor = Color.Lerp(TagInk, accent, 0.55f);
 
         if (nameText != null)
         {
@@ -608,7 +701,7 @@ public sealed class DialogueBoxUI : MonoBehaviour
         float kick = namePulse * namePulse;
 
         rect.localScale = Vector3.one * (1f + (NamePulseScale - 1f) * kick);
-        nameText.color = Color.Lerp(nameColor, DialogueText, kick * 0.8f);
+        nameText.color = Color.Lerp(nameColor, pulseColor, kick * 0.8f);
     }
 
     private void Update()
@@ -630,7 +723,8 @@ public sealed class DialogueBoxUI : MonoBehaviour
             return;
         }
 
-        RefreshPanelCard();
+        UpdateNameTag();
+        UpdateChoiceDim();
 
         if (!panelRect.gameObject.activeInHierarchy)
         {
@@ -662,6 +756,410 @@ public sealed class DialogueBoxUI : MonoBehaviour
         {
             StartShow();
         }
+    }
+
+    /// <summary>
+    /// The tag follows the name: when the speaker is cleared between lines, the white block goes
+    /// with it instead of floating on the empty card.
+    /// </summary>
+    private void UpdateNameTag()
+    {
+        if (nameTagRect == null || nameText == null)
+        {
+            return;
+        }
+
+        string speaker = nameText.text;
+        bool show = nameText.gameObject.activeInHierarchy
+            && !string.IsNullOrWhiteSpace(speaker);
+
+        if (show && !string.Equals(speaker, nameTagText, System.StringComparison.Ordinal))
+        {
+            nameTagText = speaker;
+            FitNameTag(speaker);
+        }
+
+        if (nameTagRect.gameObject.activeSelf != show)
+        {
+            nameTagRect.gameObject.SetActive(show);
+        }
+    }
+
+    /// <summary>
+    /// Cuts the tag to the name. The left edge stays put so the name lines up with the body text
+    /// under it, and only the right edge moves, which keeps a two-letter speaker in a small tab.
+    /// </summary>
+    private void FitNameTag(string speaker)
+    {
+        // Measured with the margins off, so the padding below is the only padding in the tag
+        // whatever the text layout counts as part of the preferred width.
+        Vector4 margin = nameText.margin;
+        nameText.margin = Vector4.zero;
+        Vector2 preferred = nameText.GetPreferredValues(speaker);
+        nameText.margin = margin;
+
+        float width = Mathf.Clamp(
+            Mathf.Ceil(preferred.x) + NamePadLeft + NamePadRight,
+            NameMinWidth,
+            NameMaxWidth);
+
+        RectTransform nameRect = nameText.rectTransform;
+        nameRect.sizeDelta = new Vector2(width, NameSize.y);
+        nameRect.anchoredPosition = new Vector2(NameLeft + width * 0.5f, NamePosition.y);
+
+        nameTagRect.sizeDelta = new Vector2(width + 14f, NameSize.y + 10f);
+        nameTagRect.anchoredPosition = nameRect.anchoredPosition;
+    }
+
+    // ------------------------------------------------------------------ choices
+
+    private void OnChoiceSelected(int index)
+    {
+        choiceChosen = true;
+
+        if (index < 0 || index >= choiceButtons.Count)
+        {
+            return;
+        }
+
+        StartCoroutine(FadeChosenChoice(choiceButtons[index]));
+    }
+
+    /// <summary>
+    /// The scenes switch every choice off the moment one is picked, which would cut a fade short.
+    /// So the click is left to the scene, and one frame later the picked plate's own look is drawn
+    /// back in its place and faded out from there: the answer visibly leaves as the dimming lifts.
+    /// </summary>
+    private IEnumerator FadeChosenChoice(Button choice)
+    {
+        yield return null;
+
+        if (choice == null)
+        {
+            yield break;
+        }
+
+        // A scene that leaves the plate up is faded directly instead of being copied.
+        if (choice.gameObject.activeInHierarchy)
+        {
+            DialogueButtonFx effect = choice.GetComponent<DialogueButtonFx>();
+            if (effect != null)
+            {
+                effect.FadeOut(ChoiceGhostFade);
+            }
+
+            yield break;
+        }
+
+        SpawnChoiceGhost(choice);
+    }
+
+    private void SpawnChoiceGhost(Button choice)
+    {
+        RectTransform canvasRect = transform as RectTransform;
+        RectTransform source = choice.transform as RectTransform;
+        if (canvasRect == null || source == null)
+        {
+            return;
+        }
+
+        // The plate's place in canvas space; its own rect is still known once it is switched off.
+        // The conversion lands relative to the canvas pivot, so it is shifted onto the centre
+        // anchor the ghost is placed against.
+        Vector2 pivot = canvasRect.pivot;
+        Vector2 size = source.rect.size;
+        Vector2 center = canvasRect.InverseTransformPoint(source.TransformPoint(source.rect.center));
+        center += new Vector2(
+            (pivot.x - 0.5f) * canvasRect.rect.width,
+            (pivot.y - 0.5f) * canvasRect.rect.height);
+
+        var ghostObject = new GameObject("DialogueFX_ChoiceGhost", typeof(RectTransform));
+        RectTransform rect = ghostObject.GetComponent<RectTransform>();
+        rect.SetParent(canvasRect, false);
+        rect.anchorMin = new Vector2(0.5f, 0.5f);
+        rect.anchorMax = new Vector2(0.5f, 0.5f);
+        rect.pivot = new Vector2(0.5f, 0.5f);
+        rect.sizeDelta = size;
+        rect.anchoredPosition = center;
+        rect.localRotation = Quaternion.identity;
+        rect.localScale = Vector3.one;
+
+        CanvasGroup group = ghostObject.AddComponent<CanvasGroup>();
+        group.blocksRaycasts = false;
+        group.interactable = false;
+        group.alpha = 1f;
+
+        AddGhostSlab(rect, "Edge", new Vector2(3f, 3f), ChoiceGhostEdge);
+        AddGhostSlab(rect, "Face", Vector2.zero, ChoiceGhostFace);
+
+        TMP_Text sourceLabel = choice.GetComponentInChildren<TMP_Text>(true);
+
+        var labelObject = new GameObject("Label", typeof(RectTransform));
+        RectTransform labelRect = labelObject.GetComponent<RectTransform>();
+        labelRect.SetParent(rect, false);
+        labelRect.anchorMin = Vector2.zero;
+        labelRect.anchorMax = Vector2.one;
+        labelRect.offsetMin = Vector2.zero;
+        labelRect.offsetMax = Vector2.zero;
+
+        TMP_Text label = labelObject.AddComponent<TextMeshProUGUI>();
+        if (sourceLabel != null)
+        {
+            label.font = sourceLabel.font;
+            label.text = sourceLabel.text;
+            label.fontSize = sourceLabel.fontSize;
+            label.fontStyle = sourceLabel.fontStyle;
+        }
+
+        label.color = Color.white;
+        label.alignment = TextAlignmentOptions.Center;
+        label.enableAutoSizing = false;
+        label.raycastTarget = false;
+        label.textWrappingMode = TextWrappingModes.NoWrap;
+
+        StartCoroutine(FadeGhost(ghostObject, group, rect));
+    }
+
+    private static void AddGhostSlab(RectTransform parent, string objectName, Vector2 grow, Color color)
+    {
+        var slabObject = new GameObject(objectName, typeof(RectTransform));
+        RectTransform rect = slabObject.GetComponent<RectTransform>();
+        rect.SetParent(parent, false);
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.one;
+        rect.pivot = new Vector2(0.5f, 0.5f);
+        rect.offsetMin = new Vector2(-grow.x, -grow.y);
+        rect.offsetMax = new Vector2(grow.x, grow.y);
+        rect.localScale = Vector3.one;
+
+        SkewedPanel slab = slabObject.AddComponent<SkewedPanel>();
+        slab.Slant = 14f;
+        slab.color = color;
+        slab.raycastTarget = false;
+    }
+
+    private IEnumerator FadeGhost(GameObject ghost, CanvasGroup group, RectTransform rect)
+    {
+        float elapsed = 0f;
+        Vector3 fromScale = rect.localScale;
+
+        while (elapsed < ChoiceGhostFade)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float progress = Mathf.Clamp01(elapsed / ChoiceGhostFade);
+            float eased = 1f - Mathf.Pow(1f - progress, 3f);
+
+            group.alpha = 1f - eased;
+            rect.localScale = Vector3.LerpUnclamped(fromScale, fromScale * 0.985f, eased);
+            yield return null;
+        }
+
+        Destroy(ghost);
+    }
+
+    /// <summary>
+    /// The dark sheet the choice plates sit on, dropped in between the scene art and the plates
+    /// so the art falls back while the choices and the dialogue line stay at full brightness.
+    /// </summary>
+    private void EnsureChoiceDim()
+    {
+        if (choiceDim != null || panelRect == null)
+        {
+            return;
+        }
+
+        RectTransform canvasRect = transform as RectTransform;
+        if (canvasRect == null)
+        {
+            return;
+        }
+
+        RectTransform rect = EnsureChild(canvasRect, "DialogueFX_Dim");
+        choiceDimRect = rect;
+
+        choiceDim = rect.GetComponent<Image>();
+        if (choiceDim == null)
+        {
+            choiceDim = rect.gameObject.AddComponent<Image>();
+        }
+
+        choiceDim.color = new Color(0f, 0f, 0f, 0f);
+        choiceDim.raycastTarget = false;
+        choiceDim.enabled = false;
+
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.one;
+        rect.pivot = new Vector2(0.5f, 0.5f);
+        rect.offsetMin = Vector2.zero;
+        rect.offsetMax = Vector2.zero;
+        rect.localScale = Vector3.one;
+
+        // Between the art and the choice plates. The scenes draw their backgrounds as full-screen
+        // images inside this same canvas, so a sheet at the very back would be hidden behind them;
+        // the plates and the card, which come later, stay above it and stay bright.
+        int insertAt = Mathf.Max(0, rect.parent.childCount - 1);
+        insertAt = Mathf.Min(insertAt, TopLevelIndex(panelRect, canvasRect));
+
+        for (int i = 0; i < choiceButtons.Count; i++)
+        {
+            RectTransform choiceRect = choiceButtons[i].transform as RectTransform;
+            if (choiceRect != null)
+            {
+                insertAt = Mathf.Min(insertAt, TopLevelIndex(choiceRect, canvasRect));
+            }
+        }
+
+        rect.SetSiblingIndex(insertAt);
+    }
+
+    /// <summary>
+    /// The index of a rect's outermost ancestor under the canvas, which is the slot the canvas
+    /// actually sorts by.
+    /// </summary>
+    private static int TopLevelIndex(RectTransform rect, RectTransform canvasRoot)
+    {
+        Transform top = rect;
+        while (top.parent != null && top.parent != canvasRoot)
+        {
+            top = top.parent;
+        }
+
+        return top.parent == canvasRoot
+            ? Mathf.Max(0, top.GetSiblingIndex())
+            : Mathf.Max(0, canvasRoot.childCount - 1);
+    }
+
+    private void UpdateChoiceDim()
+    {
+        if (choiceDim == null)
+        {
+            return;
+        }
+
+        bool anyShowing = AnyChoiceShowing();
+        if (!anyShowing)
+        {
+            choiceChosen = false;
+            choicesRaised = false;
+        }
+
+        bool showing = anyShowing && !choiceChosen;
+
+        if (showing && !choicesRaised)
+        {
+            choicesRaised = true;
+            RaiseChoicesAboveScene();
+        }
+        float target = showing ? ChoiceDimOpacity : 0f;
+        float duration = showing ? ChoiceDimFadeIn : ChoiceDimFadeOut;
+
+        choiceDimAlpha = Mathf.MoveTowards(
+            choiceDimAlpha,
+            target,
+            Time.unscaledDeltaTime / Mathf.Max(0.01f, duration));
+
+        choiceDim.color = new Color(0f, 0f, 0f, choiceDimAlpha);
+        choiceDim.enabled = choiceDimAlpha > 0.002f;
+    }
+
+    /// <summary>
+    /// Builds the choice stack: the plates over everything else the canvas draws — character
+    /// expressions included, since scenes stack theirs above the buttons — the dim directly under
+    /// the plates so those characters are dimmed too, the dialogue card just above the dim so the
+    /// line stays readable, and the scene's fade overlays above the lot so a transition still
+    /// covers everything.
+    /// </summary>
+    private void RaiseChoicesAboveScene()
+    {
+        RectTransform canvasRect = transform as RectTransform;
+        if (canvasRect == null)
+        {
+            return;
+        }
+
+        var fades = new List<Transform>();
+
+        for (int i = 0; i < canvasRect.childCount; i++)
+        {
+            Transform child = canvasRect.GetChild(i);
+            if (child.name.StartsWith("Fade", System.StringComparison.OrdinalIgnoreCase))
+            {
+                fades.Add(child);
+            }
+        }
+
+        var tops = new List<Transform>();
+
+        for (int i = 0; i < choiceButtons.Count; i++)
+        {
+            RectTransform choiceRect = choiceButtons[i].transform as RectTransform;
+            if (choiceRect == null)
+            {
+                continue;
+            }
+
+            Transform top = TopUnderCanvas(choiceRect, canvasRect);
+            if (top != null && !tops.Contains(top))
+            {
+                tops.Add(top);
+            }
+        }
+
+        if (tops.Count == 0)
+        {
+            return;
+        }
+
+        Transform cardTop = TopUnderCanvas(panelRect, canvasRect);
+        bool cardSharesPlate = cardTop != null && tops.Contains(cardTop);
+
+        // Appended in this order, so this is the stack they end up in: the dim, then the card,
+        // then the plates, then the fades. Characters fall behind the dim, the line and the
+        // answers stay in front of it, and a transition still covers everything.
+        if (choiceDimRect != null)
+        {
+            choiceDimRect.SetAsLastSibling();
+        }
+
+        if (cardTop != null && !cardSharesPlate)
+        {
+            cardTop.SetAsLastSibling();
+        }
+
+        for (int i = 0; i < tops.Count; i++)
+        {
+            tops[i].SetAsLastSibling();
+        }
+
+        for (int i = 0; i < fades.Count; i++)
+        {
+            fades[i].SetAsLastSibling();
+        }
+    }
+
+    private static Transform TopUnderCanvas(Transform rect, RectTransform canvasRoot)
+    {
+        Transform top = rect;
+        while (top.parent != null && top.parent != canvasRoot)
+        {
+            top = top.parent;
+        }
+
+        return top.parent == canvasRoot ? top : null;
+    }
+
+    private bool AnyChoiceShowing()
+    {
+        for (int i = 0; i < choiceButtons.Count; i++)
+        {
+            Button button = choiceButtons[i];
+            if (button != null && button.gameObject.activeInHierarchy)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private bool HasDialogueContent()
@@ -777,8 +1275,6 @@ public sealed class DialogueBoxUI : MonoBehaviour
             StopCoroutine(panelTransition);
         }
 
-        DialogueGradient.DestroyTexture(panelFillTexture);
-        DialogueGradient.DestroyTexture(panelFrameTexture);
     }
 }
 
