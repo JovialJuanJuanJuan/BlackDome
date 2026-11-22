@@ -7,8 +7,6 @@ public class MainMenu : MonoBehaviour
 {
     [SerializeField] GameObject fadeOut;
     [SerializeField] AudioSource buttonClick;
-    [SerializeField] int sceneToLoad;
-    [SerializeField] int saveTransferValue;
     [SerializeField] GameObject fadeIn;
 
     void Start()
@@ -25,14 +23,11 @@ public class MainMenu : MonoBehaviour
 
     public void LoadGame()
     {
-        saveTransferValue = PlayerPrefs.GetInt("LoadState");
-        if (saveTransferValue > 0)
-        {
-            sceneToLoad = saveTransferValue + 1;
-            buttonClick.Play();
-            fadeOut.SetActive(true);
-            StartCoroutine(LoadScene());
-        }
+        buttonClick.Play();
+
+        // The title menu opens the same twelve save boxes the pause menu uses. The chosen slot
+        // reloads its scene and fast-forwards it back to the saved line.
+        SaveMenuUI.OpenLoadFromMenu();
     }
 
     public void GotToCredits()
@@ -51,12 +46,6 @@ public class MainMenu : MonoBehaviour
     {
         yield return new WaitForSeconds(3);
         yield return SceneManager.LoadSceneAsync(3);
-    }
-
-    IEnumerator LoadScene()
-    {
-        yield return new WaitForSeconds(3);
-        yield return SceneManager.LoadSceneAsync(sceneToLoad);
     }
 
     IEnumerator TransferToCredits()

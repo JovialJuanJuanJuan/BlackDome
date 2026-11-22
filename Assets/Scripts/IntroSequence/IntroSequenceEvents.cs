@@ -157,6 +157,10 @@ public class IntroSequenceEvents : MonoBehaviour
                 
         }
 
+        // This scene runs its own typewriter instead of TextCreator, so the save system is told
+        // about the line here. That lets a save taken during the intro reload to this same line.
+        TextCreator.NoteLineStarted(textToSpeak);
+
         // The line can carry pacing markers: a mood like [slow], and holds like [pause=0.8] between
         // words. They are stripped here, so only the words themselves are ever shown.
         TypewriterLine line = TypewriterPacing.Parse(textToSpeak);
@@ -187,9 +191,10 @@ public class IntroSequenceEvents : MonoBehaviour
         // at any frame rate instead of one character per frame boundary.
         while (shown < totalCharacters)
         {
-            if (isSkipping)
+            if (isSkipping || TextCreator.InstantMode)
             {
-                // Instantly show full line if user clicked during typing
+                // Instantly show full line if user clicked during typing, or if a loaded save
+                // is being fast-forwarded back to the player's place.
                 break;
             }
 
@@ -222,7 +227,7 @@ public class IntroSequenceEvents : MonoBehaviour
 
         // A skipped line is shown at once; a finished one lets its last characters keep fading in
         // through the short pause before Next appears.
-        if (isSkipping)
+        if (isSkipping || TextCreator.InstantMode)
             reveal.Finish();
 
         // Small pause after full line is visible

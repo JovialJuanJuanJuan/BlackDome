@@ -19,6 +19,28 @@ public class TextCreator : MonoBehaviour
     public static bool runTextPrint;
     public static int charCount;
 
+    /// <summary>
+    /// How many dialogue lines this scene has started. The save system records it so a loaded
+    /// scene can be replayed up to the line the player left.
+    /// </summary>
+    public static int SceneLineCount { get; private set; }
+
+    /// <summary>
+    /// Set while a loaded scene is being fast-forwarded: every line is shown whole at once so the
+    /// replay does not spend real time typing out dialogue the player has already read.
+    /// </summary>
+    public static bool InstantMode { get; set; }
+
+    /// <summary>The last raw line handed to the typewriter, pacing markers included.</summary>
+    public static string LatestLine { get; private set; }
+
+    /// <summary>Called by the save system when a scene loads, so line counting starts from zero.</summary>
+    public static void ResetSceneLineCount()
+    {
+        SceneLineCount = 0;
+        LatestLine = string.Empty;
+    }
+
     static string pendingLine;
 
     [SerializeField] string transferText;
@@ -62,8 +84,19 @@ public class TextCreator : MonoBehaviour
     /// </summary>
     public static void Run(string line)
     {
+        NoteLineStarted(line);
         pendingLine = line;
         runTextPrint = true;
+    }
+
+    /// <summary>
+    /// Records that a line has begun. The typewriter calls this itself; a scene that types its own
+    /// dialogue (the intro sequence) calls it so saves made there still point at a line.
+    /// </summary>
+    public static void NoteLineStarted(string line)
+    {
+        SceneLineCount++;
+        LatestLine = line;
     }
 
     void Awake()
@@ -115,6 +148,16 @@ public class TextCreator : MonoBehaviour
         float gap = charDelay / speed;
 
         viewText.text = body;
+
+        if (InstantMode)
+        {
+            // Fast-forwarding a loaded save: show the line whole and let the caller move on.
+            int instantCount = viewText.textInfo != null ? viewText.textInfo.characterCount : 0;
+            charCount = Mathf.Max(body.Length, instantCount);
+            internalCount = charCount;
+            rollRoutine = null;
+            yield break;
+        }
 
         reveal.Duration = Mathf.Clamp(revealDuration / speed, 0.05f, 0.3f);
         reveal.RiseFraction = revealRise;
