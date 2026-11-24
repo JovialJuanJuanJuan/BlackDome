@@ -10,4 +10,4 @@
 
 # [PROGRESS]
 
-I have finished the development of Chapter One. Now all that is left is to playtest, and check for any issues/bugs. After that, I will be making and replacing the current placeholder assets with the final ones.
+I have finished the development of Chapter One. Now all that is left is to playtest, and check for any issues/bugs. Final character expressions have been fully implemented in the game, all that's left are the final background assets.
