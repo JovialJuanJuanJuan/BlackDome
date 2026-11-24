@@ -47,6 +47,7 @@ public sealed class SaveMenuUI : MonoBehaviour
     const float WindowSlant = 40f;
     const float CardSlant = 16f;
     const float PlateSlant = 14f;
+    const float FooterPlateGap = 14f;
 
     // ------------------------------------------------------------------ materials
 
@@ -108,7 +109,6 @@ public sealed class SaveMenuUI : MonoBehaviour
         public TMP_Text dateLabel;
         public TMP_Text previewLabel;
         public TMP_Text emptyLabel;
-        public Button deleteTab;
         public int slot;
         public bool hasSave;
         public bool hovered;
@@ -240,7 +240,6 @@ public sealed class SaveMenuUI : MonoBehaviour
     Button backButton;
     TMP_Text backLabel;
     Button deleteButton;
-    Button continueButton;
     Button pauseResumeButton;
     Button confirmCancelButton;
     TMP_Text pauseHintLabel;
@@ -438,7 +437,6 @@ public sealed class SaveMenuUI : MonoBehaviour
         // The delete plate belongs to the two lists, never to delete mode itself, and only shows
         // while there is a save that could be removed.
         RefreshDeleteButton();
-        RefreshContinueButton();
 
         if (next == Mode.Pause)
         {
@@ -561,7 +559,6 @@ public sealed class SaveMenuUI : MonoBehaviour
 
         RefreshCards(mode == Mode.Save || mode == Mode.Load ? mode : Mode.Delete);
         RefreshDeleteButton();
-        RefreshContinueButton();
     }
 
     /// <summary>
@@ -575,6 +572,9 @@ public sealed class SaveMenuUI : MonoBehaviour
 
         bool listScreen = mode == Mode.Save || mode == Mode.Load;
         deleteButton.gameObject.SetActive(listScreen && AnySaveExists());
+
+        // Showing or hiding the plate shifts the ones beside it, so the row is packed again.
+        LayoutFooterPlates();
     }
 
     void RefreshCards(Mode listMode)
@@ -888,9 +888,6 @@ public sealed class SaveMenuUI : MonoBehaviour
 
         if (deleteButton != null)
             deleteButton.gameObject.SetActive(false);
-
-        if (continueButton != null)
-            continueButton.gameObject.SetActive(false);
 
         ShowConfirm("Quit Black Dome? The game will close.", "QUIT", QuitNow);
     }
@@ -1232,15 +1229,6 @@ public sealed class SaveMenuUI : MonoBehaviour
                 : NumberDisabled;
 
             card.rect.localScale = Vector3.one * (1f - 0.008f * card.press);
-
-            bool showDeleteTab = card.deleteTab != null
-                && card.hasSave
-                && card.interactable
-                && !deleting
-                && card.hovered;
-
-            if (card.deleteTab != null && card.deleteTab.gameObject.activeSelf != showDeleteTab)
-                card.deleteTab.gameObject.SetActive(showDeleteTab);
         }
     }
 
@@ -1641,15 +1629,8 @@ public sealed class SaveMenuUI : MonoBehaviour
 
         deleteButton = CreateDarkPlate(deleteRect, "DELETE SAVE", OpenDelete, 15f, Muted, 6f);
 
-        // CONTINUE leads the cluster: one press resumes the newest save, autosave included.
-        RectTransform continueRect = CreateRect("ContinueButton", footer);
-        continueRect.anchorMin = new Vector2(1f, 0.5f);
-        continueRect.anchorMax = new Vector2(1f, 0.5f);
-        continueRect.pivot = new Vector2(1f, 0.5f);
-        continueRect.sizeDelta = new Vector2(200f, 52f);
-        continueRect.anchoredPosition = new Vector2(-478f, 0f);
-
-        continueButton = CreateDarkPlate(continueRect, "CONTINUE", ContinuePressed, 15f, Ink, 6f);
+        // The row is packed at runtime, so a plate that is not offered never leaves a hole.
+        LayoutFooterPlates();
     }
 
     SlotCard BuildCard(Transform parent, int slot)
@@ -1779,19 +1760,6 @@ public sealed class SaveMenuUI : MonoBehaviour
         emptyRect.anchoredPosition = new Vector2(114f, 0f);
         card.emptyLabel = AddText(emptyRect, "EMPTY SLOT", 14f, Ghost, TextAlignmentOptions.Left, RegularFont, FontStyles.Normal);
         card.emptyLabel.characterSpacing = 5f;
-
-        // A compact delete tag under the slot number, shown only while the pointer is on the box
-        // so a written save can be removed without walking the delete list. Keyboard and gamepad
-        // keep using the list, since neither can hover.
-        RectTransform deleteRect = CreateRect("DeleteTab", rect);
-        deleteRect.anchorMin = new Vector2(0f, 0f);
-        deleteRect.anchorMax = new Vector2(0f, 0f);
-        deleteRect.pivot = new Vector2(0f, 0f);
-        deleteRect.sizeDelta = new Vector2(66f, 22f);
-        deleteRect.anchoredPosition = new Vector2(30f, 10f);
-
-        card.deleteTab = CreateDarkPlate(deleteRect, "DEL", () => ShowDeleteConfirm(capturedSlot), 9f, Muted, 4f);
-        card.deleteTab.gameObject.SetActive(false);
 
         return card;
     }
@@ -2007,32 +1975,41 @@ public sealed class SaveMenuUI : MonoBehaviour
         Mode listMode = mode == Mode.Save || mode == Mode.Load ? mode : Mode.Delete;
         RefreshCards(listMode);
         RefreshDeleteButton();
-        RefreshContinueButton();
         ShowToast("SLOT " + slot.ToString("00") + " DELETED");
     }
 
-    /// <summary>Resumes the newest save, autosave included, without opening a box.</summary>
-    void ContinuePressed()
+    /// <summary>
+    /// Packs the footer's right-hand plates against BACK, so they always sit the same small
+    /// distance apart no matter which of them the screen is offering.
+    /// </summary>
+    void LayoutFooterPlates()
     {
-        int newest = SaveSlots.NewestSlot();
-
-        if (newest < 0)
-        {
-            ShowToast("NO SAVE TO CONTINUE");
-            return;
-        }
-
-        if (SaveGameManager.Instance != null)
-            SaveGameManager.Instance.LoadFromSlot(newest);
+        float edge = PlaceFooterPlate(backButton, -8f);
+        PlaceFooterPlate(deleteButton, edge);
     }
 
-    /// <summary>CONTINUE belongs to the load list, and only while there is something to resume.</summary>
-    void RefreshContinueButton()
+    /// <summary>Puts one plate on the row and returns the edge the next one starts at.</summary>
+    float PlaceFooterPlate(Button button, float rightEdge)
     {
-        if (continueButton == null)
-            return;
+        if (button == null || !button.gameObject.activeSelf)
+            return rightEdge;
 
-        continueButton.gameObject.SetActive(mode == Mode.Load && SaveSlots.NewestSlot() >= 0);
+        var rect = (RectTransform)button.transform;
+        Vector2 position = new Vector2(rightEdge, 0f);
+
+        rect.anchoredPosition = position;
+
+        // A plate's hover slide starts from its home, so the home moves with it.
+        for (int i = 0; i < plates.Count; i++)
+        {
+            if (plates[i].button == button)
+            {
+                plates[i].home = position;
+                break;
+            }
+        }
+
+        return rightEdge - rect.sizeDelta.x - FooterPlateGap;
     }
 
     static bool AnySaveExists()

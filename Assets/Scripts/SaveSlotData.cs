@@ -40,8 +40,8 @@ public static class SaveSlots
     public const int SlotCount = 12;
 
     /// <summary>
-    /// A reserved slot written when a chapter starts. It never appears in the grid; CONTINUE reads
-    /// it, and it keeps a place to resume even when the player has never saved by hand.
+    /// A reserved slot written when a chapter starts. It never appears in the grid, so a chapter's
+    /// opening is recorded even when the player has never saved by hand.
     /// </summary>
     public const int AutosaveSlot = 0;
 
@@ -152,7 +152,6 @@ public static class SaveSlots
 
     /// <summary>
     /// The slot holding the most recent save, autosave included, or -1 when nothing is saved.
-    /// CONTINUE uses this.
     /// </summary>
     public static int NewestSlot()
     {

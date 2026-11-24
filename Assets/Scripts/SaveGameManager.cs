@@ -208,8 +208,8 @@ public sealed class SaveGameManager : MonoBehaviour
 
     /// <summary>
     /// Records the start of the chapter that is now playing. It has no screenshot and no dialogue
-    /// preview because it is written before the scene has drawn a frame; CONTINUE only needs the
-    /// scene and the route, and an entry with no lines simply replays the scene from the top.
+    /// preview because it is written before the scene has drawn a frame; it only needs the scene
+    /// and the route, and an entry with no lines simply replays the scene from the top.
     /// </summary>
     void WriteAutosave()
     {
