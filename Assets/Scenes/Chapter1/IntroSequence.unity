@@ -532,6 +532,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TextCreator
   transferText: 
   internalCount: 0
+  charDelay: 0.03
+  sentencePause: 0.18
+  clausePause: 0.08
+  revealDuration: 0.16
+  revealRise: 0.16
+  revealStartScale: 0.8
+  revealTint: {r: 1, g: 0.96, b: 0.86, a: 1}
+  revealTintStrength: 0.5
 --- !u!114 &482621361
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1042,7 +1050,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.RawImage
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1076,16 +1084,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3de78c3c1be47264496d612cb68c9d3b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIDustParticles
-  particleCount: 300
-  minSize: 0.8
-  maxSize: 2.5
-  minSpeed: 3
-  maxSpeed: 12
-  wobbleAmount: 1.2
-  wobbleSpeed: 0.7
-  minOpacity: 0.15
-  maxOpacity: 0.65
-  fadeTime: 1.33
+  particleCount: 500
+  minSize: 2.5
+  maxSize: 7
+  minSpeed: 0.4
+  maxSpeed: 1.8
+  wobbleAmount: 0.5
+  wobbleSpeed: 0.35
+  minOpacity: 0.12
+  maxOpacity: 0.55
+  fadeTime: 2.2
   windDirection: {x: 0, y: 0}
   randomizeOnStart: 1
   useUnscaledTime: 1
@@ -1861,11 +1869,11 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 287256493}
-  - {fileID: 1256627489}
   - {fileID: 2017914729}
   - {fileID: 1730314776}
   - {fileID: 1722642595}
   - {fileID: 920973796}
+  - {fileID: 1256627489}
   - {fileID: 1132138755}
   - {fileID: 1863780412}
   - {fileID: 1457897433}
@@ -2219,6 +2227,9 @@ MonoBehaviour:
   pictureFadeDuration: 1.5
   textToSpeak: 
   charDelay: 0.04
+  sentencePause: 0.18
+  clausePause: 0.08
+  revealDuration: 0.16
 --- !u!1 &2012326332
 GameObject:
   m_ObjectHideFlags: 0

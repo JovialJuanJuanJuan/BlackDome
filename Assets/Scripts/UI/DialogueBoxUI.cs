@@ -80,7 +80,6 @@ public sealed class DialogueBoxUI : MonoBehaviour
     private static readonly Color CardShadowColor = new Color(0.13f, 0.13f, 0.14f, 0.40f);
     private static readonly Color TagFace = new Color(0.94f, 0.94f, 0.95f, 1f);
     private static readonly Color TagInk = new Color(0.05f, 0.05f, 0.05f, 1f);
-    private static readonly Color SteelAccent = new Color(0.56f, 0.70f, 0.84f, 1f);
 
     private const float CardSlant = 40f;
     private const float CardRuleThickness = 3f;

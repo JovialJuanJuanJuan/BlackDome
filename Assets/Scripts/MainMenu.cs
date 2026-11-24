@@ -39,7 +39,9 @@ public class MainMenu : MonoBehaviour
 
     public void QuitGame()
     {
-        Application.Quit();
+        // Quitting goes through the menu's confirmation card, so the game is never closed by a
+        // single stray click.
+        SaveMenuUI.ConfirmQuit();
     }
 
     IEnumerator TransferToIntroSeq()
@@ -58,5 +60,15 @@ public class MainMenu : MonoBehaviour
     {
         yield return new WaitForSeconds(2);
         fadeIn.SetActive(false);
+    }
+
+    /// <summary>
+    /// Drops the title's own opening fade. Used when the game already faded to black and brings
+    /// the menu in itself, so the two fades do not stack on top of each other.
+    /// </summary>
+    public void SkipFadeIn()
+    {
+        if (fadeIn != null)
+            fadeIn.SetActive(false);
     }
 }

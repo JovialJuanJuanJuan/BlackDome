@@ -2095,16 +2095,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3de78c3c1be47264496d612cb68c9d3b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIDustParticles
-  particleCount: 300
-  minSize: 0.8
-  maxSize: 2.5
-  minSpeed: 3
-  maxSpeed: 12
-  wobbleAmount: 1.2
-  wobbleSpeed: 0.7
-  minOpacity: 0.15
-  maxOpacity: 0.65
-  fadeTime: 1.33
+  particleCount: 500
+  minSize: 2.5
+  maxSize: 7
+  minSpeed: 0.4
+  maxSpeed: 1.8
+  wobbleAmount: 0.5
+  wobbleSpeed: 0.35
+  minOpacity: 0.12
+  maxOpacity: 0.55
+  fadeTime: 2.2
   windDirection: {x: 0, y: 0}
   randomizeOnStart: 1
   useUnscaledTime: 1

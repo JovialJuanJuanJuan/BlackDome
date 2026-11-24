@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using UnityEngine;
@@ -35,7 +36,14 @@ public sealed class SaveSlotData
 /// </summary>
 public static class SaveSlots
 {
+    /// <summary>The twelve slots the save and load screens show.</summary>
     public const int SlotCount = 12;
+
+    /// <summary>
+    /// A reserved slot written when a chapter starts. It never appears in the grid; CONTINUE reads
+    /// it, and it keeps a place to resume even when the player has never saved by hand.
+    /// </summary>
+    public const int AutosaveSlot = 0;
 
     const string FolderName = "Saves";
     const int ThumbnailWidth = 480;
@@ -57,7 +65,7 @@ public static class SaveSlots
 
     public static bool HasSave(int slot)
     {
-        if (slot < 1 || slot > SlotCount)
+        if (slot < AutosaveSlot || slot > SlotCount)
             return false;
 
         return File.Exists(DataPath(slot));
@@ -96,6 +104,7 @@ public static class SaveSlots
         try
         {
             Directory.CreateDirectory(FolderPath);
+            BackupExisting(data.slot);
             File.WriteAllText(DataPath(data.slot), JsonUtility.ToJson(data, true), Encoding.UTF8);
 
             if (thumbnail != null)
@@ -115,6 +124,89 @@ public static class SaveSlots
         {
             Debug.LogWarning("SaveLoad: could not write slot " + data.slot + " - " + error.Message);
             return false;
+        }
+    }
+
+    /// <summary>
+    /// Keeps one copy of whatever is about to be replaced. A write that fails half way (disk full,
+    /// the game closed mid-save) can then never leave the slot with nothing in it.
+    /// </summary>
+    static void BackupExisting(int slot)
+    {
+        try
+        {
+            string dataPath = DataPath(slot);
+            if (File.Exists(dataPath))
+                File.Copy(dataPath, dataPath + ".bak", true);
+
+            string thumbnailPath = ThumbnailPath(slot);
+            if (File.Exists(thumbnailPath))
+                File.Copy(thumbnailPath, thumbnailPath + ".bak", true);
+        }
+        catch (Exception error)
+        {
+            // A backup that cannot be made is not a reason to refuse the save itself.
+            Debug.LogWarning("SaveLoad: could not back up slot " + slot + " - " + error.Message);
+        }
+    }
+
+    /// <summary>
+    /// The slot holding the most recent save, autosave included, or -1 when nothing is saved.
+    /// CONTINUE uses this.
+    /// </summary>
+    public static int NewestSlot()
+    {
+        int newest = -1;
+        DateTime newestTime = DateTime.MinValue;
+
+        for (int slot = AutosaveSlot; slot <= SlotCount; slot++)
+        {
+            SaveSlotData data = Read(slot);
+            if (data == null)
+                continue;
+
+            DateTime savedAt;
+            if (!DateTime.TryParse(
+                    data.savedAtUtc,
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.RoundtripKind,
+                    out savedAt))
+            {
+                savedAt = DateTime.MinValue;
+            }
+
+            if (newest < 0 || savedAt > newestTime)
+            {
+                newest = slot;
+                newestTime = savedAt;
+            }
+        }
+
+        return newest;
+    }
+
+    /// <summary>
+    /// Removes a slot's record and its picture. The record goes first, so the slot is empty even
+    /// if the picture cannot be removed.
+    /// </summary>
+    public static bool Delete(int slot)
+    {
+        if (!HasSave(slot))
+            return false;
+
+        try
+        {
+            File.Delete(DataPath(slot));
+
+            if (File.Exists(ThumbnailPath(slot)))
+                File.Delete(ThumbnailPath(slot));
+
+            return true;
+        }
+        catch (Exception error)
+        {
+            Debug.LogWarning("SaveLoad: could not delete slot " + slot + " - " + error.Message);
+            return !HasSave(slot);
         }
     }
 

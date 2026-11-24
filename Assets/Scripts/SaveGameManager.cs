@@ -33,6 +33,14 @@ public sealed class SaveGameManager : MonoBehaviour
     const float RestoreHardLimit = 60f;
     const float FirstLineLimit = 10f;
 
+    // Every scene hand-over goes through black: the outgoing picture and its music wind down, then
+    // the incoming scene is brought up, so neither end of a load ever shows a frozen frame.
+    const float ReturnFadeOut = 0.7f;
+    const float ReturnFadeIn = 0.8f;
+    const float LoadFadeOut = 0.5f;
+    const float LoadFadeIn = 0.7f;
+    const float QuitFade = 0.8f;
+
     // Scenes 0 to 2 are the splash screen, the title menu and the credits.
     const int FirstGameplayBuildIndex = 3;
 
@@ -44,6 +52,10 @@ public sealed class SaveGameManager : MonoBehaviour
     bool paused;
     float timeScaleBeforePause = 1f;
     bool saving;
+    bool returningToMenu;
+    bool loadingSave;
+    bool fadeInOnSceneLoad;
+    bool quitting;
 
     readonly List<string> choiceRoute = new List<string>();
     string lastChoiceName;
@@ -102,13 +114,24 @@ public sealed class SaveGameManager : MonoBehaviour
             return;
 
         TextCreator.ResetSceneLineCount();
+        WriteAutosave();
         StartCoroutine(WatchChoiceButtons());
     }
 
     void Update()
     {
-        if (EscapePressed() && ui != null)
+        if ((EscapePressed() || MenuButtonPressed()) && ui != null)
             ui.HandleEscape();
+    }
+
+    /// <summary>The pad's start/options button toggles the menu the same way Escape does.</summary>
+    static bool MenuButtonPressed()
+    {
+#if ENABLE_INPUT_SYSTEM
+        if (Gamepad.current != null && Gamepad.current.startButton.wasPressedThisFrame)
+            return true;
+#endif
+        return false;
     }
 
     static bool EscapePressed()
@@ -181,6 +204,32 @@ public sealed class SaveGameManager : MonoBehaviour
 
         saving = true;
         StartCoroutine(SaveRoutine(slot));
+    }
+
+    /// <summary>
+    /// Records the start of the chapter that is now playing. It has no screenshot and no dialogue
+    /// preview because it is written before the scene has drawn a frame; CONTINUE only needs the
+    /// scene and the route, and an entry with no lines simply replays the scene from the top.
+    /// </summary>
+    void WriteAutosave()
+    {
+        if (!IsGameplayScene())
+            return;
+
+        Scene scene = SceneManager.GetActiveScene();
+
+        var data = new SaveSlotData
+        {
+            slot = SaveSlots.AutosaveSlot,
+            sceneBuildIndex = scene.buildIndex,
+            sceneName = scene.name,
+            sceneTitle = SaveSlots.TitleForScene(scene.name),
+            lineCount = TextCreator.SceneLineCount,
+            choiceRoute = string.Join("|", choiceRoute.ToArray()),
+            savedAtUtc = DateTime.UtcNow.ToString("o"),
+        };
+
+        SaveSlots.Write(data, null);
     }
 
     IEnumerator SaveRoutine(int slot)
@@ -304,11 +353,37 @@ public sealed class SaveGameManager : MonoBehaviour
 
         if (data == null)
         {
-            ui.ShowToast("SLOT " + slot.ToString("00") + " IS EMPTY");
+            ui.ShowToast(SaveSlots.HasSave(slot)
+                ? "SLOT " + slot.ToString("00") + " IS DAMAGED"
+                : "SLOT " + slot.ToString("00") + " IS EMPTY");
             return;
         }
 
+        if (loadingSave || isRestoring)
+            return;
+
+        StartCoroutine(LoadFromSlotRoutine(data));
+    }
+
+    IEnumerator LoadFromSlotRoutine(SaveSlotData data)
+    {
+        loadingSave = true;
         pendingRestore = data;
+
+        // From the title menu the menu and its music fade out first, because the scene behind the
+        // boxes is still alive and would otherwise be cut. Loading from the pause menu already
+        // happens behind the loading screen, so it goes straight there.
+        bool fromTitle = !IsGameplayScene();
+
+        if (fromTitle)
+        {
+            FadeSceneMusic(LoadFadeOut);
+
+            if (ui != null)
+                ui.FadeScreenOut(LoadFadeOut);
+
+            yield return new WaitForSecondsRealtime(LoadFadeOut);
+        }
 
         // The loading screen goes up before the scene starts loading, so the pause menu does not
         // flash back to the frozen scene on the way out.
@@ -318,7 +393,9 @@ public sealed class SaveGameManager : MonoBehaviour
         EndPause();
         Time.timeScale = 1f;
 
-        StartCoroutine(LoadSceneRoutine(data));
+        yield return LoadSceneRoutine(data);
+
+        loadingSave = false;
     }
 
     IEnumerator LoadSceneRoutine(SaveSlotData data)
@@ -329,7 +406,10 @@ public sealed class SaveGameManager : MonoBehaviour
             Debug.LogWarning("SaveLoad: the save points at a scene that is not in the build list - " + data.sceneName);
 
             if (ui != null)
+            {
                 ui.HideLoading();
+                ui.FadeScreenIn(LoadFadeIn);
+            }
 
             yield break;
         }
@@ -342,24 +422,123 @@ public sealed class SaveGameManager : MonoBehaviour
 
     public void ReturnToMainMenu()
     {
+        if (returningToMenu)
+            return;
+
+        StartCoroutine(ReturnToMainMenuRoutine());
+    }
+
+    IEnumerator ReturnToMainMenuRoutine()
+    {
+        returningToMenu = true;
+
         if (ui != null)
             ui.CloseMenu();
 
+        // The pause is lifted before the fade so the music and the last picture of the chapter
+        // move together instead of sitting frozen under the black.
         EndPause();
         Time.timeScale = 1f;
-        AudioListener.pause = false;
+
+        FadeSceneMusic(ReturnFadeOut);
+
+        if (ui != null)
+            ui.FadeScreenOut(ReturnFadeOut);
+
+        yield return new WaitForSecondsRealtime(ReturnFadeOut);
+
         pendingRestore = null;
 
         int menuIndex = FindSceneIndex("MainMenu");
 
-        if (menuIndex >= 0)
-        {
-            SceneManager.LoadSceneAsync(menuIndex);
-        }
-        else
+        if (menuIndex < 0)
         {
             Debug.LogWarning("SaveLoad: no scene named MainMenu is in the build list.");
+
+            if (ui != null)
+                ui.FadeScreenIn(ReturnFadeIn);
+
+            returningToMenu = false;
+            yield break;
         }
+
+        // The black stays up across the load and is only lifted once the menu is standing.
+        fadeInOnSceneLoad = true;
+
+        AsyncOperation load = SceneManager.LoadSceneAsync(menuIndex);
+
+        while (load != null && !load.isDone)
+            yield return null;
+
+        returningToMenu = false;
+    }
+
+    /// <summary>
+    /// Winds the scene's music down before the scene is replaced. The fader belongs to the scene
+    /// that is leaving, so this has to run while that scene is still loaded.
+    /// </summary>
+    static void FadeSceneMusic(float duration)
+    {
+        BackgroundMusicFader[] faders = FindObjectsByType<BackgroundMusicFader>(
+            FindObjectsInactive.Include,
+            FindObjectsSortMode.None);
+
+        for (int i = 0; i < faders.Length; i++)
+        {
+            if (faders[i] != null)
+                faders[i].FadeOutOver(duration);
+        }
+    }
+
+    static void RestoreSceneMusic()
+    {
+        BackgroundMusicFader[] faders = FindObjectsByType<BackgroundMusicFader>(
+            FindObjectsInactive.Include,
+            FindObjectsSortMode.None);
+
+        for (int i = 0; i < faders.Length; i++)
+        {
+            if (faders[i] != null)
+                faders[i].FadeIn();
+        }
+    }
+
+    /// <summary>
+    /// Closes the game on a fade: the music winds down and the screen goes black before the process
+    /// ends, so quitting is a transition like every other one the menus make.
+    /// </summary>
+    public void QuitGame()
+    {
+        if (quitting)
+            return;
+
+        StartCoroutine(QuitRoutine());
+    }
+
+    IEnumerator QuitRoutine()
+    {
+        quitting = true;
+
+        FadeSceneMusic(QuitFade);
+
+        if (ui != null)
+            ui.FadeScreenOut(QuitFade);
+
+        yield return new WaitForSecondsRealtime(QuitFade);
+
+        Application.Quit();
+
+        // The editor never closes on Application.Quit, so play mode is given its screen and music
+        // back rather than being left sitting on a black screen.
+        if (Application.isEditor)
+        {
+            RestoreSceneMusic();
+
+            if (ui != null)
+                ui.FadeScreenIn(ReturnFadeIn);
+        }
+
+        quitting = false;
     }
 
     static int FindSceneIndex(string sceneName)
@@ -381,6 +560,21 @@ public sealed class SaveGameManager : MonoBehaviour
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         TextCreator.ResetSceneLineCount();
+
+        // Coming back to the title menu through black: the menu's own opening fade would stack
+        // under ours, so it steps aside and the black is lifted here instead.
+        if (fadeInOnSceneLoad)
+        {
+            fadeInOnSceneLoad = false;
+
+            MainMenu menu = FindFirstObjectByType<MainMenu>();
+
+            if (menu != null)
+                menu.SkipFadeIn();
+
+            if (ui != null)
+                ui.FadeScreenIn(ReturnFadeIn);
+        }
 
         choiceRoute.Clear();
         lastChoiceName = null;
@@ -406,7 +600,15 @@ public sealed class SaveGameManager : MonoBehaviour
             AudioListener.pause = false;
 
             if (ui != null)
+            {
                 ui.HideLoading();
+                ui.FadeScreenIn(LoadFadeIn);
+            }
+        }
+        else
+        {
+            // A chapter was entered without a save to replay, so mark its opening for CONTINUE.
+            WriteAutosave();
         }
 
         StartCoroutine(WatchChoiceButtons());
@@ -540,6 +742,9 @@ public sealed class SaveGameManager : MonoBehaviour
 
         isRestoring = false;
         ui.HideLoading();
+
+        // The replay happened behind black; this is the moment the scene is actually seen again.
+        ui.FadeScreenIn(LoadFadeIn);
     }
 
     /// <summary>

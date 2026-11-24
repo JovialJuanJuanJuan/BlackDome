@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -28,6 +31,7 @@ public sealed class SaveMenuUI : MonoBehaviour
         Pause,
         Save,
         Load,
+        Delete,
         Loading
     }
 
@@ -53,6 +57,11 @@ public sealed class SaveMenuUI : MonoBehaviour
     const float PauseMusicFadeOut = 0.55f;
     const float OpenFade = 0.16f;
     const float CloseFade = 0.20f;
+    const float ConfirmFade = 0.14f;
+    const float PauseHintFade = 0.6f;
+    const float PauseHintReturn = 0.3f;
+    const float PauseHintHide = 0.22f;
+    const float ConfirmGuardTime = 0.25f;
 
     static readonly Color BackdropColor = new Color(0.002f, 0.002f, 0.003f, 0.94f);
     static readonly Color WindowFace = new Color(0.012f, 0.012f, 0.013f, 1f);
@@ -74,8 +83,9 @@ public sealed class SaveMenuUI : MonoBehaviour
     static readonly Color Ghost = new Color(0.31f, 0.31f, 0.31f, 1f);
     static readonly Color NumberIdle = new Color(0.64f, 0.64f, 0.64f, 1f);
     static readonly Color NumberDisabled = new Color(0.28f, 0.28f, 0.28f, 1f);
-    static readonly Color Steel = new Color(0.56f, 0.70f, 0.84f, 1f);
-    static readonly Color SteelDim = new Color(0.44f, 0.55f, 0.66f, 1f);
+    // Hover ink stays inside the monochrome palette: a hovered box lifts its number and its
+    // accent bar from grey to a lighter grey, never to a colour.
+    static readonly Color HoverGrey = new Color(0.86f, 0.86f, 0.87f, 1f);
     static readonly Color TagFace = new Color(0.94f, 0.94f, 0.95f, 1f);
     static readonly Color TagInk = new Color(0.05f, 0.05f, 0.05f, 1f);
     static readonly Color ThumbWell = new Color(0f, 0f, 0f, 0.55f);
@@ -98,6 +108,9 @@ public sealed class SaveMenuUI : MonoBehaviour
         public TMP_Text dateLabel;
         public TMP_Text previewLabel;
         public TMP_Text emptyLabel;
+        public Button deleteTab;
+        public int slot;
+        public bool hasSave;
         public bool hovered;
         public bool pressed;
         public bool interactable = true;
@@ -109,11 +122,12 @@ public sealed class SaveMenuUI : MonoBehaviour
     sealed class PlateFx
     {
         public RectTransform rect;
+        public Button button;
         public Vector2 home;
         public float slide;
         public SkewedPanel edge;
         public SkewedPanel sheen;
-        public Image fillTint;
+        public Graphic fillTint;
         public Color fillIdle;
         public Color fillHover;
         public TMP_Text label;
@@ -191,6 +205,9 @@ public sealed class SaveMenuUI : MonoBehaviour
 
     Canvas canvas;
     Canvas pauseHintCanvas;
+    CanvasGroup pauseHintGroup;
+    bool pauseHintRevealed;
+    float pauseHintReveal;
     RectTransform windowRect;
     CanvasGroup rootGroup;
     bool closing;
@@ -208,8 +225,27 @@ public sealed class SaveMenuUI : MonoBehaviour
     TMP_Text toastText;
     TMP_Text confirmMessage;
     TMP_Text confirmYesLabel;
+    CanvasGroup confirmGroup;
+    RectTransform confirmBox;
+
+    Canvas screenFadeCanvas;
+    CanvasGroup screenFadeGroup;
+    float screenFadeAlpha;
+    float screenFadeTarget;
+    float screenFadeSpeed;
+    float confirmFade;
+    bool confirmOpen;
+    bool confirmHidesCanvas;
 
     Button backButton;
+    TMP_Text backLabel;
+    Button deleteButton;
+    Button continueButton;
+    Button pauseResumeButton;
+    Button confirmCancelButton;
+    TMP_Text pauseHintLabel;
+    float confirmOpenedAt;
+    Mode deleteReturnMode = Mode.Load;
 
     readonly List<SlotCard> cards = new List<SlotCard>();
     readonly List<PlateFx> plates = new List<PlateFx>();
@@ -235,6 +271,8 @@ public sealed class SaveMenuUI : MonoBehaviour
     bool openedFromPause;
     Action confirmAction;
     float toastUntil;
+    bool quitPrompt;
+    bool quitAfterFade;
 
     float enterStart = -1f;
 
@@ -287,6 +325,18 @@ public sealed class SaveMenuUI : MonoBehaviour
         SetMode(Mode.Save);
     }
 
+    /// <summary>
+    /// Asks before the game closes. The title menu's Quit button calls this instead of quitting
+    /// outright; the question is the same confirmation card the save screens use.
+    /// </summary>
+    public static void ConfirmQuit()
+    {
+        SaveGameManager.EnsureExists();
+
+        if (Instance != null)
+            Instance.OpenQuitPrompt();
+    }
+
     public void OpenLoad(bool fromPause)
     {
         EnsureBuilt();
@@ -326,6 +376,7 @@ public sealed class SaveMenuUI : MonoBehaviour
 
             case Mode.Save:
             case Mode.Load:
+            case Mode.Delete:
                 BackPressed();
                 return;
 
@@ -367,7 +418,7 @@ public sealed class SaveMenuUI : MonoBehaviour
 
         canvas.enabled = true;
 
-        bool slots = next == Mode.Save || next == Mode.Load;
+        bool slots = next == Mode.Save || next == Mode.Load || next == Mode.Delete;
 
         windowRect.gameObject.SetActive(next == Mode.Pause || slots);
         pausePanel.SetActive(next == Mode.Pause);
@@ -379,6 +430,15 @@ public sealed class SaveMenuUI : MonoBehaviour
 
         if (backButton != null)
             backButton.gameObject.SetActive(slots);
+
+        // In delete mode the plate says what it does: it leaves the delete list.
+        if (backLabel != null)
+            backLabel.text = next == Mode.Delete ? "EXIT DELETE" : "BACK";
+
+        // The delete plate belongs to the two lists, never to delete mode itself, and only shows
+        // while there is a save that could be removed.
+        RefreshDeleteButton();
+        RefreshContinueButton();
 
         if (next == Mode.Pause)
         {
@@ -398,6 +458,12 @@ public sealed class SaveMenuUI : MonoBehaviour
             subtitleText.text = "ESC TO STEP BACK";
             footerHint.text = "Choose a box to continue from there.";
         }
+        else if (next == Mode.Delete)
+        {
+            titleText.text = "DELETE SAVE";
+            subtitleText.text = "ESC TO STEP BACK";
+            footerHint.text = "Choose a box to delete its save. This cannot be undone.";
+        }
 
         // The pause theme belongs to the pause flow, never to the title menu's load screen.
         if (next == Mode.Loading)
@@ -407,6 +473,9 @@ public sealed class SaveMenuUI : MonoBehaviour
 
         if (previous != next && next != Mode.Loading)
             BeginEnter();
+
+        if (next != Mode.Loading)
+            SelectDefaultFocus();
     }
 
     void BackPressed()
@@ -414,6 +483,17 @@ public sealed class SaveMenuUI : MonoBehaviour
         if (confirmPanel != null && confirmPanel.activeSelf)
         {
             HideConfirm();
+            return;
+        }
+
+        if (mode == Mode.Delete)
+        {
+            // Delete mode leaves the boxes in their delete state (empty ones disabled and
+            // labelled NO DATA), so the list it returns to is rebuilt instead of inherited:
+            // an empty save box has to be selectable again.
+            Mode back = deleteReturnMode;
+            RefreshCards(back);
+            SetMode(back);
             return;
         }
 
@@ -439,6 +519,12 @@ public sealed class SaveMenuUI : MonoBehaviour
 
     void OnSlotClicked(int slot)
     {
+        if (mode == Mode.Delete)
+        {
+            ShowDeleteConfirm(slot);
+            return;
+        }
+
         if (mode == Mode.Save)
         {
             if (SaveSlots.HasSave(slot))
@@ -473,7 +559,22 @@ public sealed class SaveMenuUI : MonoBehaviour
         if (canvas == null)
             return;
 
-        RefreshCards(mode == Mode.Save ? Mode.Save : Mode.Load);
+        RefreshCards(mode == Mode.Save || mode == Mode.Load ? mode : Mode.Delete);
+        RefreshDeleteButton();
+        RefreshContinueButton();
+    }
+
+    /// <summary>
+    /// A list with nothing saved in it has nothing to delete, so the plate stays away until a
+    /// save exists. Refreshed whenever a list is shown or a save is written.
+    /// </summary>
+    void RefreshDeleteButton()
+    {
+        if (deleteButton == null)
+            return;
+
+        bool listScreen = mode == Mode.Save || mode == Mode.Load;
+        deleteButton.gameObject.SetActive(listScreen && AnySaveExists());
     }
 
     void RefreshCards(Mode listMode)
@@ -487,6 +588,9 @@ public sealed class SaveMenuUI : MonoBehaviour
 
             SaveSlotData data = SaveSlots.Read(slot);
             bool filled = data != null;
+            bool damaged = !filled && SaveSlots.HasSave(slot);
+
+            card.hasSave = filled || damaged;
 
             if (filled)
             {
@@ -515,9 +619,15 @@ public sealed class SaveMenuUI : MonoBehaviour
             card.previewLabel.gameObject.SetActive(filled);
 
             card.emptyLabel.gameObject.SetActive(!filled);
-            card.emptyLabel.text = listMode == Mode.Save ? "EMPTY SLOT" : "NO DATA";
+            card.emptyLabel.text = damaged
+                ? "SAVE DAMAGED"
+                : (listMode == Mode.Save ? "EMPTY SLOT" : "NO DATA");
 
-            card.button.interactable = listMode == Mode.Save || filled;
+            // A damaged file cannot be loaded, but it can still be overwritten or deleted, which
+            // are the two ways to get rid of it.
+            card.button.interactable = listMode == Mode.Save
+                || filled
+                || (damaged && listMode == Mode.Delete);
             card.interactable = card.button.interactable;
 
             if (!card.interactable)
@@ -628,6 +738,112 @@ public sealed class SaveMenuUI : MonoBehaviour
         StopPauseMusic();
     }
 
+    // ------------------------------------------------------------------ screen fade
+
+    /// <summary>
+    /// Fades the whole screen to black. It lives on the manager rather than on a menu canvas, so it
+    /// outlives the scene it covers and can bring the next scene in from black.
+    /// </summary>
+    public void FadeScreenOut(float duration)
+    {
+        EnsureBuilt();
+        BeginScreenFade(1f, duration);
+    }
+
+    /// <summary>Lifts the black back off the screen.</summary>
+    public void FadeScreenIn(float duration)
+    {
+        EnsureBuilt();
+        BeginScreenFade(0f, duration);
+    }
+
+    /// <summary>True while the screen is between black and clear.</summary>
+    public bool IsScreenFading
+    {
+        get { return !Mathf.Approximately(screenFadeAlpha, screenFadeTarget); }
+    }
+
+    void BeginScreenFade(float target, float duration)
+    {
+        if (screenFadeGroup == null)
+            return;
+
+        screenFadeTarget = Mathf.Clamp01(target);
+        screenFadeSpeed = duration <= 0f ? 0f : 1f / duration;
+
+        if (duration <= 0f)
+            screenFadeAlpha = screenFadeTarget;
+
+        ApplyScreenFade();
+    }
+
+    /// <summary>Runs on unscaled time, so a paused game still fades.</summary>
+    void UpdateScreenFade()
+    {
+        if (screenFadeGroup == null || screenFadeSpeed <= 0f)
+            return;
+
+        if (Mathf.Approximately(screenFadeAlpha, screenFadeTarget))
+            return;
+
+        screenFadeAlpha = Mathf.MoveTowards(
+            screenFadeAlpha,
+            screenFadeTarget,
+            Time.unscaledDeltaTime * screenFadeSpeed);
+
+        ApplyScreenFade();
+    }
+
+    void ApplyScreenFade()
+    {
+        if (screenFadeGroup == null)
+            return;
+
+        screenFadeGroup.alpha = screenFadeAlpha;
+        screenFadeGroup.blocksRaycasts = screenFadeAlpha > 0.001f;
+
+        // The canvas stays on for a fade in even at alpha 0, so its first steps are drawn.
+        bool visible = screenFadeAlpha > 0.001f || screenFadeTarget > 0f;
+
+        if (screenFadeCanvas != null && screenFadeCanvas.enabled != visible)
+            screenFadeCanvas.enabled = visible;
+    }
+
+    void BuildScreenFade()
+    {
+        GameObject canvasObject = new GameObject(
+            "ScreenFadeCanvas",
+            typeof(RectTransform),
+            typeof(Canvas),
+            typeof(CanvasScaler),
+            typeof(GraphicRaycaster));
+
+        canvasObject.transform.SetParent(transform, false);
+
+        screenFadeCanvas = canvasObject.GetComponent<Canvas>();
+        screenFadeCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+
+        // Above the menu and its loading screen, so a fade covers everything either of them shows.
+        screenFadeCanvas.sortingOrder = 6000;
+
+        CanvasScaler scaler = canvasObject.GetComponent<CanvasScaler>();
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.referenceResolution = new Vector2(1920f, 1080f);
+        scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
+        scaler.matchWidthOrHeight = 0.5f;
+
+        RectTransform root = CreateRect("Root", canvasObject.transform);
+        Stretch(root, 0f, 0f, 0f, 0f);
+        AddImage(root, Color.black, true);
+
+        screenFadeGroup = root.gameObject.AddComponent<CanvasGroup>();
+        screenFadeGroup.alpha = 0f;
+        screenFadeGroup.blocksRaycasts = false;
+        screenFadeGroup.interactable = false;
+
+        screenFadeCanvas.enabled = false;
+    }
+
     public void ShowToast(string message)
     {
         if (canvas == null || mode == Mode.Closed || toastText == null)
@@ -641,6 +857,55 @@ public sealed class SaveMenuUI : MonoBehaviour
 
     // ------------------------------------------------------------------ confirm
 
+    /// <summary>
+    /// Puts the quit question over the title menu. The menu proper stays closed: only the prompt
+    /// and its dark backdrop are switched on, and the plates behind it are not reachable.
+    /// </summary>
+    void OpenQuitPrompt()
+    {
+        EnsureBuilt();
+
+        quitPrompt = true;
+        closing = false;
+        enterStart = -1f;
+        mode = Mode.Closed;
+
+        canvas.enabled = true;
+
+        if (rootGroup != null)
+        {
+            rootGroup.alpha = 1f;
+            rootGroup.blocksRaycasts = true;
+        }
+
+        windowRect.gameObject.SetActive(false);
+        pausePanel.SetActive(false);
+        slotsPanel.SetActive(false);
+        loadingPanel.SetActive(false);
+
+        if (backButton != null)
+            backButton.gameObject.SetActive(false);
+
+        if (deleteButton != null)
+            deleteButton.gameObject.SetActive(false);
+
+        if (continueButton != null)
+            continueButton.gameObject.SetActive(false);
+
+        ShowConfirm("Quit Black Dome? The game will close.", "QUIT", QuitNow);
+    }
+
+    void QuitNow()
+    {
+        // The pause theme leaves with the screen; the scene's own music is faded by the manager
+        // during the black.
+        StopPauseMusic();
+
+        // The game waits for the card's fade-out, so quitting ends on the same motion every other
+        // answer gets instead of cutting on the click.
+        quitAfterFade = true;
+    }
+
     void ShowConfirm(string message, string confirmLabel, Action onConfirm)
     {
         EnsureBuilt();
@@ -652,20 +917,124 @@ public sealed class SaveMenuUI : MonoBehaviour
         confirmYesLabel.text = confirmLabel;
         confirmAction = onConfirm;
 
+        // A fresh card starts transparent and a hair small, then eases to full like the menu's
+        // own window. Reopening it mid fade-out simply turns the fade around.
+        if (!confirmPanel.activeSelf)
+        {
+            confirmFade = 0f;
+
+            if (confirmGroup != null)
+                confirmGroup.alpha = 0f;
+
+            if (confirmBox != null)
+                confirmBox.localScale = Vector3.one * 0.985f;
+        }
+
+        confirmOpen = true;
+        confirmOpenedAt = Time.unscaledTime;
+
+        if (confirmGroup != null)
+            confirmGroup.blocksRaycasts = true;
+
         confirmPanel.SetActive(true);
         confirmPanel.transform.SetAsLastSibling();
+
+        // The safe answer holds the keyboard and gamepad focus; the destructive plate has to be
+        // navigated to on purpose.
+        Select(confirmCancelButton != null ? confirmCancelButton.gameObject : null);
+    }
+
+    /// <summary>
+    /// Fades the confirmation card in and out on unscaled time. The card's word is dropped from
+    /// the action immediately when it starts closing, so a second click cannot fire it twice.
+    /// </summary>
+    void UpdateConfirm()
+    {
+        if (confirmPanel == null || !confirmPanel.activeSelf)
+            return;
+
+        if (confirmOpen)
+        {
+            confirmFade = Mathf.MoveTowards(confirmFade, 1f, Time.unscaledDeltaTime / ConfirmFade);
+            float eased = 1f - Mathf.Pow(1f - confirmFade, 3f);
+
+            if (confirmGroup != null)
+                confirmGroup.alpha = eased;
+
+            if (confirmBox != null)
+                confirmBox.localScale = Vector3.one * Mathf.LerpUnclamped(0.985f, 1f, eased);
+
+            return;
+        }
+
+        confirmFade = Mathf.MoveTowards(confirmFade, 0f, Time.unscaledDeltaTime / ConfirmFade);
+
+        if (confirmGroup != null)
+            confirmGroup.alpha = confirmFade;
+
+        if (confirmFade > 0f)
+            return;
+
+        confirmPanel.SetActive(false);
+        SelectDefaultFocus();
+
+        // The quit question is the one confirmation with no screen behind it, so the overlay that
+        // carried it is put away once it has finished fading.
+        if (confirmHidesCanvas)
+        {
+            confirmHidesCanvas = false;
+
+            if (canvas != null && mode == Mode.Closed)
+                canvas.enabled = false;
+        }
+
+        if (quitAfterFade)
+        {
+            quitAfterFade = false;
+
+            // The manager takes it from here: it fades the screen and the music out before the game
+            // closes, so the quit does not cut on the confirm card's last frame.
+            if (SaveGameManager.Instance != null)
+                SaveGameManager.Instance.QuitGame();
+            else
+                Application.Quit();
+        }
     }
 
     void HideConfirm()
     {
-        if (confirmPanel != null)
-            confirmPanel.SetActive(false);
+        // The card fades out under its own steam, so it is only switched off once that has played.
+        if (confirmPanel != null && confirmPanel.activeSelf)
+        {
+            confirmOpen = false;
+
+            if (confirmGroup != null)
+                confirmGroup.blocksRaycasts = false;
+
+            if (quitPrompt)
+            {
+                quitPrompt = false;
+                confirmHidesCanvas = true;
+            }
+        }
+        else if (quitPrompt)
+        {
+            quitPrompt = false;
+
+            if (canvas != null && mode == Mode.Closed)
+                canvas.enabled = false;
+        }
 
         confirmAction = null;
     }
 
     void ConfirmPressed()
     {
+        // A click in the card's first quarter second cannot be an answer to a question the
+        // player has not read yet, so a double click cannot delete a save or quit the game.
+        if (Time.unscaledTime - confirmOpenedAt < ConfirmGuardTime)
+            return;
+
         Action action = confirmAction;
         HideConfirm();
 
@@ -675,7 +1044,9 @@ public sealed class SaveMenuUI : MonoBehaviour
 
     void Update()
     {
+        UpdateScreenFade();
         UpdateToast();
+        UpdateConfirm();
         UpdatePauseHint();
         UpdateEnter();
         UpdateClose();
@@ -793,7 +1164,8 @@ public sealed class SaveMenuUI : MonoBehaviour
             if (fx == null)
                 continue;
 
-            float hoverTarget = fx.interactable && fx.hovered ? 1f : 0f;
+            bool selected = fx.button != null && IsSelected(fx.button.gameObject);
+            float hoverTarget = fx.interactable && (fx.hovered || selected) ? 1f : 0f;
             float pressTarget = fx.interactable && fx.pressed ? 1f : 0f;
 
             fx.hover = Mathf.MoveTowards(fx.hover, hoverTarget, deltaTime * HoverSpeed);
@@ -822,33 +1194,53 @@ public sealed class SaveMenuUI : MonoBehaviour
     void TickCards()
     {
         float deltaTime = Time.unscaledDeltaTime;
+        bool deleting = mode == Mode.Delete;
 
         for (int i = 0; i < cards.Count; i++)
         {
             SlotCard card = cards[i];
 
-            float hoverTarget = card.interactable && card.hovered ? 1f : 0f;
+            // Selection is what the keyboard and gamepad move; it lights a box exactly the way
+            // the pointer does, so both ways of driving the menu look the same.
+            bool selected = card.button != null && IsSelected(card.button.gameObject);
+            float hoverTarget = card.interactable && (card.hovered || selected) ? 1f : 0f;
             float pressTarget = card.interactable && card.pressed ? 1f : 0f;
 
             card.hover = Mathf.MoveTowards(card.hover, hoverTarget, deltaTime * HoverSpeed);
             card.press = Mathf.MoveTowards(card.press, pressTarget, deltaTime * PressSpeed);
 
+            // In delete mode every filled box breathes a little, one after another down the grid,
+            // so the boxes that can be removed read as live targets before the pointer reaches
+            // them. Hover still takes the box all the way to its bright edge.
+            float breathe = deleting && card.interactable
+                ? 0.5f + 0.5f * Mathf.Sin(Time.unscaledTime * 2.2f - i * 0.35f)
+                : 0f;
+
             Color edge = card.interactable
-                ? Color.Lerp(CardEdgeIdle, CardEdgeHover, card.hover)
+                ? Color.Lerp(CardEdgeIdle, CardEdgeHover, Mathf.Max(card.hover, breathe * 0.30f))
                 : CardEdgeDisabled;
             card.edge.color = edge;
 
             card.sheen.color = new Color(1f, 1f, 1f, 0.06f * card.hover);
 
-            Color accent = Steel;
-            accent.a = 0.85f * card.hover;
+            Color accent = HoverGrey;
+            accent.a = 0.85f * Mathf.Max(card.hover, breathe * 0.35f);
             card.accent.color = accent;
 
             card.number.color = card.interactable
-                ? Color.Lerp(NumberIdle, Steel, card.hover)
+                ? Color.Lerp(NumberIdle, HoverGrey, Mathf.Max(card.hover, breathe * 0.25f))
                 : NumberDisabled;
 
             card.rect.localScale = Vector3.one * (1f - 0.008f * card.press);
+
+            bool showDeleteTab = card.deleteTab != null
+                && card.hasSave
+                && card.interactable
+                && !deleting
+                && card.hovered;
+
+            if (card.deleteTab != null && card.deleteTab.gameObject.activeSelf != showDeleteTab)
+                card.deleteTab.gameObject.SetActive(showDeleteTab);
         }
     }
 
@@ -878,8 +1270,47 @@ public sealed class SaveMenuUI : MonoBehaviour
             && SaveGameManager.Instance != null
             && SaveGameManager.Instance.CanPause;
 
-        if (pauseHintCanvas.enabled != show)
-            pauseHintCanvas.enabled = show;
+        // The tab names the button the player actually holds: a pad reports its start button,
+        // everything else uses escape.
+        if (pauseHintLabel != null)
+        {
+            string label = GamepadConnected() ? "OPTIONS" : "MENU";
+
+            if (pauseHintLabel.text != label)
+                pauseHintLabel.text = label;
+        }
+
+        float deltaTime = Time.unscaledDeltaTime;
+
+        if (show)
+        {
+            // The first appearance is the slow one; after that the player knows the tab is there
+            // and only needs it back.
+            float duration = pauseHintRevealed ? PauseHintReturn : PauseHintFade;
+            pauseHintRevealed = true;
+
+            pauseHintReveal = Mathf.MoveTowards(
+                pauseHintReveal,
+                1f,
+                deltaTime / Mathf.Max(duration, 0.0001f));
+        }
+        else
+        {
+            // The tab leaves with the menu it belongs to instead of being cut off the instant the
+            // pause screen appears.
+            pauseHintReveal = Mathf.MoveTowards(
+                pauseHintReveal,
+                0f,
+                deltaTime / Mathf.Max(PauseHintHide, 0.0001f));
+        }
+
+        if (pauseHintGroup != null)
+            pauseHintGroup.alpha = 1f - Mathf.Pow(1f - pauseHintReveal, 3f);
+
+        bool visible = show || pauseHintReveal > 0.001f;
+
+        if (pauseHintCanvas.enabled != visible)
+            pauseHintCanvas.enabled = visible;
     }
 
     // ------------------------------------------------------------------ construction
@@ -898,6 +1329,11 @@ public sealed class SaveMenuUI : MonoBehaviour
         pauseHintCanvas = canvasObject.GetComponent<Canvas>();
         pauseHintCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
         pauseHintCanvas.sortingOrder = 4000;
+
+        // The tab fades in the first time a chapter offers it, so it arrives rather than being
+        // switched on. The group holds that alpha; the canvas stays the on/off switch.
+        pauseHintGroup = canvasObject.AddComponent<CanvasGroup>();
+        pauseHintGroup.alpha = 0f;
 
         CanvasScaler scaler = canvasObject.GetComponent<CanvasScaler>();
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
@@ -977,10 +1413,12 @@ public sealed class SaveMenuUI : MonoBehaviour
             BoldFont,
             FontStyles.Bold);
         label.characterSpacing = 6f;
+        pauseHintLabel = label;
 
         var fx = new PlateFx
         {
             rect = rect,
+            button = button,
             home = rect.anchoredPosition,
             slide = 0f,
             edge = edge,
@@ -1035,6 +1473,7 @@ public sealed class SaveMenuUI : MonoBehaviour
         BuildConfirm(root);
         BuildLoading(root);
         BuildToast(root);
+        BuildScreenFade();
 
         canvas.enabled = false;
     }
@@ -1135,10 +1574,12 @@ public sealed class SaveMenuUI : MonoBehaviour
         Stretch(panel, 0f, 0f, 0f, 0f);
         pausePanel = panel.gameObject;
 
-        MakeMenuPlate(panel, "ResumeButton", "RESUME", new Vector2(0f, 156f), new Vector2(640f, 84f), ResumePressed);
-        MakeMenuPlate(panel, "SaveButton", "SAVE GAME", new Vector2(0f, 52f), new Vector2(640f, 84f), OpenSave);
-        MakeMenuPlate(panel, "LoadButton", "LOAD GAME", new Vector2(0f, -52f), new Vector2(640f, 84f), OpenPauseLoad);
-        MakeMenuPlate(panel, "MenuButton", "RETURN TO MAIN MENU", new Vector2(0f, -156f), new Vector2(640f, 84f), ReturnToMenuPressed);
+        // Quitting from here makes five rows, so the stack is re-spaced to fit them all.
+        pauseResumeButton = MakeMenuPlate(panel, "ResumeButton", "RESUME", new Vector2(0f, 208f), new Vector2(640f, 84f), ResumePressed);
+        MakeMenuPlate(panel, "SaveButton", "SAVE GAME", new Vector2(0f, 104f), new Vector2(640f, 84f), OpenSave);
+        MakeMenuPlate(panel, "LoadButton", "LOAD GAME", new Vector2(0f, 0f), new Vector2(640f, 84f), OpenPauseLoad);
+        MakeMenuPlate(panel, "MenuButton", "RETURN TO MAIN MENU", new Vector2(0f, -104f), new Vector2(640f, 84f), ReturnToMenuPressed);
+        MakeMenuPlate(panel, "QuitButton", "QUIT GAME", new Vector2(0f, -208f), new Vector2(640f, 84f), QuitFromPausePressed);
     }
 
     void BuildSlotsPanel(RectTransform body)
@@ -1175,7 +1616,7 @@ public sealed class SaveMenuUI : MonoBehaviour
         hintRect.anchorMax = new Vector2(1f, 0.5f);
         hintRect.pivot = new Vector2(0f, 0.5f);
         hintRect.offsetMin = new Vector2(8f, -14f);
-        hintRect.offsetMax = new Vector2(-250f, 14f);
+        hintRect.offsetMax = new Vector2(-700f, 14f);
 
         footerHint = AddText(hintRect, string.Empty, 15.5f, Faint, TextAlignmentOptions.Left, RegularFont, FontStyles.Normal);
 
@@ -1186,7 +1627,29 @@ public sealed class SaveMenuUI : MonoBehaviour
         backRect.sizeDelta = new Vector2(212f, 54f);
         backRect.anchoredPosition = new Vector2(-8f, 0f);
 
-        backButton = CreateInvertedPlate(backRect, "BACK", BackPressed, 17f);
+        backButton = CreateInvertedPlate(backRect, "BACK", BackPressed, 17f, PlateSlant);
+        backLabel = backButton.GetComponentInChildren<TMP_Text>();
+
+        // The delete plate sits beside BACK and only on the two lists, so the delete screen itself
+        // never offers a way to delete again.
+        RectTransform deleteRect = CreateRect("DeleteButton", footer);
+        deleteRect.anchorMin = new Vector2(1f, 0.5f);
+        deleteRect.anchorMax = new Vector2(1f, 0.5f);
+        deleteRect.pivot = new Vector2(1f, 0.5f);
+        deleteRect.sizeDelta = new Vector2(230f, 52f);
+        deleteRect.anchoredPosition = new Vector2(-234f, 0f);
+
+        deleteButton = CreateDarkPlate(deleteRect, "DELETE SAVE", OpenDelete, 15f, Muted, 6f);
+
+        // CONTINUE leads the cluster: one press resumes the newest save, autosave included.
+        RectTransform continueRect = CreateRect("ContinueButton", footer);
+        continueRect.anchorMin = new Vector2(1f, 0.5f);
+        continueRect.anchorMax = new Vector2(1f, 0.5f);
+        continueRect.pivot = new Vector2(1f, 0.5f);
+        continueRect.sizeDelta = new Vector2(200f, 52f);
+        continueRect.anchoredPosition = new Vector2(-478f, 0f);
+
+        continueButton = CreateDarkPlate(continueRect, "CONTINUE", ContinuePressed, 15f, Ink, 6f);
     }
 
     SlotCard BuildCard(Transform parent, int slot)
@@ -1196,6 +1659,7 @@ public sealed class SaveMenuUI : MonoBehaviour
         RectTransform rect = CreateRect("Slot" + slot.ToString("00"), parent);
         rect.sizeDelta = new Vector2(CardWidth, CardHeight);
         card.rect = rect;
+        card.slot = slot;
         card.group = rect.gameObject.AddComponent<CanvasGroup>();
 
         card.edge = CreateSkew(
@@ -1228,7 +1692,7 @@ public sealed class SaveMenuUI : MonoBehaviour
             "Accent",
             new Vector2(5f, 112f),
             new Vector2(20f, 0f),
-            new Color(Steel.r, Steel.g, Steel.b, 0f),
+            new Color(HoverGrey.r, HoverGrey.g, HoverGrey.b, 0f),
             CardSlant);
 
         card.button = rect.gameObject.AddComponent<Button>();
@@ -1316,6 +1780,19 @@ public sealed class SaveMenuUI : MonoBehaviour
         card.emptyLabel = AddText(emptyRect, "EMPTY SLOT", 14f, Ghost, TextAlignmentOptions.Left, RegularFont, FontStyles.Normal);
         card.emptyLabel.characterSpacing = 5f;
 
+        // A compact delete tag under the slot number, shown only while the pointer is on the box
+        // so a written save can be removed without walking the delete list. Keyboard and gamepad
+        // keep using the list, since neither can hover.
+        RectTransform deleteRect = CreateRect("DeleteTab", rect);
+        deleteRect.anchorMin = new Vector2(0f, 0f);
+        deleteRect.anchorMax = new Vector2(0f, 0f);
+        deleteRect.pivot = new Vector2(0f, 0f);
+        deleteRect.sizeDelta = new Vector2(66f, 22f);
+        deleteRect.anchoredPosition = new Vector2(30f, 10f);
+
+        card.deleteTab = CreateDarkPlate(deleteRect, "DEL", () => ShowDeleteConfirm(capturedSlot), 9f, Muted, 4f);
+        card.deleteTab.gameObject.SetActive(false);
+
         return card;
     }
 
@@ -1326,8 +1803,13 @@ public sealed class SaveMenuUI : MonoBehaviour
         AddImage(overlay, Overlay, true);
         confirmPanel = overlay.gameObject;
 
+        // The whole card fades as one group while the box itself does the menu's small pop, so the
+        // dim behind it fades too but does not scale away from the screen edges.
+        confirmGroup = overlay.gameObject.AddComponent<CanvasGroup>();
+
         RectTransform box = CreateRect("ConfirmBox", overlay);
         SetCentered(box, new Vector2(860f, 380f), Vector2.zero);
+        confirmBox = box;
 
         CreateSkew(
             box,
@@ -1374,16 +1856,33 @@ public sealed class SaveMenuUI : MonoBehaviour
         confirmMessage.overflowMode = TextOverflowModes.Overflow;
         confirmMessage.lineSpacing = 6f;
 
-        RectTransform yesRect = CreateRect("ConfirmYes", box);
-        SetCentered(yesRect, new Vector2(250f, 56f), new Vector2(-186f, -132f));
+        // The two plates are centred as one pair, shear included, so the answer sits on the box's
+        // middle line instead of drifting to the left.
+        const float yesWidth = 250f;
+        const float yesHeight = 56f;
+        const float cancelWidth = 220f;
+        const float cancelHeight = 54f;
+        const float gap = 22f;
+        const float plateY = -132f;
 
-        Button yes = CreateInvertedPlate(yesRect, "CONFIRM", ConfirmPressed, 18f);
+        float pairLeft = -(yesWidth + gap + cancelWidth) * 0.5f - PlateSlant * 0.5f;
+
+        RectTransform yesRect = CreateRect("ConfirmYes", box);
+        SetCentered(
+            yesRect,
+            new Vector2(yesWidth, yesHeight),
+            new Vector2(pairLeft + yesWidth * 0.5f, plateY));
+
+        Button yes = CreateInvertedPlate(yesRect, "CONFIRM", ConfirmPressed, 18f, PlateSlant);
         confirmYesLabel = yes.GetComponentInChildren<TMP_Text>();
 
         RectTransform cancelRect = CreateRect("ConfirmCancel", box);
-        SetCentered(cancelRect, new Vector2(220f, 54f), new Vector2(140f, -132f));
+        SetCentered(
+            cancelRect,
+            new Vector2(cancelWidth, cancelHeight),
+            new Vector2(pairLeft + yesWidth + gap + cancelWidth * 0.5f, plateY));
 
-        CreateDarkPlate(cancelRect, "CANCEL", HideConfirm, 18f, Ink, 0f);
+        confirmCancelButton = CreateDarkPlate(cancelRect, "CANCEL", HideConfirm, 18f, Ink, 0f);
 
         confirmPanel.SetActive(false);
     }
@@ -1465,6 +1964,88 @@ public sealed class SaveMenuUI : MonoBehaviour
         OpenLoad(true);
     }
 
+    /// <summary>
+    /// Swaps the slot grid into its delete list. The plate lives in the footer of the save and
+    /// load screens; BACK returns to whichever of them it was opened from.
+    /// </summary>
+    void OpenDelete()
+    {
+        if (!AnySaveExists())
+        {
+            ShowToast("NO SAVES TO DELETE");
+            return;
+        }
+
+        deleteReturnMode = mode == Mode.Save ? Mode.Save : Mode.Load;
+        RefreshCards(Mode.Delete);
+        SetMode(Mode.Delete);
+    }
+
+    void ShowDeleteConfirm(int slot)
+    {
+        if (!SaveSlots.HasSave(slot))
+        {
+            ShowToast("SLOT " + slot.ToString("00") + " IS EMPTY");
+            return;
+        }
+
+        ShowConfirm(
+            "Delete the save in slot " + slot.ToString("00") + "? This cannot be undone.",
+            "DELETE",
+            () => DeleteSlot(slot));
+    }
+
+    void DeleteSlot(int slot)
+    {
+        if (!SaveSlots.Delete(slot))
+        {
+            ShowToast("COULD NOT DELETE SLOT " + slot.ToString("00"));
+            return;
+        }
+
+        // A per-box delete happens on a list screen; a delete-list delete happens in delete mode.
+        Mode listMode = mode == Mode.Save || mode == Mode.Load ? mode : Mode.Delete;
+        RefreshCards(listMode);
+        RefreshDeleteButton();
+        RefreshContinueButton();
+        ShowToast("SLOT " + slot.ToString("00") + " DELETED");
+    }
+
+    /// <summary>Resumes the newest save, autosave included, without opening a box.</summary>
+    void ContinuePressed()
+    {
+        int newest = SaveSlots.NewestSlot();
+
+        if (newest < 0)
+        {
+            ShowToast("NO SAVE TO CONTINUE");
+            return;
+        }
+
+        if (SaveGameManager.Instance != null)
+            SaveGameManager.Instance.LoadFromSlot(newest);
+    }
+
+    /// <summary>CONTINUE belongs to the load list, and only while there is something to resume.</summary>
+    void RefreshContinueButton()
+    {
+        if (continueButton == null)
+            return;
+
+        continueButton.gameObject.SetActive(mode == Mode.Load && SaveSlots.NewestSlot() >= 0);
+    }
+
+    static bool AnySaveExists()
+    {
+        for (int slot = 1; slot <= SaveSlots.SlotCount; slot++)
+        {
+            if (SaveSlots.HasSave(slot))
+                return true;
+        }
+
+        return false;
+    }
+
     void ReturnToMenuPressed()
     {
         ShowConfirm(
@@ -1473,7 +2054,73 @@ public sealed class SaveMenuUI : MonoBehaviour
             () => SaveGameManager.Instance.ReturnToMainMenu());
     }
 
+    /// <summary>
+    /// Quits from under the pause menu. It asks first, and it stays in pause mode while it asks,
+    /// so cancelling leaves the pause screen exactly where it was.
+    /// </summary>
+    void QuitFromPausePressed()
+    {
+        ShowConfirm(
+            "Quit Black Dome? Anything since your last save will be lost.",
+            "QUIT",
+            QuitNow);
+    }
+
     // ------------------------------------------------------------------ ui helpers
+
+    /// <summary>
+    /// Gives the keyboard and gamepad somewhere to start, so a screen can be walked the moment it
+    /// opens rather than waiting for the pointer to wake it up.
+    /// </summary>
+    void SelectDefaultFocus()
+    {
+        if (EventSystem.current == null)
+            return;
+
+        if (mode == Mode.Pause && pauseResumeButton != null)
+        {
+            Select(pauseResumeButton.gameObject);
+            return;
+        }
+
+        if (mode == Mode.Save || mode == Mode.Load || mode == Mode.Delete)
+        {
+            for (int i = 0; i < cards.Count; i++)
+            {
+                if (cards[i].button != null && cards[i].button.IsInteractable())
+                {
+                    Select(cards[i].button.gameObject);
+                    return;
+                }
+            }
+        }
+    }
+
+    /// <summary>The box or plate the keyboard and gamepad are currently on.</summary>
+    static bool IsSelected(GameObject target)
+    {
+        return target != null
+            && EventSystem.current != null
+            && EventSystem.current.currentSelectedGameObject == target;
+    }
+
+    static void Select(GameObject target)
+    {
+        if (target == null || EventSystem.current == null)
+            return;
+
+        if (EventSystem.current.currentSelectedGameObject != target)
+            EventSystem.current.SetSelectedGameObject(target);
+    }
+
+    static bool GamepadConnected()
+    {
+#if ENABLE_INPUT_SYSTEM
+        return Gamepad.current != null;
+#else
+        return false;
+#endif
+    }
 
     Button MakeMenuPlate(
         Transform parent,
@@ -1548,6 +2195,7 @@ public sealed class SaveMenuUI : MonoBehaviour
         var fx = new PlateFx
         {
             rect = rect,
+            button = button,
             home = rect.anchoredPosition,
             slide = slide,
             edge = edge,
@@ -1566,13 +2214,35 @@ public sealed class SaveMenuUI : MonoBehaviour
         return button;
     }
 
-    Button CreateInvertedPlate(RectTransform rect, string label, Action onClick, float fontSize)
+    Button CreateInvertedPlate(
+        RectTransform rect,
+        string label,
+        Action onClick,
+        float fontSize,
+        float slant = 0f)
     {
         // A solid white plate with black type: the inverted button Persona uses for its
-        // confirmations, and the loudest thing on the screen.
-        Image fill = rect.gameObject.AddComponent<Image>();
-        fill.color = InvertedIdle;
-        fill.raycastTarget = true;
+        // confirmations, and the loudest thing on the screen. A slant shears it into the same
+        // slab as the menu plates, so it can stand beside one without the edges clashing.
+        Graphic fill;
+
+        if (slant > 0f)
+        {
+            Vector2 size = rect.rect.size;
+            if (size.x < 2f || size.y < 2f)
+                size = rect.sizeDelta;
+
+            SkewedPanel panel = CreateSkew(rect, "Face", size, Vector2.zero, InvertedIdle, slant);
+            panel.raycastTarget = true;
+            fill = panel;
+        }
+        else
+        {
+            Image image = rect.gameObject.AddComponent<Image>();
+            image.color = InvertedIdle;
+            image.raycastTarget = true;
+            fill = image;
+        }
 
         Button button = rect.gameObject.AddComponent<Button>();
         button.targetGraphic = fill;
@@ -1590,6 +2260,7 @@ public sealed class SaveMenuUI : MonoBehaviour
         var fx = new PlateFx
         {
             rect = rect,
+            button = button,
             home = rect.anchoredPosition,
             slide = 0f,
             fillTint = fill,
@@ -1619,6 +2290,7 @@ public sealed class SaveMenuUI : MonoBehaviour
                 return;
 
             fx.hovered = true;
+            Select(button.gameObject);
             PlayHoverSound();
         });
 
@@ -1653,6 +2325,7 @@ public sealed class SaveMenuUI : MonoBehaviour
                 return;
 
             card.hovered = true;
+            Select(button.gameObject);
             PlayHoverSound();
         });
 

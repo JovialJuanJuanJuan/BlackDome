@@ -8,40 +8,41 @@ using UnityEngine.UI;
 public class UIDustParticles : MonoBehaviour
 {
     [Header("Dust Amount")]
-    [Range(10, 300)]
-    public int particleCount = 100;
+    [Range(10, 900)]
+    public int particleCount = 500;
 
     [Header("Particle Size")]
-    [Range(0.5f, 5f)]
-    public float minSize = 0.8f;
+    [Range(0.5f, 10f)]
+    public float minSize = 2.5f;
 
-    [Range(0.5f, 8f)]
-    public float maxSize = 2.5f;
+    [Range(0.5f, 14f)]
+    public float maxSize = 7f;
 
     [Header("Floating Motion")]
-    [Range(1f, 40f)]
-    public float minSpeed = 3f;
+    [Range(0.05f, 8f)]
+    public float minSpeed = 0.4f;
 
-    [Range(1f, 60f)]
-    public float maxSpeed = 12f;
+    [Range(0.1f, 12f)]
+    public float maxSpeed = 1.8f;
 
     [Range(0f, 5f)]
-    public float wobbleAmount = 1.2f;
+    public float wobbleAmount = 0.5f;
 
-    [Range(0.1f, 3f)]
-    public float wobbleSpeed = 0.7f;
+    [Range(0.05f, 3f)]
+    public float wobbleSpeed = 0.35f;
 
     [Header("Appearance")]
-    [Range(0.05f, 1f)]
-    public float minOpacity = 0.15f;
+    [Range(0.01f, 1f)]
+    public float minOpacity = 0.12f;
 
-    [Range(0.05f, 1f)]
-    public float maxOpacity = 0.65f;
+    [Range(0.01f, 1f)]
+    public float maxOpacity = 0.55f;
 
     [Range(0.1f, 5f)]
-    public float fadeTime = 1.5f;
+    public float fadeTime = 2.2f;
 
     [Header("Drift Direction")]
+    [Tooltip("Shared drift direction. Leave at zero for still air, where every speck wanders on its own slow heading.")]
     public Vector2 windDirection = new Vector2(-0.3f, 1f);
 
     [Header("Optional")]
@@ -71,7 +72,6 @@ public class UIDustParticles : MonoBehaviour
 
         public float phase;
         public float wobble;
-        public float rotationSpeed;
     }
 
     private void Awake()
@@ -80,9 +80,10 @@ public class UIDustParticles : MonoBehaviour
 
         CreateDustTexture();
 
+        // Zero means still air, not a constant upward wind: the dust should hover where it is.
         normalizedWind = windDirection.sqrMagnitude > 0.001f
             ? windDirection.normalized
-            : Vector2.up;
+            : Vector2.zero;
     }
 
     private void Start()
@@ -116,35 +117,40 @@ public class UIDustParticles : MonoBehaviour
                 ? Time.unscaledTime
                 : Time.time;
 
-            // Natural floating movement with gentle turbulence.
+            // Natural floating movement with gentle turbulence: two sines that do not share a
+            // period, so the path wanders instead of repeating a clean loop.
             float wave = time * wobbleSpeed + p.phase;
 
             Vector2 drift = new Vector2(
-                Mathf.Sin(wave) * p.wobble,
+                Mathf.Sin(wave) * p.wobble
+                    + Mathf.Sin(wave * 0.37f + p.phase * 1.7f) * p.wobble * 0.5f,
                 Mathf.Cos(wave * 0.73f + p.phase) * p.wobble
+            );
+
+            // The air turns each mote by a degree or so a second, so its path curves. A straight
+            // line is what made the old specks read as a starfield drifting past.
+            float turn = Mathf.Sin(time * 0.17f + p.phase) * 0.12f * dt;
+            float turnCos = Mathf.Cos(turn);
+            float turnSin = Mathf.Sin(turn);
+
+            p.velocity = new Vector2(
+                p.velocity.x * turnCos - p.velocity.y * turnSin,
+                p.velocity.x * turnSin + p.velocity.y * turnCos
             );
 
             p.position += (p.velocity + drift) * dt;
 
-            // Very slow rotation adds subtle variation.
-            p.rect.localRotation = Quaternion.Euler(
-                0f, 0f, p.phase * 20f + time * p.rotationSpeed
-            );
-
-            // Wrap around the edges so the field stays populated.
+            // A speck that drifts out of the field is retired once it is fully out of sight and
+            // fades back in somewhere else. Wrapping it to the opposite edge would snap it across
+            // the screen in full view.
             float margin = p.size * 2f;
 
-            if (p.position.x > bounds.xMax + margin)
-                p.position.x = bounds.xMin - margin;
-
-            if (p.position.x < bounds.xMin - margin)
-                p.position.x = bounds.xMax + margin;
-
-            if (p.position.y > bounds.yMax + margin)
-                p.position.y = bounds.yMin - margin;
-
-            if (p.position.y < bounds.yMin - margin)
-                p.position.y = bounds.yMax + margin;
+            if (p.position.x < bounds.xMin - margin || p.position.x > bounds.xMax + margin
+                || p.position.y < bounds.yMin - margin || p.position.y > bounds.yMax + margin)
+            {
+                ResetParticle(p, bounds, false);
+                continue;
+            }
 
             p.rect.anchoredPosition = p.position;
 
@@ -213,57 +219,52 @@ public class UIDustParticles : MonoBehaviour
         bool initialSpawn
     )
     {
-        p.size = Random.Range(minSize, maxSize);
-        p.opacity = Random.Range(minOpacity, maxOpacity);
+        // Small motes catch the light while the big ones read as out of focus, so size and
+        // brightness pull against each other instead of every speck being an equal bright dot.
+        float focus = Random.value;
+        p.size = Mathf.Lerp(minSize, maxSize, focus * focus);
+        p.opacity = Mathf.Lerp(maxOpacity, minOpacity, focus) * Random.Range(0.7f, 1f);
 
-        p.lifetime = Random.Range(8f, 22f);
-        p.age = initialSpawn
+        p.lifetime = Random.Range(12f, 30f);
+        p.age = initialSpawn && randomizeOnStart
             ? Random.Range(0f, p.lifetime)
             : 0f;
 
         p.phase = Random.Range(0f, Mathf.PI * 2f);
         p.wobble = Random.Range(0.1f, wobbleAmount);
-        p.rotationSpeed = Random.Range(-4f, 4f);
 
-        // Each speck receives its own slightly different trajectory.
+        // Each speck receives its own slightly different trajectory. With no wind the field is
+        // left still, so every speck wanders on its own slow heading instead of streaming toward
+        // one edge.
         Vector2 wind = normalizedWind;
 
-        Vector2 sideways = new Vector2(-wind.y, wind.x);
-
-        p.velocity =
-            wind * Random.Range(minSpeed, maxSpeed) +
-            sideways * Random.Range(-maxSpeed * 0.3f,
-                                     maxSpeed * 0.3f);
-
-        if (initialSpawn)
+        if (wind.sqrMagnitude > 0.001f)
         {
-            p.position = new Vector2(
-                Random.Range(bounds.xMin, bounds.xMax),
-                Random.Range(bounds.yMin, bounds.yMax)
-            );
+            Vector2 sideways = new Vector2(-wind.y, wind.x);
+
+            p.velocity =
+                wind * Random.Range(minSpeed, maxSpeed) +
+                sideways * Random.Range(-maxSpeed * 0.3f,
+                                         maxSpeed * 0.3f);
         }
         else
         {
-            // Respawn at the edge opposite the main drift direction.
-            float margin = 5f;
+            float heading = Random.Range(0f, Mathf.PI * 2f);
+            float speed = Random.Range(minSpeed, maxSpeed);
 
-            if (Mathf.Abs(wind.x) > Mathf.Abs(wind.y))
-            {
-                p.position = new Vector2(
-                    wind.x > 0f ? bounds.xMin - margin
-                                : bounds.xMax + margin,
-                    Random.Range(bounds.yMin, bounds.yMax)
-                );
-            }
-            else
-            {
-                p.position = new Vector2(
-                    Random.Range(bounds.xMin, bounds.xMax),
-                    wind.y > 0f ? bounds.yMin - margin
-                                : bounds.yMax + margin
-                );
-            }
+            p.velocity = new Vector2(
+                Mathf.Cos(heading) * speed,
+                Mathf.Sin(heading) * speed
+            );
         }
+
+        // Specks are scattered over the whole field on every spawn. Pinning respawns to the edge
+        // opposite the wind is what drained the rest of the screen and left the dust banked up
+        // along one side.
+        p.position = new Vector2(
+            Random.Range(bounds.xMin, bounds.xMax),
+            Random.Range(bounds.yMin, bounds.yMax)
+        );
 
         p.rect.sizeDelta = new Vector2(p.size, p.size);
         p.rect.anchoredPosition = p.position;
@@ -290,9 +291,11 @@ public class UIDustParticles : MonoBehaviour
 
         Color[] pixels = new Color[resolution * resolution];
 
-        // A soft, slightly irregular particle instead of a hard circle.
+        // A soft, uneven mote: one noise layer bends the outline, a finer one grains it. The
+        // falloff is a wide gaussian with no hard rim and no pinpoint of full white, which is what
+        // made the old sprite read as a sharp star.
         float center = (resolution - 1) * 0.5f;
-        float radius = resolution * 0.44f;
+        float radius = resolution * 0.47f;
 
         for (int y = 0; y < resolution; y++)
         {
@@ -301,27 +304,29 @@ public class UIDustParticles : MonoBehaviour
                 float nx = (x - center) / radius;
                 float ny = (y - center) / radius;
 
+                float warp = Mathf.PerlinNoise(
+                    nx * 2.1f + 31.7f,
+                    ny * 2.1f + 9.2f
+                ) - 0.5f;
+
+                float grain = Mathf.PerlinNoise(
+                    nx * 6.4f + 4.1f,
+                    ny * 6.4f + 18.3f
+                ) - 0.5f;
+
                 float distance = Mathf.Sqrt(nx * nx + ny * ny);
+                float shape = distance / (1f + warp * 0.45f);
 
-                float noise = Mathf.PerlinNoise(
-                    x * 0.19f + 12.4f,
-                    y * 0.19f + 6.8f
-                );
-
-                float irregularRadius =
-                    0.92f + (noise - 0.5f) * 0.12f;
-
-                float edge = 1f - Mathf.SmoothStep(
-                    irregularRadius - 0.30f,
-                    irregularRadius,
-                    distance
-                );
-
-                float glow = Mathf.Exp(-distance * distance * 5f);
+                float core = Mathf.Exp(-shape * shape * 4.2f);
+                float halo = Mathf.Exp(-shape * shape * 1.1f);
 
                 float alpha = Mathf.Clamp01(
-                    edge * 0.55f + glow * 0.45f
-                );
+                    (core * 0.34f + halo * 0.30f) * (0.78f + grain * 0.44f)
+                ) * 0.9f;
+
+                // Take the last of the haze out at the square's edge, so a large mote never
+                // shows the bounds of its texture.
+                alpha *= 1f - Mathf.SmoothStep(0.7f, 1f, distance);
 
                 pixels[y * resolution + x] =
                     new Color(1f, 1f, 1f, alpha);
