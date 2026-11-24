@@ -863,7 +863,7 @@ RectTransform:
   m_GameObject: {fileID: 311618198}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.9, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2015582266}
@@ -871,7 +871,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
   m_AnchoredPosition: {x: 0, y: 501}
-  m_SizeDelta: {x: 600, y: 1000}
+  m_SizeDelta: {x: 1000, y: 1000}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &311618200
 MonoBehaviour:
@@ -893,7 +893,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: 1a5daae158d79ef41b481f06d09e122e, type: 3}
+  m_Texture: {fileID: 2800000, guid: b7208ab09c164c649a38690e4d2a0c37, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -1632,6 +1632,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TextCreator
   transferText: 
   internalCount: 0
+  charDelay: 0.03
+  sentencePause: 0.18
+  clausePause: 0.08
+  revealDuration: 0.16
+  revealRise: 0.16
+  revealStartScale: 0.8
+  revealTint: {r: 1, g: 0.96, b: 0.86, a: 1}
+  revealTintStrength: 0.5
 --- !u!114 &667647224
 MonoBehaviour:
   m_ObjectHideFlags: 0
